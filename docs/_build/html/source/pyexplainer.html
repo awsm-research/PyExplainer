@@ -1,0 +1,253 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>pyexplainer package &#8212; pyexplainer  documentation</title>
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <div class="section" id="pyexplainer-package">
+<h1>pyexplainer package<a class="headerlink" href="#pyexplainer-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pyexplainer.pyexplainer_explainer">
+<span id="pyexplainer-pyexplainer-explainer-module"></span><h2>pyexplainer.pyexplainer_explainer module<a class="headerlink" href="#module-pyexplainer.pyexplainer_explainer" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="pyexplainer.pyexplainer_explainer.Explainer">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_explainer.</span></code><code class="sig-name descname"><span class="pre">Explainer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bullet_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">risk_data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_explainer.html#Explainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_explainer.Explainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>__init__ method of Explainer class.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param1</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – A list of dictionary that contains the specification of the bullet chart to be created.</p></li>
+<li><p><strong>param2</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code> of <code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – A list of dictionary that contains the information about risk scores.</p></li>
+<li><p><strong>param3</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">np.random.RandomState</span></code>, default is None) – A RandomState instance.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_explainer.Explainer.generate_html">
+<code class="sig-name descname"><span class="pre">generate_html</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_explainer.html#Explainer.generate_html"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_explainer.Explainer.generate_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate html and return it as a String.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>html String</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pypkgs</span> <span class="kn">import</span> <span class="n">pypkgs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([</span><span class="s2">&quot;character&quot;</span><span class="p">,</span> <span class="s2">&quot;hits&quot;</span><span class="p">,</span> <span class="s2">&quot;your&quot;</span><span class="p">,</span> <span class="s2">&quot;eyeballs&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([</span><span class="s2">&quot;but&quot;</span><span class="p">,</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;where it&quot;</span><span class="p">,</span> <span class="s2">&quot;counts&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pypkgs</span><span class="o">.</span><span class="n">catbind</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="go">[character, hits, your, eyeballs, but, integer, where it, counts]</span>
+<span class="go">Categories (8, object): [but, character, counts,</span>
+<span class="go">eyeballs, hits, integer, where it, your]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_explainer.Explainer.get_bullet_data">
+<code class="sig-name descname"><span class="pre">get_bullet_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_explainer.html#Explainer.get_bullet_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_explainer.Explainer.get_bullet_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_explainer.Explainer.get_random_state">
+<code class="sig-name descname"><span class="pre">get_random_state</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_explainer.html#Explainer.get_random_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_explainer.Explainer.get_random_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_explainer.Explainer.get_risk_data">
+<code class="sig-name descname"><span class="pre">get_risk_data</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_explainer.html#Explainer.get_risk_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_explainer.Explainer.get_risk_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_explainer.Explainer.set_bullet_data">
+<code class="sig-name descname"><span class="pre">set_bullet_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">bullet_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_explainer.html#Explainer.set_bullet_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_explainer.Explainer.set_bullet_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_explainer.Explainer.set_random_state">
+<code class="sig-name descname"><span class="pre">set_random_state</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">random_state</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_explainer.html#Explainer.set_random_state"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_explainer.Explainer.set_random_state" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_explainer.Explainer.set_risk_data">
+<code class="sig-name descname"><span class="pre">set_risk_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">risk_data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_explainer.html#Explainer.set_risk_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_explainer.Explainer.set_risk_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_explainer.Explainer.show_visualisation">
+<code class="sig-name descname"><span class="pre">show_visualisation</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_explainer.html#Explainer.show_visualisation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_explainer.Explainer.show_visualisation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display the html string in a cell of Jupyter Notebook.</p>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pypkgs</span> <span class="kn">import</span> <span class="n">pypkgs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([</span><span class="s2">&quot;character&quot;</span><span class="p">,</span> <span class="s2">&quot;hits&quot;</span><span class="p">,</span> <span class="s2">&quot;your&quot;</span><span class="p">,</span> <span class="s2">&quot;eyeballs&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([</span><span class="s2">&quot;but&quot;</span><span class="p">,</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;where it&quot;</span><span class="p">,</span> <span class="s2">&quot;counts&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pypkgs</span><span class="o">.</span><span class="n">catbind</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="go">[character, hits, your, eyeballs, but, integer, where it, counts]</span>
+<span class="go">Categories (8, object): [but, character, counts,</span>
+<span class="go">eyeballs, hits, integer, where it, your]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyexplainer.pyexplainer_explainer.data_validation">
+<code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_explainer.</span></code><code class="sig-name descname"><span class="pre">data_validation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_explainer.html#data_validation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_explainer.data_validation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate the if the given data format is a list of dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>param1</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code>) – Data to be validated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>True: The data is a list of dictionary.</p>
+<p>False: The data is not a list of dictionary.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pypkgs</span> <span class="kn">import</span> <span class="n">pypkgs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([</span><span class="s2">&quot;character&quot;</span><span class="p">,</span> <span class="s2">&quot;hits&quot;</span><span class="p">,</span> <span class="s2">&quot;your&quot;</span><span class="p">,</span> <span class="s2">&quot;eyeballs&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([</span><span class="s2">&quot;but&quot;</span><span class="p">,</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;where it&quot;</span><span class="p">,</span> <span class="s2">&quot;counts&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pypkgs</span><span class="o">.</span><span class="n">catbind</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="go">[character, hits, your, eyeballs, but, integer, where it, counts]</span>
+<span class="go">Categories (8, object): [but, character, counts,</span>
+<span class="go">eyeballs, hits, integer, where it, your]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyexplainer.pyexplainer_explainer.id_generator">
+<code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_explainer.</span></code><code class="sig-name descname"><span class="pre">id_generator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_explainer.html#id_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_explainer.id_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate unique ids for div tag which will contain the visualisation stuff from d3.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>param1</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – An integer that specifies the length of the returned id, default = 15.</p></li>
+<li><p><strong>param2</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">np.random.RandomState</span></code>, default is None.) – A RandomState instance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A random identifier.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pypkgs</span> <span class="kn">import</span> <span class="n">pypkgs</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([</span><span class="s2">&quot;character&quot;</span><span class="p">,</span> <span class="s2">&quot;hits&quot;</span><span class="p">,</span> <span class="s2">&quot;your&quot;</span><span class="p">,</span> <span class="s2">&quot;eyeballs&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">b</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Categorical</span><span class="p">([</span><span class="s2">&quot;but&quot;</span><span class="p">,</span> <span class="s2">&quot;integer&quot;</span><span class="p">,</span> <span class="s2">&quot;where it&quot;</span><span class="p">,</span> <span class="s2">&quot;counts&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pypkgs</span><span class="o">.</span><span class="n">catbind</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+<span class="go">[character, hits, your, eyeballs, but, integer, where it, counts]</span>
+<span class="go">Categories (8, object): [but, character, counts,</span>
+<span class="go">eyeballs, hits, integer, where it, your]</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyexplainer.pyexplainer_model">
+<span id="pyexplainer-pyexplainer-model-module"></span><h2>pyexplainer.pyexplainer_model module<a class="headerlink" href="#module-pyexplainer.pyexplainer_model" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pyexplainer.pyexplainer_prediction">
+<span id="pyexplainer-pyexplainer-prediction-module"></span><h2>pyexplainer.pyexplainer_prediction module<a class="headerlink" href="#module-pyexplainer.pyexplainer_prediction" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pyexplainer">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyexplainer" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="../index.html">pyexplainer</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../conduct.html">Code of Conduct</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2021, Michael Fu.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 3.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="../_sources/source/pyexplainer.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
