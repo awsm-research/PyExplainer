@@ -13,7 +13,6 @@ from sklearn.preprocessing import StandardScaler
 import copy
 import math
 from collections import Counter
-'''for visualisation (to be removed)'''
 import string
 import ipywidgets as widgets
 from IPython.core.display import display, HTML
@@ -110,8 +109,8 @@ class pyExplainer():
         self.blackbox_model = blackbox_model
         self.class_label = class_label
 
-        self.set_bullet_data([{}])
-        self.set_risk_data([{}])
+        self.__set_bullet_data([{}])
+        self.__set_risk_data([{}])
         self.random_state = None
 
         # add setter later
@@ -123,7 +122,7 @@ class pyExplainer():
         self.X_explain = None
         self.y_explain = None
 
-    def __get_bullet_data(self, parsed_rule_object, X_explain):
+    def __generate_bullet_data(self, parsed_rule_object, X_explain):
 
         min_max_values = self.__get_min_max_values()
         # Version 01 - only visualise for what to follow (Rules => Clean)
@@ -202,16 +201,13 @@ class pyExplainer():
             })
         return (bullet_data)
 
-    '''
-    to do
-    '''
+    def __generate_risk_data(self, X_explain):
+        return [{"riskScore": [str(int(round(self.blackbox_model.predict_proba(X_explain)[0][1] * 100, 0))) + '%'],
+                 "riskPred": [self.class_label[self.blackbox_model.predict(X_explain)[0]]],
+                 }]
 
     def __get_class_label(self):
         return self.class_label
-
-    '''
-    to do
-    '''
 
     def __get_min_max_values(self):
         min_values = self.X_train.min()
@@ -221,15 +217,6 @@ class pyExplainer():
 
     '''
     An approach to generate instance using crossover and interpolation
-    '''
-
-    def __get_risk_data(self, X_explain):
-        return [{"riskScore": [str(int(round(self.blackbox_model.predict_proba(X_explain)[0][1] * 100, 0))) + '%'],
-                 "riskPred": [self.class_label[self.blackbox_model.predict(X_explain)[0]]],
-                 }]
-
-    '''
-    to do
     '''
 
     def __generate_instance_crossover_interpolation(self, X_test, y_test, debug=False):
@@ -570,10 +557,6 @@ class pyExplainer():
         return {'synthetic_data': new_df_case,
                 'sampled_class_frequency': sampled_class_frequency}
 
-    '''
-    to do
-    '''
-
     def __parse_top_rules(self, top_k_positive_rules, top_k_negative_rules):
 
         top_variables = []
@@ -637,10 +620,6 @@ class pyExplainer():
                 break
         return {'top_tofollow_rules': top_3_tofollow_rules,
                 'top_toavoid_rules': top_3_toavoid_rules}
-
-    '''
-    to do
-    '''
 
     def explain(self, X_explain, y_explain, top_k=3, max_rules=10, max_iter=10, cv=5, search_function='crossoverinterpolation', debug=False):
 
@@ -715,17 +694,17 @@ class pyExplainer():
         top_rules = self.__parse_top_rules(top_k_positive_rules=pyExp_rule_obj['top_k_positive_rules'],
                                            top_k_negative_rules=pyExp_rule_obj['top_k_negative_rules'])
         X_explain = pyExp_rule_obj['X_explain']
-        self.set_bullet_data(self.__get_bullet_data(top_rules, X_explain))
-        self.set_risk_data(self.__get_risk_data(X_explain))
+        self.__set_bullet_data(self.__generate_bullet_data(top_rules, X_explain))
+        self.__set_risk_data(self.__generate_risk_data(X_explain))
 
         row_name = X_explain.index[0]
         print(X_explain.loc[row_name]['CountStmt'])
         
         self.__show_visualisation()
 
-    def generate_sliders(self):
+    def __generate_sliders(self):
         slider_widgets = []
-        data = self.get_bullet_data()
+        data = self.__generate_bullet_data()
         style = {'description_width': '40%', 'widget_width': '60%'}
         layout = widgets.Layout(width='99%', height='20px')
 
@@ -767,7 +746,7 @@ class pyExplainer():
                 slider_widgets.append(slider)
         return slider_widgets
 
-    def generate_html(self):
+    def __generate_html(self):
         """Generate html and return it as a String.
 
         Returns
@@ -806,9 +785,9 @@ class pyExplainer():
         """ % main_title
 
         unique_id = id_generator(
-            random_state=check_random_state(self.get_random_state()))
-        bullet_data = self.to_js_data(self.get_bullet_data())
-        risk_data = self.to_js_data(self.get_risk_data())
+            random_state=check_random_state(self.__get_random_state()))
+        bullet_data = self.__to_js_data(self.__generate_bullet_data())
+        risk_data = self.__to_js_data(self.__generate_risk_data())
 
         d3_operation_script = """
         <script>
@@ -900,7 +879,7 @@ class pyExplainer():
 
         return html
 
-    def generate_progress_bar_items(self):
+    def __generate_progress_bar_items(self):
         progress_bar = widgets.FloatProgress(
             value=0,
             min=0,
@@ -912,39 +891,42 @@ class pyExplainer():
 
         left_text = widgets.Label("Risk Score: ")
         right_text = widgets.Label("0")
-        self.set_hbox_items(
+        self.__set_hbox_items(
             [left_text, progress_bar, right_text, widgets.Label("%")])
 
-    def get_bullet_data(self):
+    def __generate_bullet_data(self):
         return self.bullet_data
 
     def __get_hbox_items(self):
         return self.hbox_items
 
-    def get_random_state(self):
+    def __get_random_state(self):
         return self.random_state
 
-    def get_risk_data(self):
+    def __generate_risk_data(self):
         return self.risk_data
 
-    def get_risk_pred(self):
-        return self.get_risk_data()[0]['riskPred'][0]
+    def __get_risk_pred(self):
+        return self.__generate_risk_data()[0]['riskPred'][0]
 
-    def get_risk_score(self):
-        risk_score = self.get_risk_data()[0]['riskScore'][0].strip("%")
+    def __get_risk_score(self):
+        risk_score = self.__generate_risk_data()[0]['riskScore'][0].strip("%")
         return float(risk_score)
 
-    def on_value_change(self, change):
+    def __on_value_change(self, change):
+        return 
+        # func not completed
+        """
         # get var changed
         id = int(change['owner'].description.split(" ")[0].strip("#"))
-        var_changed = self.get_bullet_data()[id-1]['varRef']
+        var_changed = self.__generate_bullet_data()[id-1]['varRef']
         new_value = change.new
         # modify changed var in X_explain
         row_name = self.X_explain.index[0]
         self.X_explain.at[row_name, var_changed] = new_value
         print(self.X_explain.loc[row_name]['CountStmt'])
-        print(self.__get_risk_data(self.X_explain))
-        """
+        print(self.__generate_risk_data(self.X_explain))
+        
         # visualise new plot after var changing
         self.visualise(new_pyExp_rule_obj)
 
@@ -964,14 +946,14 @@ class pyExplainer():
             display(HTML(html))
         """
     
-    def run_bar_animation(self):
+    def __run_bar_animation(self):
         import time
         items_in_hbox = self.__get_hbox_items()
         progress_bar = items_in_hbox[1]
 
-        risk_score = self.get_risk_score()
+        risk_score = self.__get_risk_score()
         risk_prediction = True
-        if self.get_risk_pred().upper() == self.__get_class_label()[0].upper():
+        if self.__get_risk_pred().upper() == self.__get_class_label()[0].upper():
             risk_prediction = False
         if risk_prediction:
             progress_bar.style = {'bar_color': '#FA8128'}
@@ -995,25 +977,25 @@ class pyExplainer():
             time.sleep(.01)
             count += play_speed
         # update the right text
-        self.set_right_text(right_text)
+        self.__set_right_text(right_text)
 
-    def set_bullet_data(self, bullet_data):
+    def __set_bullet_data(self, bullet_data):
         self.bullet_data = bullet_data
 
-    def set_hbox_items(self, hbox_items):
+    def __set_hbox_items(self, hbox_items):
         self.hbox_items = hbox_items
 
-    def set_random_state(self, random_state):
+    def __set_random_state(self, random_state):
         self.random_state = random_state
 
-    def set_risk_data(self, risk_data):
+    def __set_risk_data(self, risk_data):
         self.risk_data = risk_data
 
-    def set_risk_score(self, risk_score):
+    def __set_risk_score(self, risk_score):
         risk_score = str(risk_score) + '%'
-        self.get_risk_data()[0]['riskScore'][0] = risk_score
+        self.__generate_risk_data()[0]['riskScore'][0] = risk_score
 
-    def set_right_text(self, right_text):
+    def __set_right_text(self, right_text):
         self.__get_hbox_items()[2] = right_text
 
     def __show_visualisation(self):
@@ -1030,15 +1012,15 @@ class pyExplainer():
         eyeballs, hits, integer, where it, your]
         """
         # display risk score progress bar
-        self.generate_progress_bar_items()
+        self.__generate_progress_bar_items()
         items = self.__get_hbox_items()
         display(widgets.HBox(items))
-        self.run_bar_animation()
+        self.__run_bar_animation()
 
         # display sliders
-        sliders = self.generate_sliders()
+        sliders = self.__generate_sliders()
         for slider in sliders:
-            slider.observe(self.on_value_change, names='value')
+            slider.observe(self.__on_value_change, names='value')
             display(slider)
 
         out = self.bullet_output
@@ -1046,8 +1028,8 @@ class pyExplainer():
         display(out)
         with out:
             # display d3 bullet chart
-            html = self.generate_html()
+            html = self.__generate_html()
             display(HTML(html))
 
-    def to_js_data(self, list_of_dict):
+    def __to_js_data(self, list_of_dict):
         return (str(list_of_dict) + ";")
