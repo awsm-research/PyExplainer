@@ -1,0 +1,1263 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>pyexplainer.pyexplainer_pyexplainer &mdash; pyexplainer  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> pyexplainer
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../conduct.html">Code of Conduct</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">pyexplainer</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>pyexplainer.pyexplainer_pyexplainer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for pyexplainer.pyexplainer_pyexplainer</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">BaseEstimator</span>
+<span class="kn">from</span> <span class="nn">sklearn.base</span> <span class="kn">import</span> <span class="n">TransformerMixin</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">GradientBoostingRegressor</span><span class="p">,</span> <span class="n">GradientBoostingClassifier</span><span class="p">,</span> <span class="n">RandomForestRegressor</span><span class="p">,</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LassoCV</span><span class="p">,</span> <span class="n">LogisticRegressionCV</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">reduce</span>
+<span class="kn">import</span> <span class="nn">sklearn</span>
+<span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">check_random_state</span>
+<span class="kn">import</span> <span class="nn">scipy</span> <span class="k">as</span> <span class="nn">sp</span>
+<span class="kn">from</span> <span class="nn">rulefit</span> <span class="kn">import</span> <span class="n">RuleCondition</span><span class="p">,</span> <span class="n">Rule</span><span class="p">,</span> <span class="n">RuleEnsemble</span><span class="p">,</span> <span class="n">RuleFit</span><span class="p">,</span> <span class="n">FriedScale</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">ipywidgets</span> <span class="k">as</span> <span class="nn">widgets</span>
+<span class="kn">from</span> <span class="nn">IPython.core.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">clear_output</span>
+
+
+<div class="viewcode-block" id="id_generator"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.id_generator">[docs]</a><span class="k">def</span> <span class="nf">id_generator</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate unique ids for div tag which will contain the visualisation stuff from d3.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param1 : :obj:`int`</span>
+<span class="sd">        An integer that specifies the length of the returned id, default = 15.</span>
+<span class="sd">    param2 : :obj:`np.random.RandomState`, default is None.</span>
+<span class="sd">        A RandomState instance.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :obj:`str`</span>
+<span class="sd">        A random identifier.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from pypkgs import pypkgs</span>
+<span class="sd">    &gt;&gt;&gt; a = pd.Categorical([&quot;character&quot;, &quot;hits&quot;, &quot;your&quot;, &quot;eyeballs&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; b = pd.Categorical([&quot;but&quot;, &quot;integer&quot;, &quot;where it&quot;, &quot;counts&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; pypkgs.catbind(a, b)</span>
+<span class="sd">    [character, hits, your, eyeballs, but, integer, where it, counts]</span>
+<span class="sd">    Categories (8, object): [but, character, counts,</span>
+<span class="sd">    eyeballs, hits, integer, where it, your]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">chars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">random_state</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">chars</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="data_validation"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.data_validation">[docs]</a><span class="k">def</span> <span class="nf">data_validation</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Validate the if the given data format is a list of dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param1 : :obj:`Any`</span>
+<span class="sd">        Data to be validated.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :obj:`bool`</span>
+<span class="sd">        True: The data is a list of dictionary.\n</span>
+<span class="sd">        False: The data is not a list of dictionary.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from pypkgs import pypkgs</span>
+<span class="sd">    &gt;&gt;&gt; a = pd.Categorical([&quot;character&quot;, &quot;hits&quot;, &quot;your&quot;, &quot;eyeballs&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; b = pd.Categorical([&quot;but&quot;, &quot;integer&quot;, &quot;where it&quot;, &quot;counts&quot;])</span>
+<span class="sd">    &gt;&gt;&gt; pypkgs.catbind(a, b)</span>
+<span class="sd">    [character, hits, your, eyeballs, but, integer, where it, counts]</span>
+<span class="sd">    Categories (8, object): [but, character, counts,</span>
+<span class="sd">    eyeballs, hits, integer, where it, your]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">==</span> <span class="s2">&quot;&lt;class &#39;list&#39;&gt;&quot;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> <span class="o">!=</span> <span class="s2">&quot;&lt;class &#39;dict&#39;&gt;&quot;</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;Data Format Error - the input data should be a list of dictionary&quot;</span><span class="p">)</span>
+                <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">break</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="n">valid</span></div>
+
+
+<div class="viewcode-block" id="PyExplainer"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer">[docs]</a><span class="k">class</span> <span class="nc">PyExplainer</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;A PyExplainer object is able to load training data and ML models to generate human-centric explanation and visualisation</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    param1 : :obj:`pandas.core.frame.DataFrame`</span>
+<span class="sd">        Training data X</span>
+<span class="sd">    param2 : :obj:`pandas.core.series.Series`</span>
+<span class="sd">        Training data y</span>
+<span class="sd">    param3 : :obj:`pandas.core.indexes.base.Index`</span>
+<span class="sd">        to be done... </span>
+<span class="sd">    param4 : :obj:`str`</span>
+<span class="sd">        to be done... </span>
+<span class="sd">    param5 : :obj:`list`</span>
+<span class="sd">        Classification labels, default = [&#39;Clean&#39;, &#39;Defect&#39;]</span>
+<span class="sd">    param6 : :obj:`black box model trained using sklearn`</span>
+<span class="sd">        A black box ML model used to generate the prediction and explanation</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; from pyexplainer_pyexplainer import PyExplainer</span>
+<span class="sd">    &gt;&gt;&gt; ...</span>
+<span class="sd">    &gt;&gt;&gt; ...</span>
+<span class="sd">    &gt;&gt;&gt; ...</span>
+<span class="sd">    sample output to be added here</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">X_train</span><span class="p">,</span>
+                 <span class="n">y_train</span><span class="p">,</span>
+                 <span class="n">indep</span><span class="p">,</span>
+                 <span class="n">dep</span><span class="p">,</span>
+                 <span class="n">class_label</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Clean&#39;</span><span class="p">,</span> <span class="s1">&#39;Defect&#39;</span><span class="p">],</span>
+                 <span class="n">blackbox_model</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+                 <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">indep</span> <span class="o">=</span> <span class="n">indep</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dep</span> <span class="o">=</span> <span class="n">dep</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processed_features</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span> <span class="o">=</span> <span class="n">blackbox_model</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">class_label</span> <span class="o">=</span> <span class="n">class_label</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__set_bullet_data</span><span class="p">([{}])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__set_risk_data</span><span class="p">([{}])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># add setter later</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bullet_output</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">(</span>
+            <span class="n">layout</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="s1">&#39;3px solid black&#39;</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hbox_items</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># store X_explain and y_explain for interactive func</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_explain</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_explain</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">__generate_bullet_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_rule_object</span><span class="p">,</span> <span class="n">X_explain</span><span class="p">):</span>
+
+        <span class="n">min_max_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_min_max_values</span><span class="p">()</span>
+        <span class="c1"># Version 01 - only visualise for what to follow (Rules =&gt; Clean)</span>
+        <span class="n">bullet_data</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parsed_rule_object</span><span class="p">[</span><span class="s1">&#39;top_tofollow_rules&#39;</span><span class="p">])):</span>
+            <span class="c1">#         {&#39;variable&#39;: &#39;MAJOR_COMMIT&#39;, &#39;lessthan&#39;: True, &#39;value&#39;: &#39;1.550000011920929&#39;}</span>
+            <span class="n">tmp_rule</span> <span class="o">=</span> <span class="n">parsed_rule_object</span><span class="p">[</span><span class="s1">&#39;top_tofollow_rules&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">tmp_min</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">min_max_values</span><span class="p">[</span><span class="s1">&#39;min_values&#39;</span><span class="p">][</span><span class="n">tmp_rule</span><span class="p">[</span><span class="s1">&#39;variable&#39;</span><span class="p">]]))</span>
+            <span class="n">tmp_max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="nb">round</span><span class="p">(</span><span class="n">min_max_values</span><span class="p">[</span><span class="s1">&#39;max_values&#39;</span><span class="p">][</span><span class="n">tmp_rule</span><span class="p">[</span><span class="s1">&#39;variable&#39;</span><span class="p">]]))</span>
+            <span class="n">tmp_interval</span> <span class="o">=</span> <span class="p">(</span><span class="n">tmp_max</span> <span class="o">-</span> <span class="n">tmp_min</span><span class="p">)</span> <span class="o">/</span> <span class="mf">10.0</span>
+            <span class="n">tmp_threshold_value</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">tmp_rule</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]),</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">tmp_actual_value</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">X_explain</span><span class="p">[</span><span class="n">tmp_rule</span><span class="p">[</span><span class="s1">&#39;variable&#39;</span><span class="p">]][</span><span class="mi">0</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+
+            <span class="n">tmp_markers</span> <span class="o">=</span> <span class="p">[</span><span class="n">tmp_actual_value</span><span class="p">]</span>
+
+            <span class="n">plot_min</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="nb">round</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">tmp_min</span><span class="p">,</span> <span class="n">tmp_threshold_value</span> <span class="o">-</span> <span class="n">tmp_interval</span><span class="p">),</span> <span class="mi">0</span><span class="p">))</span><span class="o">*</span><span class="mf">1.0</span>
+            <span class="n">plot_max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                <span class="nb">round</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">tmp_max</span><span class="p">,</span> <span class="n">tmp_threshold_value</span> <span class="o">+</span> <span class="n">tmp_interval</span><span class="p">),</span> <span class="mi">0</span><span class="p">))</span><span class="o">*</span><span class="mf">1.0</span>
+
+            <span class="c1"># keep marker in the range</span>
+            <span class="k">if</span> <span class="n">tmp_markers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">plot_max</span><span class="p">:</span>
+                <span class="n">plot_max</span> <span class="o">=</span> <span class="n">tmp_markers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">tmp_markers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">plot_min</span><span class="p">:</span>
+                <span class="n">plot_min</span> <span class="o">=</span> <span class="n">tmp_markers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="n">diff_plot_max_min</span> <span class="o">=</span> <span class="n">plot_max</span> <span class="o">-</span> <span class="n">plot_min</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Min&#39;</span><span class="p">,</span> <span class="n">tmp_min</span><span class="p">,</span> <span class="s1">&#39;Max&#39;</span><span class="p">,</span> <span class="n">tmp_max</span><span class="p">,</span> <span class="s1">&#39;threshold&#39;</span><span class="p">,</span> <span class="n">tmp_threshold_value</span><span class="p">,</span>
+                  <span class="s1">&#39;Actual&#39;</span><span class="p">,</span> <span class="n">tmp_actual_value</span><span class="p">,</span> <span class="s1">&#39;Plot_min&#39;</span><span class="p">,</span> <span class="n">plot_min</span><span class="p">,</span> <span class="s1">&#39;Plot_max&#39;</span><span class="p">,</span> <span class="n">plot_max</span><span class="p">)</span>
+
+            <span class="n">tmp_subtitle_text</span> <span class="o">=</span> <span class="s1">&#39;Actual = &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">tmp_actual_value</span><span class="p">)</span>
+            <span class="n">tmp_ticks</span> <span class="o">=</span> <span class="p">[</span><span class="n">plot_min</span><span class="p">,</span> <span class="n">plot_max</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">plot_max</span> <span class="o">-</span> <span class="n">plot_min</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">:</span>
+                <span class="n">tmp_step</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tmp_step</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+            <span class="n">tmp_startpoints</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="mi">0</span><span class="p">,</span> <span class="nb">round</span><span class="p">((</span><span class="n">tmp_threshold_value</span> <span class="o">-</span> <span class="n">plot_min</span><span class="p">)</span><span class="o">/</span><span class="n">diff_plot_max_min</span> <span class="o">*</span> <span class="mi">760</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+            <span class="n">tmp_widths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">((</span><span class="n">tmp_threshold_value</span> <span class="o">-</span> <span class="n">plot_min</span><span class="p">)</span><span class="o">/</span><span class="n">diff_plot_max_min</span> <span class="o">*</span> <span class="mi">760</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                          <span class="nb">round</span><span class="p">((</span><span class="n">plot_max</span> <span class="o">-</span> <span class="n">tmp_threshold_value</span><span class="p">)</span><span class="o">/</span><span class="n">diff_plot_max_min</span> <span class="o">*</span> <span class="mi">760</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+
+            <span class="nb">id</span> <span class="o">=</span> <span class="s1">&#39;#&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">var_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp_rule</span><span class="p">[</span><span class="s1">&#39;variable&#39;</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">tmp_rule</span><span class="p">[</span><span class="s1">&#39;lessthan&#39;</span><span class="p">]:</span>
+
+                <span class="c1"># lessthan == TRUE:</span>
+                <span class="c1"># The rule suggest to decrease the values to less than a certain threshold</span>
+                <span class="n">tmp_title_text</span> <span class="o">=</span> <span class="nb">id</span><span class="o">+</span><span class="s1">&#39; Decrease the values of &#39;</span> <span class="o">+</span> \
+                    <span class="n">var_name</span><span class="o">+</span><span class="s1">&#39; to less than &#39;</span> <span class="o">+</span> \
+                    <span class="nb">str</span><span class="p">(</span><span class="n">tmp_actual_value</span><span class="p">)</span>
+                <span class="n">tmp_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;#a6d96a&quot;</span><span class="p">,</span> <span class="s2">&quot;#d7191c&quot;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="c1"># lessthan == FALSE:</span>
+                <span class="c1"># The rule suggest to increase the values to more than a certain threshold</span>
+                <span class="n">tmp_title_text</span> <span class="o">=</span> <span class="nb">id</span><span class="o">+</span><span class="s1">&#39; Increase the values of &#39;</span> <span class="o">+</span> \
+                    <span class="n">var_name</span><span class="o">+</span><span class="s1">&#39; to more than &#39;</span> <span class="o">+</span> \
+                    <span class="nb">str</span><span class="p">(</span><span class="n">tmp_actual_value</span><span class="p">)</span>
+                <span class="n">tmp_colors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;#d7191c&quot;</span><span class="p">,</span> <span class="s2">&quot;#a6d96a&quot;</span><span class="p">]</span>
+
+            <span class="n">bullet_data</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">tmp_title_text</span><span class="p">,</span>
+                <span class="s2">&quot;subtitle&quot;</span><span class="p">:</span> <span class="n">tmp_subtitle_text</span><span class="p">,</span>
+                <span class="s2">&quot;ticks&quot;</span><span class="p">:</span> <span class="n">tmp_ticks</span><span class="p">,</span>
+                <span class="s2">&quot;step&quot;</span><span class="p">:</span> <span class="n">tmp_step</span><span class="p">,</span>
+                <span class="s2">&quot;startPoints&quot;</span><span class="p">:</span> <span class="n">tmp_startpoints</span><span class="p">,</span>
+                <span class="s2">&quot;widths&quot;</span><span class="p">:</span> <span class="n">tmp_widths</span><span class="p">,</span>
+                <span class="s2">&quot;colors&quot;</span><span class="p">:</span> <span class="n">tmp_colors</span><span class="p">,</span>
+                <span class="s2">&quot;markers&quot;</span><span class="p">:</span> <span class="n">tmp_markers</span><span class="p">,</span>
+                <span class="s2">&quot;varRef&quot;</span><span class="p">:</span> <span class="n">var_name</span><span class="p">,</span>
+            <span class="p">})</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">bullet_data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__generate_risk_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_explain</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[{</span><span class="s2">&quot;riskScore&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_explain</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span> <span class="o">+</span> <span class="s1">&#39;%&#39;</span><span class="p">],</span>
+                 <span class="s2">&quot;riskPred&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">class_label</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_explain</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]],</span>
+                 <span class="p">}]</span>
+
+    <span class="k">def</span> <span class="nf">__get_class_label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_label</span>
+
+    <span class="k">def</span> <span class="nf">__get_min_max_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">min_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">max_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;min_values&#39;</span><span class="p">:</span> <span class="n">min_values</span><span class="p">,</span>
+                <span class="s1">&#39;max_values&#39;</span><span class="p">:</span> <span class="n">max_values</span><span class="p">}</span>
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    An approach to generate instance using crossover and interpolation</span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__generate_instance_crossover_interpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="n">categorical_vars</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">X_train_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">y_train_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">y_test</span> <span class="o">=</span> <span class="n">y_test</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">X_train_i</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">X_test</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">X_train_i</span> <span class="o">=</span> <span class="n">X_train_i</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]</span>
+        <span class="n">y_train_i</span> <span class="o">=</span> <span class="n">y_train_i</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[[</span><span class="bp">self</span><span class="o">.</span><span class="n">dep</span><span class="p">]]</span>
+
+        <span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]</span>
+        <span class="n">y_test</span> <span class="o">=</span> <span class="n">y_test</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[[</span><span class="bp">self</span><span class="o">.</span><span class="n">dep</span><span class="p">]]</span>
+
+        <span class="c1"># get the global model predictions for the training set</span>
+        <span class="n">target_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train_i</span><span class="p">)</span>
+
+        <span class="c1"># class variables</span>
+        <span class="n">ori_dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">X_train_i</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">y_train_i</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">colnames</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ori_dataset</span><span class="p">)</span>  <span class="c1"># Return column names</span>
+
+        <span class="c1"># Does feature scaling for continuous data and one hot encoding for categorical data</span>
+        <span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
+        <span class="n">trainset_normalize</span> <span class="o">=</span> <span class="n">X_train_i</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">X_train_i</span><span class="p">),</span> <span class="s2">&quot;columns&quot;</span><span class="p">)</span>
+        <span class="n">cases_normalize</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">train_objs_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">trainset_normalize</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">objs</span><span class="o">=</span><span class="p">[</span><span class="n">trainset_normalize</span><span class="p">,</span> <span class="n">cases_normalize</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">,</span> <span class="s2">&quot;continuous&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">))</span>
+        <span class="n">dataset</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">])</span>
+        <span class="c1">#    dataset = pd.get_dummies(dataset, prefix_sep=&quot;__&quot;, columns=self.__categorical_vars)</span>
+        <span class="n">trainset_normalize</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">dataset</span><span class="p">[:</span><span class="n">train_objs_num</span><span class="p">])</span>
+        <span class="n">cases_normalize</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">train_objs_num</span><span class="p">:])</span>
+
+        <span class="n">temp_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([])</span>
+
+        <span class="c1"># make dataframe to store similarities of the trained instances from the explained instance</span>
+        <span class="n">dist_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">trainset_normalize</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+        <span class="n">test_num</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X_train_i</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span> <span class="o">*</span> <span class="mf">0.75</span>
+        <span class="c1"># similarity</span>
+        <span class="k">for</span> <span class="n">count</span><span class="p">,</span> <span class="n">case</span> <span class="ow">in</span> <span class="n">cases_normalize</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+
+            <span class="c1"># Calculate the euclidian distance from the instance to be explained</span>
+            <span class="n">dist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span>
+                <span class="n">trainset_normalize</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">case</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+            <span class="c1"># Convert distance to a similarity score</span>
+            <span class="n">similarity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">dist</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">width</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)))</span>
+
+            <span class="n">dist_df</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">similarity</span>
+            <span class="n">dist_df</span><span class="p">[</span><span class="s1">&#39;t_target&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">target_train</span>
+        <span class="c1">#        dist_df</span>
+            <span class="c1"># get the unique classes of the training set</span>
+            <span class="n">unique_classes</span> <span class="o">=</span> <span class="n">dist_df</span><span class="o">.</span><span class="n">t_target</span><span class="o">.</span><span class="n">unique</span><span class="p">()</span>
+            <span class="c1"># Sort similarity scores in to decending order</span>
+            <span class="n">dist_df</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;dist&#39;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="c1">#        dist_df.reset_index(inplace=True)</span>
+
+            <span class="c1"># Make a dataframe with top 40 elements in each class</span>
+            <span class="n">top_fourty_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([])</span>
+            <span class="k">for</span> <span class="n">clz</span> <span class="ow">in</span> <span class="n">unique_classes</span><span class="p">:</span>
+                <span class="n">top_fourty_df</span> <span class="o">=</span> <span class="n">top_fourty_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="n">dist_df</span><span class="p">[</span><span class="n">dist_df</span><span class="p">[</span><span class="s1">&#39;t_target&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">clz</span><span class="p">]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">40</span><span class="p">))</span>
+
+        <span class="c1">#        top_fourty_df.reset_index(inplace=True)</span>
+
+            <span class="c1"># get the minimum value of the top 40 elements and return the index</span>
+            <span class="n">cutoff_similarity</span> <span class="o">=</span> <span class="n">top_fourty_df</span><span class="o">.</span><span class="n">nsmallest</span><span class="p">(</span>
+                <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;dist&#39;</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="s1">&#39;last&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># Get the location for the given index with the minimum similarity</span>
+            <span class="n">min_loc</span> <span class="o">=</span> <span class="n">dist_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">get_loc</span><span class="p">(</span><span class="n">cutoff_similarity</span><span class="p">)</span>
+            <span class="c1"># whole neighbourhood without undersampling the majority class</span>
+            <span class="n">train_neigh_sampling_b</span> <span class="o">=</span> <span class="n">dist_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">min_loc</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="c1"># get the size of neighbourhood for each class</span>
+            <span class="n">target_details</span> <span class="o">=</span> <span class="n">train_neigh_sampling_b</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span>
+                <span class="p">[</span><span class="s1">&#39;t_target&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">target_details</span><span class="p">,</span> <span class="s2">&quot;target_details&quot;</span><span class="p">)</span>
+            <span class="n">target_details_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+                <span class="p">{</span><span class="s1">&#39;target&#39;</span><span class="p">:</span> <span class="n">target_details</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="s1">&#39;target_count&#39;</span><span class="p">:</span> <span class="n">target_details</span><span class="o">.</span><span class="n">values</span><span class="p">})</span>
+
+            <span class="c1"># Get the majority class and undersample</span>
+            <span class="n">final_neighbours_similarity_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([])</span>
+            <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">target_details_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">row</span><span class="p">[</span><span class="s2">&quot;target_count&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">200</span><span class="p">:</span>
+                    <span class="n">filterd_class_set</span> <span class="o">=</span> <span class="n">train_neigh_sampling_b</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                        <span class="n">train_neigh_sampling_b</span><span class="p">[</span><span class="s1">&#39;t_target&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">n</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
+                    <span class="n">final_neighbours_similarity_df</span> <span class="o">=</span> <span class="n">final_neighbours_similarity_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">filterd_class_set</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">filterd_class_set</span> <span class="o">=</span> <span class="n">train_neigh_sampling_b</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+                        <span class="n">train_neigh_sampling_b</span><span class="p">[</span><span class="s1">&#39;t_target&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">row</span><span class="p">[</span><span class="s1">&#39;target&#39;</span><span class="p">]]</span>
+                    <span class="n">final_neighbours_similarity_df</span> <span class="o">=</span> <span class="n">final_neighbours_similarity_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="n">filterd_class_set</span><span class="p">)</span>
+                    <span class="c1"># print(index,row,&quot;index and row&quot;)</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">final_neighbours_similarity_df</span><span class="p">,</span>
+                      <span class="s2">&quot;final_neighbours_similarity_df&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Get the original training set instances which is equal to the index of the selected neighbours</span>
+            <span class="n">train_set_neigh</span> <span class="o">=</span> <span class="n">X_train_i</span><span class="p">[</span><span class="n">X_train_i</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span>
+                <span class="n">final_neighbours_similarity_df</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">train_set_neigh</span><span class="p">,</span> <span class="s2">&quot;train set neigh&quot;</span><span class="p">)</span>
+            <span class="n">train_class_neigh</span> <span class="o">=</span> <span class="n">y_test</span><span class="p">[</span><span class="n">y_test</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span>
+                <span class="n">final_neighbours_similarity_df</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span>
+            <span class="n">train_neigh_df</span> <span class="o">=</span> <span class="n">train_set_neigh</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">train_class_neigh</span><span class="p">)</span>
+            <span class="n">class_neigh</span> <span class="o">=</span> <span class="n">train_class_neigh</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dep</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+
+            <span class="n">new_con_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([])</span>
+
+            <span class="n">sample_classes_arr</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">sample_indexes_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># Generating 1000 instances using interpolation technique</span>
+            <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">):</span>
+                <span class="n">rand_rows</span> <span class="o">=</span> <span class="n">train_set_neigh</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">sample_indexes_list</span> <span class="o">=</span> <span class="n">sample_indexes_list</span> <span class="o">+</span> <span class="n">rand_rows</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">similarity_both</span> <span class="o">=</span> <span class="n">dist_df</span><span class="p">[</span><span class="n">dist_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">rand_rows</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span>
+                <span class="n">sample_classes</span> <span class="o">=</span> <span class="n">train_class_neigh</span><span class="p">[</span><span class="n">train_class_neigh</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span>
+                    <span class="n">rand_rows</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span>
+                <span class="n">sample_classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                    <span class="n">sample_classes</span><span class="o">.</span><span class="n">to_records</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">))</span>
+                <span class="n">sample_classes_arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample_classes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+                <span class="n">alpha_n</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">rand_rows</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">rand_rows</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">new_ins</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">alpha_n</span>
+                <span class="n">new_ins</span> <span class="o">=</span> <span class="n">new_ins</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+
+                <span class="c1"># For Categorical Variables</span>
+
+                <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">categorical_vars</span><span class="p">:</span>
+
+                    <span class="n">x_df</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+                    <span class="n">y_df</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+
+                    <span class="k">if</span> <span class="n">similarity_both</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">similarity_both</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span>
+                            <span class="s1">&#39;dist&#39;</span><span class="p">]:</span>  <span class="c1"># Check similarity of x &gt; similarity of y</span>
+                        <span class="n">new_ins</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">cat</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">similarity_both</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;dist&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">similarity_both</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span>
+                            <span class="s1">&#39;dist&#39;</span><span class="p">]:</span>  <span class="c1"># Check similarity of y &gt; similarity of x</span>
+                        <span class="n">new_ins</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span> <span class="o">=</span> <span class="n">y_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">cat</span><span class="p">]</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">new_ins</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                            <span class="p">[</span><span class="n">x_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">cat</span><span class="p">],</span> <span class="n">y_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">cat</span><span class="p">]])</span>
+
+                <span class="n">new_ins</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">num</span>
+                <span class="n">new_con_df</span> <span class="o">=</span> <span class="n">new_con_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_ins</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Generating 1000 instances using cross-over technique</span>
+            <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span> <span class="mi">2000</span><span class="p">):</span>
+                <span class="n">rand_rows</span> <span class="o">=</span> <span class="n">train_set_neigh</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+                <span class="n">sample_indexes_list</span> <span class="o">=</span> <span class="n">sample_indexes_list</span> <span class="o">+</span> <span class="n">rand_rows</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">similarity_both</span> <span class="o">=</span> <span class="n">dist_df</span><span class="p">[</span><span class="n">dist_df</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">rand_rows</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span>
+                <span class="n">sample_classes</span> <span class="o">=</span> <span class="n">train_class_neigh</span><span class="p">[</span><span class="n">train_class_neigh</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span>
+                    <span class="n">rand_rows</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span>
+                <span class="n">sample_classes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                    <span class="n">sample_classes</span><span class="o">.</span><span class="n">to_records</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="nb">type</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">matrix</span><span class="p">))</span>
+                <span class="n">sample_classes_arr</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample_classes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+                <span class="n">mu_f</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">rand_rows</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">y</span> <span class="o">=</span> <span class="n">rand_rows</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">z</span> <span class="o">=</span> <span class="n">rand_rows</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">new_ins</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">z</span><span class="p">)</span> <span class="o">*</span> <span class="n">mu_f</span>
+                <span class="n">new_ins</span> <span class="o">=</span> <span class="n">new_ins</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+
+                <span class="c1"># For Categorical Variables get the value of the closest instance to the explained instance</span>
+                <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">categorical_vars</span><span class="p">:</span>
+                    <span class="n">x_df</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+                    <span class="n">y_df</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+                    <span class="n">z_df</span> <span class="o">=</span> <span class="n">z</span><span class="o">.</span><span class="n">to_frame</span><span class="p">()</span><span class="o">.</span><span class="n">T</span>
+
+                    <span class="n">new_ins</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">x_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">cat</span><span class="p">],</span> <span class="n">y_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">cat</span><span class="p">],</span> <span class="n">z_df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">cat</span><span class="p">]])</span>
+
+                <span class="n">new_ins</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">num</span>
+                <span class="n">new_con_df</span> <span class="o">=</span> <span class="n">new_con_df</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_ins</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># get the global model predictions of the generated instances and the instances in the neighbourhood</span>
+            <span class="n">predict_dataset</span> <span class="o">=</span> <span class="n">train_set_neigh</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">new_con_df</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">target</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">predict_dataset</span><span class="p">)</span>
+            <span class="n">target_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+
+            <span class="n">neighbor_frequency</span> <span class="o">=</span> <span class="n">Counter</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">entry</span><span class="p">))</span>
+                                         <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">sample_classes_arr</span><span class="p">)</span>
+
+            <span class="n">new_df_case</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">predict_dataset</span><span class="p">,</span> <span class="n">target_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">new_df_case</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">new_df_case</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">new_df_case</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="n">y_test</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">sampled_class_frequency</span> <span class="o">=</span> <span class="n">new_df_case</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dep</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
+
+            <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;synthetic_data&#39;</span><span class="p">:</span> <span class="n">new_df_case</span><span class="p">,</span>
+                    <span class="s1">&#39;sampled_class_frequency&#39;</span><span class="p">:</span> <span class="n">sampled_class_frequency</span><span class="p">}</span>
+
+    <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">    </span>
+<span class="sd">    This random pertubation approach to generate instances is used by LIME to gerate synthetic instances</span>
+<span class="sd">    </span>
+<span class="sd">    &#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__generate_instance_random_pertubation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_explain</span><span class="p">,</span> <span class="n">y_explain</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="n">n_defect_class</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">random_seed</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">data_row</span> <span class="o">=</span> <span class="p">(</span><span class="n">X_explain</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">num_samples</span> <span class="o">=</span> <span class="mi">1000</span>
+        <span class="n">sampling_method</span> <span class="o">=</span> <span class="s1">&#39;gaussian&#39;</span>
+        <span class="n">discretizer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">sample_around_instance</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">scaler</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">StandardScaler</span><span class="p">(</span><span class="n">with_mean</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">scaler</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">])</span>
+        <span class="n">distance_metric</span> <span class="o">=</span> <span class="s1">&#39;euclidean&#39;</span>
+        <span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="n">random_seed</span><span class="p">)</span>
+        <span class="n">class_names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_label</span>
+
+        <span class="n">is_sparse</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">data_row</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">is_sparse</span><span class="p">:</span>
+            <span class="n">num_cols</span> <span class="o">=</span> <span class="n">data_row</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">data_row</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">num_cols</span> <span class="o">=</span> <span class="n">data_row</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">))</span>
+        <span class="n">categorical_features</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_cols</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">discretizer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">instance_sample</span> <span class="o">=</span> <span class="n">data_row</span>
+            <span class="n">scale</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">scale_</span>
+            <span class="n">mean</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">mean_</span>
+            <span class="k">if</span> <span class="n">is_sparse</span><span class="p">:</span>
+                <span class="c1"># Perturb only the non-zero values</span>
+                <span class="n">non_zero_indexes</span> <span class="o">=</span> <span class="n">data_row</span><span class="o">.</span><span class="n">nonzero</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">num_cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_zero_indexes</span><span class="p">)</span>
+                <span class="n">instance_sample</span> <span class="o">=</span> <span class="n">data_row</span><span class="p">[:,</span> <span class="n">non_zero_indexes</span><span class="p">]</span>
+                <span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span><span class="p">[</span><span class="n">non_zero_indexes</span><span class="p">]</span>
+                <span class="n">mean</span> <span class="o">=</span> <span class="n">mean</span><span class="p">[</span><span class="n">non_zero_indexes</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">sampling_method</span> <span class="o">==</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span> <span class="o">*</span> <span class="n">num_cols</span>
+                                           <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">)</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">sampling_method</span> <span class="o">==</span> <span class="s1">&#39;lhs&#39;</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">lhs</span><span class="p">(</span><span class="n">num_cols</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="n">num_samples</span>
+                           <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">)</span>
+                <span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_cols</span><span class="p">)</span>
+                <span class="n">stdvs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">num_cols</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_cols</span><span class="p">):</span>
+                    <span class="n">data</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span>
+                        <span class="n">loc</span><span class="o">=</span><span class="n">means</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="n">stdvs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;Invalid input for sampling_method.</span>
+<span class="s1">                                 Defaulting to Gaussian sampling.&#39;&#39;&#39;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span> <span class="o">*</span> <span class="n">num_cols</span>
+                                           <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">)</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">sample_around_instance</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">instance_sample</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">mean</span>
+            <span class="k">if</span> <span class="n">is_sparse</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">num_cols</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">((</span><span class="n">num_samples</span><span class="p">,</span>
+                                                 <span class="n">data_row</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
+                                                <span class="n">dtype</span><span class="o">=</span><span class="n">data_row</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">non_zero_indexes</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
+                    <span class="n">indptr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                        <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_zero_indexes</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_samples</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
+                              <span class="nb">len</span><span class="p">(</span><span class="n">non_zero_indexes</span><span class="p">)))</span>
+                    <span class="n">data_1d_shape</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                    <span class="n">data_1d</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">data_1d_shape</span><span class="p">)</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">(</span>
+                        <span class="p">(</span><span class="n">data_1d</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">indptr</span><span class="p">),</span>
+                        <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">data_row</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">categorical_features</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">first_row</span> <span class="o">=</span> <span class="n">data_row</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">first_row</span> <span class="o">=</span> <span class="n">discretizer</span><span class="o">.</span><span class="n">discretize</span><span class="p">(</span><span class="n">data_row</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_row</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">inverse</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">categorical_features</span><span class="p">:</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">feature_values</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
+            <span class="n">freqs</span> <span class="o">=</span> <span class="n">feature_frequencies</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
+            <span class="n">inverse_column</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">num_samples</span><span class="p">,</span>
+                                                 <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">freqs</span><span class="p">)</span>
+            <span class="n">binary_column</span> <span class="o">=</span> <span class="p">(</span><span class="n">inverse_column</span> <span class="o">==</span> <span class="n">first_row</span><span class="p">[</span><span class="n">column</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+            <span class="n">binary_column</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">inverse_column</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span>
+            <span class="n">data</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">binary_column</span>
+            <span class="n">inverse</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">inverse_column</span>
+        <span class="k">if</span> <span class="n">discretizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">inverse</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">discretizer</span><span class="o">.</span><span class="n">undiscretize</span><span class="p">(</span><span class="n">inverse</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="n">inverse</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_row</span>
+
+        <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+            <span class="c1"># Note in sparse case we don&#39;t subtract mean since data would become dense</span>
+            <span class="n">scaled_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">multiply</span><span class="p">(</span><span class="n">scaler</span><span class="o">.</span><span class="n">scale_</span><span class="p">)</span>
+            <span class="c1"># Multiplying with csr matrix can return a coo sparse matrix</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">isspmatrix_csr</span><span class="p">(</span><span class="n">scaled_data</span><span class="p">):</span>
+                <span class="n">scaled_data</span> <span class="o">=</span> <span class="n">scaled_data</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">scaled_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="n">scaler</span><span class="o">.</span><span class="n">mean_</span><span class="p">)</span> <span class="o">/</span> <span class="n">scaler</span><span class="o">.</span><span class="n">scale_</span>
+            <span class="n">distances</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">pairwise_distances</span><span class="p">(</span>
+                <span class="n">scaled_data</span><span class="p">,</span>
+                <span class="n">scaled_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+                <span class="n">metric</span><span class="o">=</span><span class="n">distance_metric</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+
+        <span class="n">new_df_case</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">scaled_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">)</span>
+        <span class="n">sampled_class_frequency</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="n">n_defect_class</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+            <span class="n">new_df_case</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]))</span>
+
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Random seed&#39;</span><span class="p">,</span> <span class="n">random_seed</span><span class="p">,</span> <span class="s1">&#39;nDefective&#39;</span><span class="p">,</span> <span class="n">n_defect_class</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;synthetic_data&#39;</span><span class="p">:</span> <span class="n">new_df_case</span><span class="p">,</span>
+                <span class="s1">&#39;sampled_class_frequency&#39;</span><span class="p">:</span> <span class="n">sampled_class_frequency</span><span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">__parse_top_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">top_k_positive_rules</span><span class="p">,</span> <span class="n">top_k_negative_rules</span><span class="p">):</span>
+
+        <span class="n">top_variables</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">top_3_toavoid_rules</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">top_3_tofollow_rules</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">top_k_positive_rules</span><span class="p">)):</span>
+            <span class="n">tmp_rule</span> <span class="o">=</span> <span class="p">(</span><span class="n">top_k_positive_rules</span><span class="p">[</span><span class="s1">&#39;rule&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">tmp_rule</span> <span class="o">=</span> <span class="n">tmp_rule</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">tmp_rule</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tmp_rule</span><span class="p">,</span> <span class="s1">&#39;&amp;&#39;</span><span class="p">)</span>
+        <span class="c1">#    print(&#39;tmp_rule:&#39;, tmp_rule)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">tmp_rule</span><span class="p">:</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="c1">#print(&#39;subrule:&#39;, j)</span>
+                <span class="n">tmp_sub_rule</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="c1">#        print(tmp_sub_rule)</span>
+                <span class="n">tmp_variable</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">tmp_condition_variable</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">tmp_value</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">tmp_variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_variables</span><span class="p">:</span>
+                    <span class="n">top_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_variable</span><span class="p">)</span>
+                    <span class="n">top_3_toavoid_rules</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                        <span class="s1">&#39;variable&#39;</span><span class="p">:</span> <span class="n">tmp_variable</span><span class="p">,</span>
+                        <span class="s1">&#39;lessthan&#39;</span><span class="p">:</span> <span class="n">tmp_condition_variable</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">tmp_value</span>
+                    <span class="p">})</span>
+
+                <span class="c1">#print(tmp_variable, tmp_condition_variable, tmp_value)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_3_toavoid_rules</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_3_toavoid_rules</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">break</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">top_k_negative_rules</span><span class="p">)):</span>
+
+            <span class="n">tmp_rule</span> <span class="o">=</span> <span class="p">(</span><span class="n">top_k_negative_rules</span><span class="p">[</span><span class="s1">&#39;rule&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">tmp_rule</span> <span class="o">=</span> <span class="n">tmp_rule</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">tmp_rule</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tmp_rule</span><span class="p">,</span> <span class="s1">&#39;&amp;&#39;</span><span class="p">)</span>
+        <span class="c1">#    print(&#39;tmp_rule:&#39;, tmp_rule)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">tmp_rule</span><span class="p">:</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="c1">#print(&#39;subrule:&#39;, j)</span>
+                <span class="n">tmp_sub_rule</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="c1">#        print(tmp_sub_rule)</span>
+                <span class="n">tmp_variable</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">tmp_condition_variable</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">tmp_value</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+
+                <span class="k">if</span> <span class="n">tmp_variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_variables</span><span class="p">:</span>
+                    <span class="n">top_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_variable</span><span class="p">)</span>
+                    <span class="n">top_3_tofollow_rules</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                        <span class="s1">&#39;variable&#39;</span><span class="p">:</span> <span class="n">tmp_variable</span><span class="p">,</span>
+                        <span class="s1">&#39;lessthan&#39;</span><span class="p">:</span> <span class="n">tmp_condition_variable</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span>
+                        <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">tmp_value</span>
+                    <span class="p">})</span>
+
+                <span class="c1">#print(tmp_variable, tmp_condition_variable, tmp_value)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_3_tofollow_rules</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_3_tofollow_rules</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;top_tofollow_rules&#39;</span><span class="p">:</span> <span class="n">top_3_tofollow_rules</span><span class="p">,</span>
+                <span class="s1">&#39;top_toavoid_rules&#39;</span><span class="p">:</span> <span class="n">top_3_toavoid_rules</span><span class="p">}</span>
+
+<div class="viewcode-block" id="PyExplainer.explain"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.explain">[docs]</a>    <span class="k">def</span> <span class="nf">explain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_explain</span><span class="p">,</span> <span class="n">y_explain</span><span class="p">,</span> <span class="n">top_k</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">max_rules</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">search_function</span><span class="o">=</span><span class="s1">&#39;crossoverinterpolation&#39;</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+
+        <span class="c1"># Step 1 - Generate synthetic instances</span>
+        <span class="k">if</span> <span class="n">search_function</span> <span class="o">==</span> <span class="s1">&#39;crossoverinterpolation&#39;</span><span class="p">:</span>
+
+            <span class="n">synthetic_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__generate_instance_crossover_interpolation</span><span class="p">(</span>
+                <span class="n">X_explain</span><span class="p">,</span>
+                <span class="n">y_explain</span><span class="p">,</span>
+                <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+
+        <span class="k">elif</span> <span class="n">search_function</span> <span class="o">==</span> <span class="s1">&#39;randompertubation&#39;</span><span class="p">:</span>
+            <span class="c1"># This random pertubation approach to generate instances is used by LIME to gerate synthetic instances</span>
+            <span class="n">synthetic_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__generate_instance_random_pertubation</span><span class="p">(</span>
+                <span class="n">X_explain</span><span class="o">=</span><span class="n">X_explain</span><span class="p">,</span>
+                <span class="n">y_explain</span><span class="o">=</span><span class="n">y_explain</span><span class="p">,</span>
+                <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># TODO</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;TODO&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Step 2 - Generate predictions of synthetic instances using the global model</span>
+        <span class="n">synthetic_instances</span> <span class="o">=</span> <span class="n">synthetic_object</span><span class="p">[</span><span class="s1">&#39;synthetic_data&#39;</span><span class="p">]</span>
+        <span class="n">synthetic_predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
+            <span class="n">synthetic_instances</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="n">n_defect_class</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">synthetic_predictions</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;nDefect=&#39;</span><span class="p">,</span> <span class="n">n_defect_class</span><span class="p">,</span>
+                  <span class="s1">&#39;from&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">synthetic_predictions</span><span class="p">))</span>
+
+        <span class="c1"># Step 3 - Build a RuleFit local model with synthetic instances</span>
+        <span class="n">indep_index</span> <span class="o">=</span> <span class="p">[</span><span class="nb">list</span><span class="p">(</span><span class="n">synthetic_instances</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                       <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]</span>
+        
+        <span class="n">local_rulefit_model</span> <span class="o">=</span> <span class="n">RuleFit</span><span class="p">(</span><span class="n">rfmode</span><span class="o">=</span><span class="s1">&#39;classify&#39;</span><span class="p">,</span>
+                                      <span class="n">exp_rand_tree_size</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                      <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                                      <span class="n">max_rules</span><span class="o">=</span><span class="n">max_rules</span><span class="p">,</span>
+                                      <span class="c1">#max_iter=max_iter,</span>
+                                      <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span>
+                                      <span class="c1">#n_jobs=-1</span>
+                                      <span class="p">)</span>
+
+        <span class="n">local_rulefit_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span>
+            <span class="n">synthetic_instances</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">,</span> <span class="n">synthetic_predictions</span><span class="p">,</span> <span class="n">feature_names</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Constructed a RuleFit model&#39;</span><span class="p">)</span>
+        <span class="c1"># Step 4 Get rules from theRuleFit local model</span>
+        <span class="n">rules</span> <span class="o">=</span> <span class="n">local_rulefit_model</span><span class="o">.</span><span class="n">get_rules</span><span class="p">()</span>
+        <span class="n">rules</span> <span class="o">=</span> <span class="n">rules</span><span class="p">[</span><span class="n">rules</span><span class="o">.</span><span class="n">coef</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+            <span class="s2">&quot;importance&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">rules</span> <span class="o">=</span> <span class="n">rules</span><span class="p">[</span><span class="n">rules</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;rule&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+            <span class="s2">&quot;importance&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">top_k_positive_rules</span> <span class="o">=</span> <span class="n">rules</span><span class="p">[</span><span class="n">rules</span><span class="o">.</span><span class="n">coef</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+            <span class="s2">&quot;importance&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">top_k</span><span class="p">)</span>
+        <span class="n">top_k_positive_rules</span><span class="p">[</span><span class="s1">&#39;Class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_label</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">top_k_negative_rules</span> <span class="o">=</span> <span class="n">rules</span><span class="p">[</span><span class="n">rules</span><span class="o">.</span><span class="n">coef</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span>
+            <span class="s2">&quot;importance&quot;</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">top_k</span><span class="p">)</span>
+        <span class="n">top_k_negative_rules</span><span class="p">[</span><span class="s1">&#39;Class&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">class_label</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">pyExp_rule_obj</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;synthetic_data&#39;</span><span class="p">:</span> <span class="n">synthetic_instances</span><span class="p">,</span>
+                          <span class="s1">&#39;synthetic_predictions&#39;</span><span class="p">:</span> <span class="n">synthetic_predictions</span><span class="p">,</span>
+                          <span class="s1">&#39;X_explain&#39;</span><span class="p">:</span> <span class="n">X_explain</span><span class="p">,</span>
+                          <span class="s1">&#39;y_explain&#39;</span><span class="p">:</span> <span class="n">y_explain</span><span class="p">,</span>
+                          <span class="s1">&#39;indep&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">,</span>
+                          <span class="s1">&#39;dep&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dep</span><span class="p">,</span>
+                          <span class="s1">&#39;top_k_positive_rules&#39;</span><span class="p">:</span> <span class="n">top_k_positive_rules</span><span class="p">,</span>
+                          <span class="s1">&#39;top_k_negative_rules&#39;</span><span class="p">:</span> <span class="n">top_k_negative_rules</span><span class="p">}</span>
+        <span class="k">return</span> <span class="n">pyExp_rule_obj</span></div>
+
+<div class="viewcode-block" id="PyExplainer.visualise"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.visualise">[docs]</a>    <span class="k">def</span> <span class="nf">visualise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pyExp_rule_obj</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Visualise the explanations with bullet chart and interactive sliders.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        :obj:`dict`</span>
+<span class="sd">            A Rule Object that contains the data to be transferred to visualisation data</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from pyexplainer_pyexplainer import PyExplainer</span>
+<span class="sd">        &gt;&gt;&gt; ...</span>
+<span class="sd">        &gt;&gt;&gt; ...</span>
+<span class="sd">        &gt;&gt;&gt; ...</span>
+<span class="sd">        sample output to be added here</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">top_rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__parse_top_rules</span><span class="p">(</span><span class="n">top_k_positive_rules</span><span class="o">=</span><span class="n">pyExp_rule_obj</span><span class="p">[</span><span class="s1">&#39;top_k_positive_rules&#39;</span><span class="p">],</span>
+                                           <span class="n">top_k_negative_rules</span><span class="o">=</span><span class="n">pyExp_rule_obj</span><span class="p">[</span><span class="s1">&#39;top_k_negative_rules&#39;</span><span class="p">])</span>
+        <span class="n">X_explain</span> <span class="o">=</span> <span class="n">pyExp_rule_obj</span><span class="p">[</span><span class="s1">&#39;X_explain&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__set_bullet_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__generate_bullet_data</span><span class="p">(</span><span class="n">top_rules</span><span class="p">,</span> <span class="n">X_explain</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__set_risk_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__generate_risk_data</span><span class="p">(</span><span class="n">X_explain</span><span class="p">))</span>
+
+        <span class="c1">#row_name = X_explain.index[0]</span>
+        <span class="c1">#print(X_explain.loc[row_name][&#39;CountStmt&#39;])</span>
+        
+        <span class="bp">self</span><span class="o">.</span><span class="n">__show_visualisation</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">__generate_sliders</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">slider_widgets</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_bullet_data</span><span class="p">()</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description_width&#39;</span><span class="p">:</span> <span class="s1">&#39;40%&#39;</span><span class="p">,</span> <span class="s1">&#39;widget_width&#39;</span><span class="p">:</span> <span class="s1">&#39;60%&#39;</span><span class="p">}</span>
+        <span class="n">layout</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;99%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;20px&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+            <span class="c1"># decide to use either IntSlider or FloatSlider</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">],</span> <span class="nb">int</span><span class="p">):</span>
+                <span class="c1"># create IntSlider obj and store it into a list</span>
+                <span class="n">slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">IntSlider</span><span class="p">(</span>
+                    <span class="n">value</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;markers&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="nb">min</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;ticks&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="nb">max</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;ticks&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">step</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">description</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span>
+                    <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+                    <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span>
+                    <span class="n">readout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">readout_format</span><span class="o">=</span><span class="s1">&#39;d&#39;</span>
+                <span class="p">)</span>
+                <span class="n">slider_widgets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">slider</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># create FloatSlider obj and store it into a list</span>
+                <span class="n">slider</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FloatSlider</span><span class="p">(</span>
+                    <span class="n">value</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;markers&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="nb">min</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;ticks&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="nb">max</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;ticks&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">step</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;step&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span>
+                    <span class="n">description</span><span class="o">=</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">],</span>
+                    <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
+                    <span class="n">style</span><span class="o">=</span><span class="n">style</span><span class="p">,</span>
+                    <span class="n">disabled</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">continuous_update</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span>
+                    <span class="n">readout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">readout_format</span><span class="o">=</span><span class="s1">&#39;.1f&#39;</span>
+                <span class="p">)</span>
+                <span class="n">slider_widgets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">slider</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">slider_widgets</span>
+
+    <span class="k">def</span> <span class="nf">__generate_html</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Generate html and return it as a String.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ----------</span>
+<span class="sd">        :obj:`str`</span>
+<span class="sd">            html String</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">css_filepath</span> <span class="o">=</span> <span class="s2">&quot;css/styles.css&quot;</span>
+        <span class="n">css_stylesheet</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">            &lt;link rel=&quot;stylesheet&quot; href=&quot;</span><span class="si">%s</span><span class="s2">&quot; /&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">css_filepath</span><span class="p">)</span>
+
+        <span class="n">d3_filepath</span> <span class="o">=</span> <span class="s2">&quot;js/d3.min.js&quot;</span>
+        <span class="n">bulletjs_filepath</span> <span class="o">=</span> <span class="s2">&quot;js/bullet.js&quot;</span>
+        <span class="n">d3_script</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        &lt;script src=&quot;</span><span class="si">%s</span><span class="s2">&quot;&gt;&lt;/script&gt;</span>
+<span class="s2">        &lt;script src=&quot;</span><span class="si">%s</span><span class="s2">&quot;&gt;&lt;/script&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">d3_filepath</span><span class="p">,</span> <span class="n">bulletjs_filepath</span><span class="p">)</span>
+
+        <span class="n">main_title</span> <span class="o">=</span> <span class="s2">&quot;What to do to decrease the risk of having defects?&quot;</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        &lt;div style=&quot;position: relative; top: 0; width: 100vw; text-align: center&quot;&gt;</span>
+<span class="s2">            &lt;b&gt;</span><span class="si">%s</span><span class="s2">&lt;/b&gt;</span>
+<span class="s2">        &lt;/div&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span> <span class="o">%</span> <span class="n">main_title</span>
+
+        <span class="n">unique_id</span> <span class="o">=</span> <span class="n">id_generator</span><span class="p">(</span>
+            <span class="n">random_state</span><span class="o">=</span><span class="n">check_random_state</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_random_state</span><span class="p">()))</span>
+        <span class="n">bullet_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__to_js_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_bullet_data</span><span class="p">())</span>
+        <span class="n">risk_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__to_js_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_risk_data</span><span class="p">())</span>
+
+        <span class="n">d3_operation_script</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        &lt;script&gt;</span>
+
+<span class="s2">        var margin = { top: 5, right: 40, bottom: 20, left: 500 },</span>
+<span class="s2">          width = 1300 - margin.left - margin.right,</span>
+<span class="s2">          height = 50 - margin.top - margin.bottom;</span>
+
+<span class="s2">        var chart = d3.bullet().width(width).height(height);</span>
+
+<span class="s2">        var bulletData = </span><span class="si">%s</span><span class="s2"></span>
+
+<span class="s2">        var riskData = </span><span class="si">%s</span><span class="s2"></span>
+
+<span class="s2">        // define the color of the box</span>
+<span class="s2">        var boxColor = &quot;box green&quot;;</span>
+<span class="s2">        var riskPred = riskData[0].riskPred[0];</span>
+<span class="s2">        if (riskPred.localeCompare(&quot;Yes&quot;)==0) {</span>
+<span class="s2">            boxColor = &quot;box orange&quot;;</span>
+<span class="s2">        }</span>
+
+<span class="s2">        // append risk prediction and risk score</span>
+<span class="s2">        d3.select(&quot;#d3-target-bullet-</span><span class="si">%s</span><span class="s2">&quot;)</span>
+<span class="s2">          .append(&quot;div&quot;)</span>
+<span class="s2">          .attr(&quot;class&quot;, &quot;riskPred&quot;)</span>
+<span class="s2">          .data(riskData)</span>
+<span class="s2">          .text((d) =&gt; d.riskPred)</span>
+<span class="s2">          .append(&quot;div&quot;)</span>
+<span class="s2">          .attr(&quot;class&quot;, boxColor);</span>
+
+<span class="s2">        d3.select(&quot;#d3-target-bullet-</span><span class="si">%s</span><span class="s2">&quot;)</span>
+<span class="s2">          .append(&quot;div&quot;)</span>
+<span class="s2">          .attr(&quot;class&quot;, &quot;riskScore&quot;)</span>
+<span class="s2">          .data(riskData)</span>
+<span class="s2">          .text((d) =&gt; &quot;Risk Score: &quot; + d.riskScore);</span>
+
+<span class="s2">        var svg = d3</span>
+<span class="s2">          .select(&quot;#d3-target-bullet-</span><span class="si">%s</span><span class="s2">&quot;)</span>
+<span class="s2">          .selectAll(&quot;svg&quot;)</span>
+<span class="s2">          .data(bulletData)</span>
+<span class="s2">          .enter()</span>
+<span class="s2">          .append(&quot;svg&quot;)</span>
+<span class="s2">          .attr(&quot;class&quot;, &quot;bullet&quot;)</span>
+<span class="s2">          .attr(&quot;width&quot;, width + margin.left + margin.right)</span>
+<span class="s2">          .attr(&quot;height&quot;, height + margin.top + margin.bottom)</span>
+<span class="s2">          .append(&quot;g&quot;)</span>
+<span class="s2">          .attr(</span>
+<span class="s2">            &quot;transform&quot;,</span>
+<span class="s2">            &quot;translate(&quot; + margin.left + &quot;,&quot; + margin.top + &quot;)&quot;</span>
+<span class="s2">          )</span>
+<span class="s2">          .call(chart);</span>
+
+<span class="s2">        var title = svg</span>
+<span class="s2">          .append(&quot;g&quot;)</span>
+<span class="s2">          .style(&quot;text-anchor&quot;, &quot;end&quot;)</span>
+<span class="s2">          .attr(&quot;transform&quot;, &quot;translate(-6,&quot; + height / 2 + &quot;)&quot;);</span>
+
+<span class="s2">        title</span>
+<span class="s2">          .append(&quot;text&quot;)</span>
+<span class="s2">          .attr(&quot;class&quot;, &quot;title&quot;)</span>
+<span class="s2">          .text((d) =&gt; d.title);</span>
+
+<span class="s2">        title</span>
+<span class="s2">          .append(&quot;text&quot;)</span>
+<span class="s2">          .attr(&quot;class&quot;, &quot;subtitle&quot;)</span>
+<span class="s2">          .attr(&quot;dy&quot;, &quot;1em&quot;)</span>
+<span class="s2">          .text((d) =&gt; d.subtitle);</span>
+
+<span class="s2">        &lt;/script&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">bullet_data</span><span class="p">,</span> <span class="n">risk_data</span><span class="p">,</span> <span class="n">unique_id</span><span class="p">,</span> <span class="n">unique_id</span><span class="p">,</span> <span class="n">unique_id</span><span class="p">)</span>
+
+        <span class="n">html</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        &lt;!DOCTYPE html&gt;</span>
+<span class="s2">        &lt;html&gt;</span>
+<span class="s2">        &lt;meta http-equiv=&quot;content-type&quot; content=&quot;text/html; charset=UTF8&quot;&gt;</span>
+<span class="s2">        &lt;head&gt;</span>
+<span class="s2">            </span><span class="si">%s</span><span class="s2"></span>
+<span class="s2">            </span><span class="si">%s</span><span class="s2"></span>
+<span class="s2">        &lt;/head&gt;</span>
+<span class="s2">        &lt;body&gt;</span>
+<span class="s2">            &lt;div class=&quot;bullet-chart&quot;&gt;</span>
+<span class="s2">                </span><span class="si">%s</span><span class="s2"></span>
+<span class="s2">                &lt;div class=&quot;d3-target-bullet&quot; id=&quot;d3-target-bullet-</span><span class="si">%s</span><span class="s2">&quot; /&gt;</span>
+<span class="s2">            &lt;/div&gt;</span>
+<span class="s2">            </span><span class="si">%s</span><span class="s2"></span>
+<span class="s2">        &lt;/body&gt;</span>
+<span class="s2">        &lt;/html&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">css_stylesheet</span><span class="p">,</span> <span class="n">d3_script</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">unique_id</span><span class="p">,</span> <span class="n">d3_operation_script</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">html</span>
+
+    <span class="k">def</span> <span class="nf">__generate_progress_bar_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FloatProgress</span><span class="p">(</span>
+            <span class="n">value</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+            <span class="nb">max</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+            <span class="n">bar_style</span><span class="o">=</span><span class="s1">&#39;info&#39;</span><span class="p">,</span>
+            <span class="n">layout</span><span class="o">=</span><span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;40%&#39;</span><span class="p">),</span>
+            <span class="n">orientation</span><span class="o">=</span><span class="s1">&#39;horizontal&#39;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">left_text</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;Risk Score: &quot;</span><span class="p">)</span>
+        <span class="n">right_text</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__set_hbox_items</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">left_text</span><span class="p">,</span> <span class="n">progress_bar</span><span class="p">,</span> <span class="n">right_text</span><span class="p">,</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Label</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">)])</span>
+
+    <span class="k">def</span> <span class="nf">__get_bullet_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bullet_data</span>
+
+    <span class="k">def</span> <span class="nf">__get_hbox_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hbox_items</span>
+
+    <span class="k">def</span> <span class="nf">__get_random_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span>
+
+    <span class="k">def</span> <span class="nf">__get_risk_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">risk_data</span>
+
+    <span class="k">def</span> <span class="nf">__get_risk_pred</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_risk_data</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;riskPred&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__get_risk_score</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">risk_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_risk_data</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;riskScore&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">risk_score</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__on_value_change</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">change</span><span class="p">):</span>
+        <span class="k">return</span> 
+        <span class="c1"># func not completed</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        # get var changed</span>
+<span class="sd">        id = int(change[&#39;owner&#39;].description.split(&quot; &quot;)[0].strip(&quot;#&quot;))</span>
+<span class="sd">        var_changed = self.__generate_bullet_data()[id-1][&#39;varRef&#39;]</span>
+<span class="sd">        new_value = change.new</span>
+<span class="sd">        # modify changed var in X_explain</span>
+<span class="sd">        row_name = self.X_explain.index[0]</span>
+<span class="sd">        self.X_explain.at[row_name, var_changed] = new_value</span>
+<span class="sd">        print(self.X_explain.loc[row_name][&#39;CountStmt&#39;])</span>
+<span class="sd">        print(self.__generate_risk_data(self.X_explain))</span>
+<span class="sd">        </span>
+<span class="sd">        # visualise new plot after var changing</span>
+<span class="sd">        self.visualise(new_pyExp_rule_obj)</span>
+
+<span class="sd">        # update risk score text</span>
+<span class="sd">        self.run_bar_animation()</span>
+
+<span class="sd">        # debugging purpose - to be removed</span>
+<span class="sd">        from time import sleep</span>
+<span class="sd">        sleep(1)</span>
+<span class="sd">        </span>
+<span class="sd">        # update d3 bullet chart</span>
+<span class="sd">        out = self.bullet_output</span>
+<span class="sd">        out.clear_output()</span>
+<span class="sd">        with out:</span>
+<span class="sd">            # display d3 bullet chart</span>
+<span class="sd">            html = self.generate_html()</span>
+<span class="sd">            display(HTML(html))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">__run_bar_animation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="kn">import</span> <span class="nn">time</span>
+        <span class="n">items_in_hbox</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_hbox_items</span><span class="p">()</span>
+        <span class="n">progress_bar</span> <span class="o">=</span> <span class="n">items_in_hbox</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="n">risk_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_risk_score</span><span class="p">()</span>
+        <span class="n">risk_prediction</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_risk_pred</span><span class="p">()</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_class_label</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">():</span>
+            <span class="n">risk_prediction</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">risk_prediction</span><span class="p">:</span>
+            <span class="n">progress_bar</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bar_color&#39;</span><span class="p">:</span> <span class="s1">&#39;#FA8128&#39;</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">progress_bar</span><span class="o">.</span><span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;bar_color&#39;</span><span class="p">:</span> <span class="s1">&#39;#00FF00&#39;</span><span class="p">}</span>
+
+        <span class="c1"># play speed of the animation</span>
+        <span class="n">play_speed</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="c1"># progress bar animation</span>
+        <span class="c1"># count start from the current val of the progress bar</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="n">progress_bar</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">right_text</span> <span class="o">=</span> <span class="n">items_in_hbox</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">while</span> <span class="n">count</span> <span class="o">&lt;</span> <span class="n">risk_score</span><span class="p">:</span>
+            <span class="n">progress_bar</span><span class="o">.</span><span class="n">value</span> <span class="o">+=</span> <span class="n">play_speed</span>  <span class="c1"># signal to increment the progress bar</span>
+            <span class="n">new_progress_value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">right_text</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="n">play_speed</span>
+
+            <span class="k">if</span> <span class="n">new_progress_value</span> <span class="o">&gt;</span> <span class="n">risk_score</span><span class="p">:</span>
+                <span class="n">right_text</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">risk_score</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">right_text</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">new_progress_value</span><span class="p">)</span>
+            <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="o">.</span><span class="mi">01</span><span class="p">)</span>
+            <span class="n">count</span> <span class="o">+=</span> <span class="n">play_speed</span>
+        <span class="c1"># update the right text</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__set_right_text</span><span class="p">(</span><span class="n">right_text</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__set_bullet_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bullet_data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bullet_data</span> <span class="o">=</span> <span class="n">bullet_data</span>
+
+    <span class="k">def</span> <span class="nf">__set_hbox_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hbox_items</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hbox_items</span> <span class="o">=</span> <span class="n">hbox_items</span>
+
+    <span class="k">def</span> <span class="nf">__set_random_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">random_state</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span>
+
+    <span class="k">def</span> <span class="nf">__set_risk_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">risk_data</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">risk_data</span> <span class="o">=</span> <span class="n">risk_data</span>
+
+    <span class="k">def</span> <span class="nf">__set_risk_score</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">risk_score</span><span class="p">):</span>
+        <span class="n">risk_score</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">risk_score</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;%&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__get_risk_data</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;riskScore&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">risk_score</span>
+
+    <span class="k">def</span> <span class="nf">__set_right_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">right_text</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__get_hbox_items</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">right_text</span>
+
+    <span class="k">def</span> <span class="nf">__show_visualisation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Display the html string in a cell of Jupyter Notebook.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; from pypkgs import pypkgs</span>
+<span class="sd">        &gt;&gt;&gt; a = pd.Categorical([&quot;character&quot;, &quot;hits&quot;, &quot;your&quot;, &quot;eyeballs&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; b = pd.Categorical([&quot;but&quot;, &quot;integer&quot;, &quot;where it&quot;, &quot;counts&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; pypkgs.catbind(a, b)</span>
+<span class="sd">        [character, hits, your, eyeballs, but, integer, where it, counts]</span>
+<span class="sd">        Categories (8, object): [but, character, counts,</span>
+<span class="sd">        eyeballs, hits, integer, where it, your]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># display risk score progress bar</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__generate_progress_bar_items</span><span class="p">()</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_hbox_items</span><span class="p">()</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">HBox</span><span class="p">(</span><span class="n">items</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__run_bar_animation</span><span class="p">()</span>
+
+        <span class="c1"># display sliders</span>
+        <span class="n">sliders</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__generate_sliders</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">slider</span> <span class="ow">in</span> <span class="n">sliders</span><span class="p">:</span>
+            <span class="n">slider</span><span class="o">.</span><span class="n">observe</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__on_value_change</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="s1">&#39;value&#39;</span><span class="p">)</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">slider</span><span class="p">)</span>
+
+        <span class="n">out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bullet_output</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">clear_output</span><span class="p">()</span>
+        <span class="n">display</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">out</span><span class="p">:</span>
+            <span class="c1"># display d3 bullet chart</span>
+            <span class="n">html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__generate_html</span><span class="p">()</span>
+            <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="n">html</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">__to_js_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">list_of_dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">list_of_dict</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Michael Fu.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

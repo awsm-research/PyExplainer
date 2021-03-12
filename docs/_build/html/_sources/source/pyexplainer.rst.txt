@@ -4,26 +4,10 @@ pyexplainer package
 Submodules
 ----------
 
-pyexplainer.pyexplainer\_explainer module
------------------------------------------
+pyexplainer.pyexplainer\_pyexplainer module
+-------------------------------------------
 
-.. automodule:: pyexplainer.pyexplainer_explainer
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pyexplainer.pyexplainer\_model module
--------------------------------------
-
-.. automodule:: pyexplainer.pyexplainer_model
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pyexplainer.pyexplainer\_prediction module
-------------------------------------------
-
-.. automodule:: pyexplainer.pyexplainer_prediction
+.. automodule:: pyexplainer.pyexplainer_pyexplainer
    :members:
    :undoc-members:
    :show-inheritance:

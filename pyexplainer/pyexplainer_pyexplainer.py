@@ -86,11 +86,31 @@ def data_validation(data):
     return valid
 
 
-class pyExplainer():
-    """
+class PyExplainer():
+    """A PyExplainer object is able to load training data and ML models to generate human-centric explanation and visualisation
 
-    TODO
+    Parameters
+    ----------
+    param1 : :obj:`pandas.core.frame.DataFrame`
+        Training data X
+    param2 : :obj:`pandas.core.series.Series`
+        Training data y
+    param3 : :obj:`pandas.core.indexes.base.Index`
+        to be done... 
+    param4 : :obj:`str`
+        to be done... 
+    param5 : :obj:`list`
+        Classification labels, default = ['Clean', 'Defect']
+    param6 : :obj:`black box model trained using sklearn`
+        A black box ML model used to generate the prediction and explanation
 
+    Examples
+    --------
+    >>> from pyexplainer_pyexplainer import PyExplainer
+    >>> ...
+    >>> ...
+    >>> ...
+    sample output to be added here
     """
 
     def __init__(self,
@@ -658,9 +678,10 @@ class pyExplainer():
                                       exp_rand_tree_size=False,
                                       random_state=0,
                                       max_rules=max_rules,
-                                      max_iter=max_iter,
+                                      #max_iter=max_iter,
                                       cv=cv,
-                                      n_jobs=-1)
+                                      #n_jobs=-1
+                                      )
 
         local_rulefit_model.fit(
             synthetic_instances.loc[:, self.indep].values, synthetic_predictions, feature_names=self.indep)
@@ -691,20 +712,35 @@ class pyExplainer():
         return pyExp_rule_obj
 
     def visualise(self, pyExp_rule_obj):
+        """Visualise the explanations with bullet chart and interactive sliders.
+
+        Parameters
+        ----------
+        :obj:`dict`
+            A Rule Object that contains the data to be transferred to visualisation data
+
+        Examples
+        --------
+        >>> from pyexplainer_pyexplainer import PyExplainer
+        >>> ...
+        >>> ...
+        >>> ...
+        sample output to be added here
+        """
         top_rules = self.__parse_top_rules(top_k_positive_rules=pyExp_rule_obj['top_k_positive_rules'],
                                            top_k_negative_rules=pyExp_rule_obj['top_k_negative_rules'])
         X_explain = pyExp_rule_obj['X_explain']
         self.__set_bullet_data(self.__generate_bullet_data(top_rules, X_explain))
         self.__set_risk_data(self.__generate_risk_data(X_explain))
 
-        row_name = X_explain.index[0]
-        print(X_explain.loc[row_name]['CountStmt'])
+        #row_name = X_explain.index[0]
+        #print(X_explain.loc[row_name]['CountStmt'])
         
         self.__show_visualisation()
 
     def __generate_sliders(self):
         slider_widgets = []
-        data = self.__generate_bullet_data()
+        data = self.__get_bullet_data()
         style = {'description_width': '40%', 'widget_width': '60%'}
         layout = widgets.Layout(width='99%', height='20px')
 
@@ -753,16 +789,6 @@ class pyExplainer():
         ----------
         :obj:`str`
             html String
-
-        Examples
-        --------
-        >>> from pypkgs import pypkgs
-        >>> a = pd.Categorical(["character", "hits", "your", "eyeballs"])
-        >>> b = pd.Categorical(["but", "integer", "where it", "counts"])
-        >>> pypkgs.catbind(a, b)
-        [character, hits, your, eyeballs, but, integer, where it, counts]
-        Categories (8, object): [but, character, counts,
-        eyeballs, hits, integer, where it, your]
         """
 
         css_filepath = "css/styles.css"
@@ -786,8 +812,8 @@ class pyExplainer():
 
         unique_id = id_generator(
             random_state=check_random_state(self.__get_random_state()))
-        bullet_data = self.__to_js_data(self.__generate_bullet_data())
-        risk_data = self.__to_js_data(self.__generate_risk_data())
+        bullet_data = self.__to_js_data(self.__get_bullet_data())
+        risk_data = self.__to_js_data(self.__get_risk_data())
 
         d3_operation_script = """
         <script>
@@ -894,7 +920,7 @@ class pyExplainer():
         self.__set_hbox_items(
             [left_text, progress_bar, right_text, widgets.Label("%")])
 
-    def __generate_bullet_data(self):
+    def __get_bullet_data(self):
         return self.bullet_data
 
     def __get_hbox_items(self):
@@ -903,14 +929,14 @@ class pyExplainer():
     def __get_random_state(self):
         return self.random_state
 
-    def __generate_risk_data(self):
+    def __get_risk_data(self):
         return self.risk_data
 
     def __get_risk_pred(self):
-        return self.__generate_risk_data()[0]['riskPred'][0]
+        return self.__get_risk_data()[0]['riskPred'][0]
 
     def __get_risk_score(self):
-        risk_score = self.__generate_risk_data()[0]['riskScore'][0].strip("%")
+        risk_score = self.__get_risk_data()[0]['riskScore'][0].strip("%")
         return float(risk_score)
 
     def __on_value_change(self, change):
@@ -993,7 +1019,7 @@ class pyExplainer():
 
     def __set_risk_score(self, risk_score):
         risk_score = str(risk_score) + '%'
-        self.__generate_risk_data()[0]['riskScore'][0] = risk_score
+        self.__get_risk_data()[0]['riskScore'][0] = risk_score
 
     def __set_right_text(self, right_text):
         self.__get_hbox_items()[2] = right_text

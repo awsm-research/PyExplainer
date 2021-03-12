@@ -8,6 +8,12 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.8"
 scikit-learn = "^0.24.1"
+pandas = "^1.2.3"
+numpy = "^1.20.1"
+scipy = "^1.6.1"
+rulefit = "^0.3.1"
+ipywidgets = "^7.6.3"
+ipython = "^7.21.0"
 
 [tool.poetry.dev-dependencies]
 Sphinx = "^3.5.1"
