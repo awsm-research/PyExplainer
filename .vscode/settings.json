@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "C:\\Users\\micha\\anaconda3\\python.exe"
+    "python.pythonPath": "C:\\Users\\micha\\anaconda3\\python.exe",
+    "restructuredtext.languageServer.disabled": true
 }
