@@ -678,10 +678,10 @@ class PyExplainer():
                                       exp_rand_tree_size=False,
                                       random_state=0,
                                       max_rules=max_rules,
+                                      cv=cv
                                       #max_iter=max_iter,
-                                      cv=cv,
                                       #n_jobs=-1
-                                      )
+                                    )
 
         local_rulefit_model.fit(
             synthetic_instances.loc[:, self.indep].values, synthetic_predictions, feature_names=self.indep)
