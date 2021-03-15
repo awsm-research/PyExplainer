@@ -678,10 +678,9 @@ class PyExplainer():
                                       exp_rand_tree_size=False,
                                       random_state=0,
                                       max_rules=max_rules,
-                                      cv=cv
-                                      #max_iter=max_iter,
-                                      #n_jobs=-1
-                                    )
+                                      cv=cv,
+                                      max_iter=max_iter,
+                                      n_jobs=-1)
 
         local_rulefit_model.fit(
             synthetic_instances.loc[:, self.indep].values, synthetic_predictions, feature_names=self.indep)
@@ -712,6 +711,10 @@ class PyExplainer():
         return pyExp_rule_obj
 
     def visualise(self, pyExp_rule_obj):
+        self.visualisation_data_setup(pyExp_rule_obj)
+        self.__show_visualisation()
+
+    def visualisation_data_setup(self, pyExp_rule_obj):
         """Visualise the explanations with bullet chart and interactive sliders.
 
         Parameters
@@ -729,14 +732,9 @@ class PyExplainer():
         """
         top_rules = self.__parse_top_rules(top_k_positive_rules=pyExp_rule_obj['top_k_positive_rules'],
                                            top_k_negative_rules=pyExp_rule_obj['top_k_negative_rules'])
-        X_explain = pyExp_rule_obj['X_explain']
-        self.__set_bullet_data(self.__generate_bullet_data(top_rules, X_explain))
-        self.__set_risk_data(self.__generate_risk_data(X_explain))
-
-        #row_name = X_explain.index[0]
-        #print(X_explain.loc[row_name]['CountStmt'])
-        
-        self.__show_visualisation()
+        self.X_explain = pyExp_rule_obj['X_explain']
+        self.__set_bullet_data(self.__generate_bullet_data(top_rules, self.X_explain))
+        self.__set_risk_data(self.__generate_risk_data(self.X_explain))
 
     def __generate_sliders(self):
         slider_widgets = []
@@ -940,38 +938,42 @@ class PyExplainer():
         return float(risk_score)
 
     def __on_value_change(self, change):
-        return 
-        # func not completed
-        """
+        # step 1 - clear the bullet chart output and risk score bar output
+        bullet_out = self.bullet_output
+        bullet_out.clear_output()
+        
+        # step 2 - compute new values to be visualised
         # get var changed
+        bullet_data = self.__get_bullet_data()
         id = int(change['owner'].description.split(" ")[0].strip("#"))
-        var_changed = self.__generate_bullet_data()[id-1]['varRef']
+        var_changed = bullet_data[id-1]['varRef']
         new_value = change.new
+        print(var_changed)
+        print("new value is ", new_value)
         # modify changed var in X_explain
         row_name = self.X_explain.index[0]
         self.X_explain.at[row_name, var_changed] = new_value
-        print(self.X_explain.loc[row_name]['CountStmt'])
-        print(self.__generate_risk_data(self.X_explain))
-        
-        # visualise new plot after var changing
-        self.visualise(new_pyExp_rule_obj)
+        print("new value", self.X_explain.loc[row_name][var_changed],
+                "has been updated into X_explain")
+        # modify bullet data
+        bullet_data[id-1]['markers'][0] = new_value
+        self.__set_bullet_data(bullet_data)
+        print("bullet data") 
+        print(self.__get_bullet_data())
+        # generate new risk data
+        self.__set_risk_data(self.__generate_risk_data(self.X_explain))
+        print("risk data")
+        print(self.__get_risk_data())
 
-        # update risk score text
-        self.run_bar_animation()
-
-        # debugging purpose - to be removed
-        from time import sleep
-        sleep(1)
-        
-        # update d3 bullet chart
-        out = self.bullet_output
-        out.clear_output()
-        with out:
+        # step 3 - visualise new output
+        # update risk score progress bar
+        self.__run_bar_animation()
+        # update bullet chart
+        with bullet_out:
             # display d3 bullet chart
-            html = self.generate_html()
+            html = self.__generate_html()
             display(HTML(html))
-        """
-    
+
     def __run_bar_animation(self):
         import time
         items_in_hbox = self.__get_hbox_items()
@@ -990,6 +992,7 @@ class PyExplainer():
         play_speed = 1
         # progress bar animation
         # count start from the current val of the progress bar
+        progress_bar.value = 0
         count = progress_bar.value
         right_text = items_in_hbox[2]
         while count < risk_score:
@@ -1049,10 +1052,10 @@ class PyExplainer():
             slider.observe(self.__on_value_change, names='value')
             display(slider)
 
-        out = self.bullet_output
-        out.clear_output()
-        display(out)
-        with out:
+        bullet_out = self.bullet_output
+        bullet_out.clear_output()
+        display(bullet_out)
+        with bullet_out:
             # display d3 bullet chart
             html = self.__generate_html()
             display(HTML(html))

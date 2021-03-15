@@ -10,7 +10,6 @@ python = "^3.8"
 scikit-learn = "^0.24.1"
 numpy = "^1.20.1"
 scipy = "^1.6.1"
-rulefit = "^0.3.1"
 ipywidgets = "^7.6.3"
 ipython = "^7.21.0"
 pandas = "^1.2.3"
@@ -19,6 +18,7 @@ pandas = "^1.2.3"
 Sphinx = "^3.5.1"
 sphinxcontrib-napoleon = "^0.7"
 rope = "^0.18.0"
+pytest = "^6.2.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
