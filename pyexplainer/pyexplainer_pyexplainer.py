@@ -711,10 +711,10 @@ class PyExplainer():
         return pyExp_rule_obj
 
     def visualise(self, pyExp_rule_obj):
-        self.visualisation_data_setup(pyExp_rule_obj)
+        self.__visualisation_data_setup(pyExp_rule_obj)
         self.__show_visualisation()
 
-    def visualisation_data_setup(self, pyExp_rule_obj):
+    def __visualisation_data_setup(self, pyExp_rule_obj):
         """Visualise the explanations with bullet chart and interactive sliders.
 
         Parameters
@@ -732,9 +732,10 @@ class PyExplainer():
         """
         top_rules = self.__parse_top_rules(top_k_positive_rules=pyExp_rule_obj['top_k_positive_rules'],
                                            top_k_negative_rules=pyExp_rule_obj['top_k_negative_rules'])
-        self.X_explain = pyExp_rule_obj['X_explain']
-        self.__set_bullet_data(self.__generate_bullet_data(top_rules, self.X_explain))
-        self.__set_risk_data(self.__generate_risk_data(self.X_explain))
+        self.__set_X_explain(pyExp_rule_obj['X_explain'])
+        self.__set_y_explain(pyExp_rule_obj['y_explain']) 
+        self.__set_bullet_data(self.__generate_bullet_data(top_rules, self.__get_X_explain()))
+        self.__set_risk_data(self.__generate_risk_data(self.__get_X_explain()))
 
     def __generate_sliders(self):
         slider_widgets = []
@@ -936,6 +937,12 @@ class PyExplainer():
     def __get_risk_score(self):
         risk_score = self.__get_risk_data()[0]['riskScore'][0].strip("%")
         return float(risk_score)
+    
+    def __get_X_explain(self):
+        return self.X_explain
+
+    def __get_y_explain(self):
+        return self.y_explain
 
     def __on_value_change(self, change):
         # step 1 - clear the bullet chart output and risk score bar output
@@ -948,22 +955,15 @@ class PyExplainer():
         id = int(change['owner'].description.split(" ")[0].strip("#"))
         var_changed = bullet_data[id-1]['varRef']
         new_value = change.new
-        print(var_changed)
-        print("new value is ", new_value)
         # modify changed var in X_explain
-        row_name = self.X_explain.index[0]
-        self.X_explain.at[row_name, var_changed] = new_value
-        print("new value", self.X_explain.loc[row_name][var_changed],
-                "has been updated into X_explain")
+        X_explain = self.__get_X_explain()
+        row_name = self.__get_X_explain().index[0]
+        X_explain.at[row_name, var_changed] = new_value
         # modify bullet data
         bullet_data[id-1]['markers'][0] = new_value
         self.__set_bullet_data(bullet_data)
-        print("bullet data") 
-        print(self.__get_bullet_data())
         # generate new risk data
-        self.__set_risk_data(self.__generate_risk_data(self.X_explain))
-        print("risk data")
-        print(self.__get_risk_data())
+        self.__set_risk_data(self.__generate_risk_data(X_explain))
 
         # step 3 - visualise new output
         # update risk score progress bar
@@ -1026,6 +1026,12 @@ class PyExplainer():
 
     def __set_right_text(self, right_text):
         self.__get_hbox_items()[2] = right_text
+
+    def __set_X_explain(self, X_explain):
+        self.X_explain = X_explain
+    
+    def __set_y_explain(self, y_explain):
+        self.y_explain = y_explain
 
     def __show_visualisation(self):
         """Display the html string in a cell of Jupyter Notebook.
