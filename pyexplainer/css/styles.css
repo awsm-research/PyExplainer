@@ -45,7 +45,7 @@ body {
   padding-top: 0;
   position: relative;
   width: 100vw;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .d3-target-bullet .riskPred {
@@ -62,5 +62,5 @@ body {
 
 .bullet-chart {
   background-color: white;
-  overflow: auto;
+  overflow: hidden;
 }

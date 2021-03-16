@@ -184,10 +184,10 @@ class PyExplainer():
             else:
                 tmp_step = [1]
 
-            tmp_startpoints = [
-                0, round((tmp_threshold_value - plot_min)/diff_plot_max_min * 760, 0)]
-            tmp_widths = [round((tmp_threshold_value - plot_min)/diff_plot_max_min * 760, 0),
-                          round((plot_max - tmp_threshold_value)/diff_plot_max_min * 760, 0)]
+            bullet_total_width = 450
+            tmp_startpoints = [0, round((tmp_threshold_value - plot_min)/diff_plot_max_min * bullet_total_width, 0)]
+            tmp_widths = [round((tmp_threshold_value - plot_min)/diff_plot_max_min * bullet_total_width, 0),
+                          round((plot_max - tmp_threshold_value)/diff_plot_max_min * bullet_total_width, 0)]
 
             id = '#'+str(i+1)
             var_name = str(tmp_rule['variable'])
@@ -573,7 +573,7 @@ class PyExplainer():
 
         if debug:
             print('Random seed', random_seed, 'nDefective', n_defect_class)
-
+        
         return {'synthetic_data': new_df_case,
                 'sampled_class_frequency': sampled_class_frequency}
 
@@ -662,18 +662,15 @@ class PyExplainer():
             print('TODO')
 
         # Step 2 - Generate predictions of synthetic instances using the global model
-        synthetic_instances = synthetic_object['synthetic_data']
-        synthetic_predictions = self.blackbox_model.predict(
-            synthetic_instances.loc[:, self.indep])
+        synthetic_instances = synthetic_object['synthetic_data'].loc[:, self.indep]
+        synthetic_predictions = self.blackbox_model.predict(synthetic_instances)
         if debug:
             n_defect_class = np.sum(synthetic_predictions)
             print('nDefect=', n_defect_class,
                   'from', len(synthetic_predictions))
 
         # Step 3 - Build a RuleFit local model with synthetic instances
-        indep_index = [list(synthetic_instances.columns).index(i)
-                       for i in self.indep]
-        
+        #indep_index = [list(synthetic_instances.columns).index(i) for i in self.indep]
         local_rulefit_model = RuleFit(rfmode='classify',
                                       exp_rand_tree_size=False,
                                       random_state=0,
@@ -681,23 +678,20 @@ class PyExplainer():
                                       cv=cv,
                                       max_iter=max_iter,
                                       n_jobs=-1)
-
-        local_rulefit_model.fit(
-            synthetic_instances.loc[:, self.indep].values, synthetic_predictions, feature_names=self.indep)
+        local_rulefit_model.fit(synthetic_instances.values,
+                                synthetic_predictions, 
+                                feature_names=self.indep)
         if debug:
             print('Constructed a RuleFit model')
+        
         # Step 4 Get rules from theRuleFit local model
         rules = local_rulefit_model.get_rules()
-        rules = rules[rules.coef != 0].sort_values(
-            "importance", ascending=False)
-        rules = rules[rules.type == 'rule'].sort_values(
-            "importance", ascending=False)
+        rules = rules[rules.coef != 0].sort_values("importance", ascending=False)
+        rules = rules[rules.type == 'rule'].sort_values("importance", ascending=False)
 
-        top_k_positive_rules = rules[rules.coef > 0].sort_values(
-            "importance", ascending=False).head(top_k)
+        top_k_positive_rules = rules[rules.coef > 0].sort_values("importance", ascending=False).head(top_k)
         top_k_positive_rules['Class'] = self.class_label[1]
-        top_k_negative_rules = rules[rules.coef < 0].sort_values(
-            "importance", ascending=False).head(top_k)
+        top_k_negative_rules = rules[rules.coef < 0].sort_values("importance", ascending=False).head(top_k)
         top_k_negative_rules['Class'] = self.class_label[0]
 
         pyExp_rule_obj = {'synthetic_data': synthetic_instances,
@@ -804,7 +798,7 @@ class PyExplainer():
 
         main_title = "What to do to decrease the risk of having defects?"
         title = """
-        <div style="position: relative; top: 0; width: 100vw; text-align: center">
+        <div style="position: relative; top: 0; width: 100vw; left: 27vw;">
             <b>%s</b>
         </div>
         """ % main_title
@@ -818,7 +812,7 @@ class PyExplainer():
         <script>
 
         var margin = { top: 5, right: 40, bottom: 20, left: 500 },
-          width = 1300 - margin.left - margin.right,
+          width = 990 - margin.left - margin.right,
           height = 50 - margin.top - margin.bottom;
 
         var chart = d3.bullet().width(width).height(height);
