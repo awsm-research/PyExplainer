@@ -480,7 +480,7 @@ class RuleFit(BaseEstimator, TransformerMixin):
             self.lscv=LogisticRegressionCV(
                 Cs=Cs, cv=self.cv, penalty='l1', max_iter=self.max_iter,
                 tol=self.tol, n_jobs=self.n_jobs,
-                random_state=self.random_state, solver='liblinear')
+                random_state=self.random_state, solver='lbfgs')
             self.lscv.fit(X_concat, y)
             self.coef_=self.lscv.coef_[0]
             self.intercept_=self.lscv.intercept_[0]
