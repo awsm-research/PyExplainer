@@ -1,14 +1,13 @@
 import pandas as pd
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier, RandomForestRegressor, \
-    RandomForestClassifier
+from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier, RandomForestRegressor, RandomForestClassifier
 from sklearn.linear_model import LassoCV, LogisticRegressionCV
 from functools import reduce
 import sklearn
 from sklearn.utils import check_random_state
 import scipy as sp
-import rulefit
+from rulefit import RuleCondition, Rule, RuleEnsemble, RuleFit, FriedScale
 from sklearn.preprocessing import StandardScaler
 import copy
 import math
@@ -152,9 +151,9 @@ class PyExplainer:
             tmp_markers = [tmp_actual_value]
 
             plot_min = int(
-                round(max(tmp_min, tmp_threshold_value - tmp_interval), 0)) * 1.0
+                round(max(tmp_min, tmp_threshold_value - tmp_interval), 0))*1.0
             plot_max = int(
-                round(min(tmp_max, tmp_threshold_value + tmp_interval), 0)) * 1.0
+                round(min(tmp_max, tmp_threshold_value + tmp_interval), 0))*1.0
 
             # keep marker in the range
             if tmp_markers[0] > plot_max:
@@ -167,7 +166,7 @@ class PyExplainer:
             print('Min', tmp_min, 'Max', tmp_max, 'threshold', tmp_threshold_value,
                   'Actual', tmp_actual_value, 'Plot_min', plot_min, 'Plot_max', plot_max)
 
-            tmp_subtitle_text = 'Actual = ' + str(tmp_actual_value)
+            tmp_subtitle_text = 'Actual = '+str(tmp_actual_value)
             tmp_ticks = [plot_min, plot_max]
 
             if plot_max - plot_min <= 10:
@@ -176,27 +175,27 @@ class PyExplainer:
                 tmp_step = [1]
 
             bullet_total_width = 450
-            tmp_startpoints = [0, round((tmp_threshold_value - plot_min) / diff_plot_max_min * bullet_total_width, 0)]
-            tmp_widths = [round((tmp_threshold_value - plot_min) / diff_plot_max_min * bullet_total_width, 0),
-                          round((plot_max - tmp_threshold_value) / diff_plot_max_min * bullet_total_width, 0)]
+            tmp_startpoints = [0, round((tmp_threshold_value - plot_min)/diff_plot_max_min * bullet_total_width, 0)]
+            tmp_widths = [round((tmp_threshold_value - plot_min)/diff_plot_max_min * bullet_total_width, 0),
+                          round((plot_max - tmp_threshold_value)/diff_plot_max_min * bullet_total_width, 0)]
 
-            id = '#' + str(i + 1)
+            id = '#'+str(i+1)
             var_name = str(tmp_rule['variable'])
             if tmp_rule['lessthan']:
 
                 # lessthan == TRUE:
                 # The rule suggest to decrease the values to less than a certain threshold
-                tmp_title_text = id + ' Decrease the values of ' + \
-                                 var_name + ' to less than ' + \
-                                 str(tmp_actual_value)
+                tmp_title_text = id+' Decrease the values of ' + \
+                    var_name+' to less than ' + \
+                    str(tmp_actual_value)
                 tmp_colors = ["#a6d96a", "#d7191c"]
             else:
 
                 # lessthan == FALSE:
                 # The rule suggest to increase the values to more than a certain threshold
-                tmp_title_text = id + ' Increase the values of ' + \
-                                 var_name + ' to more than ' + \
-                                 str(tmp_actual_value)
+                tmp_title_text = id+' Increase the values of ' + \
+                    var_name+' to more than ' + \
+                    str(tmp_actual_value)
                 tmp_colors = ["#d7191c", "#a6d96a"]
 
             bullet_data.append({
@@ -288,13 +287,13 @@ class PyExplainer:
 
             dist_df['dist'] = similarity
             dist_df['t_target'] = target_train
-            #        dist_df
+        #        dist_df
             # get the unique classes of the training set
             unique_classes = dist_df.t_target.unique()
             # Sort similarity scores in to decending order
             dist_df.sort_values(by=['dist'], ascending=False, inplace=True)
 
-            #        dist_df.reset_index(inplace=True)
+        #        dist_df.reset_index(inplace=True)
 
             # Make a dataframe with top 40 elements in each class
             top_fourty_df = pd.DataFrame([])
@@ -302,7 +301,7 @@ class PyExplainer:
                 top_fourty_df = top_fourty_df.append(
                     dist_df[dist_df['t_target'] == clz].head(40))
 
-            #        top_fourty_df.reset_index(inplace=True)
+        #        top_fourty_df.reset_index(inplace=True)
 
             # get the minimum value of the top 40 elements and return the index
             cutoff_similarity = top_fourty_df.nsmallest(
@@ -378,10 +377,10 @@ class PyExplainer:
                     y_df = y.to_frame().T
 
                     if similarity_both.iloc[0]['dist'] > similarity_both.iloc[1][
-                        'dist']:  # Check similarity of x > similarity of y
+                            'dist']:  # Check similarity of x > similarity of y
                         new_ins[cat] = x_df.iloc[0][cat]
                     if similarity_both.iloc[0]['dist'] < similarity_both.iloc[1][
-                        'dist']:  # Check similarity of y > similarity of x
+                            'dist']:  # Check similarity of y > similarity of x
                         new_ins[cat] = y_df.iloc[0][cat]
                     else:
                         new_ins[cat] = random.choice(
@@ -484,7 +483,7 @@ class PyExplainer:
                 data = lhs(num_cols, samples=num_samples
                            ).reshape(num_samples, num_cols)
                 means = np.zeros(num_cols)
-                stdvs = np.array([1] * num_cols)
+                stdvs = np.array([1]*num_cols)
                 for i in range(num_cols):
                     data[:, i] = norm(
                         loc=means[i], scale=stdvs[i]).ppf(data[:, i])
@@ -570,12 +569,12 @@ class PyExplainer:
             tmp_rule = (top_k_positive_rules['rule'].iloc[i])
             tmp_rule = tmp_rule.strip()
             tmp_rule = str.split(tmp_rule, '&')
-            #    print('tmp_rule:', tmp_rule)
+        #    print('tmp_rule:', tmp_rule)
             for j in tmp_rule:
                 j = j.strip()
-                # print('subrule:', j)
+                #print('subrule:', j)
                 tmp_sub_rule = str.split(j, ' ')
-                #        print(tmp_sub_rule)
+        #        print(tmp_sub_rule)
                 tmp_variable = tmp_sub_rule[0]
                 tmp_condition_variable = tmp_sub_rule[1]
                 tmp_value = tmp_sub_rule[2]
@@ -588,7 +587,7 @@ class PyExplainer:
                         'value': tmp_value
                     })
 
-                # print(tmp_variable, tmp_condition_variable, tmp_value)
+                #print(tmp_variable, tmp_condition_variable, tmp_value)
                 if len(top_3_toavoid_rules) == 3:
                     break
             if len(top_3_toavoid_rules) == 3:
@@ -599,12 +598,12 @@ class PyExplainer:
             tmp_rule = (top_k_negative_rules['rule'].iloc[i])
             tmp_rule = tmp_rule.strip()
             tmp_rule = str.split(tmp_rule, '&')
-            #    print('tmp_rule:', tmp_rule)
+        #    print('tmp_rule:', tmp_rule)
             for j in tmp_rule:
                 j = j.strip()
-                # print('subrule:', j)
+                #print('subrule:', j)
                 tmp_sub_rule = str.split(j, ' ')
-                #        print(tmp_sub_rule)
+        #        print(tmp_sub_rule)
                 tmp_variable = tmp_sub_rule[0]
                 tmp_condition_variable = tmp_sub_rule[1]
                 tmp_value = tmp_sub_rule[2]
@@ -617,7 +616,7 @@ class PyExplainer:
                         'value': tmp_value
                     })
 
-                # print(tmp_variable, tmp_condition_variable, tmp_value)
+                #print(tmp_variable, tmp_condition_variable, tmp_value)
                 if len(top_3_tofollow_rules) == 3:
                     break
             if len(top_3_tofollow_rules) == 3:
@@ -662,14 +661,14 @@ class PyExplainer:
                   'from', len(synthetic_predictions))
 
         # Step 3 - Build a RuleFit local model with synthetic instances
-        # indep_index = [list(synthetic_instances.columns).index(i) for i in self.indep]
-        local_rulefit_model = rulefit.RuleFit(rfmode='classify',
-                                              exp_rand_tree_size=False,
-                                              random_state=0,
-                                              max_rules=max_rules,
-                                              cv=cv,
-                                              max_iter=max_iter,
-                                              n_jobs=-1)
+        #indep_index = [list(synthetic_instances.columns).index(i) for i in self.indep]
+        local_rulefit_model = RuleFit(rfmode='classify',
+                                      exp_rand_tree_size=False,
+                                      random_state=0,
+                                      max_rules=max_rules,
+                                      cv=cv,
+                                      max_iter=max_iter,
+                                      n_jobs=-1)
         local_rulefit_model.fit(synthetic_instances.values,
                                 synthetic_predictions,
                                 feature_names=self.indep)
@@ -939,14 +938,14 @@ class PyExplainer:
         # get var changed
         bullet_data = self.__get_bullet_data()
         id = int(change['owner'].description.split(" ")[0].strip("#"))
-        var_changed = bullet_data[id - 1]['varRef']
+        var_changed = bullet_data[id-1]['varRef']
         new_value = change.new
         # modify changed var in X_explain
         X_explain = self.__get_X_explain()
         row_name = self.__get_X_explain().index[0]
         X_explain.at[row_name, var_changed] = new_value
         # modify bullet data
-        bullet_data[id - 1]['markers'][0] = new_value
+        bullet_data[id-1]['markers'][0] = new_value
         self.__set_bullet_data(bullet_data)
         # generate new risk data
         self.__set_risk_data(self.__generate_risk_data(X_explain))
