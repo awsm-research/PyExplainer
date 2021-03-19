@@ -20,10 +20,11 @@
 # import pyexplainer
 import os
 import sys
+
+os.system("pip install sphinx_rtd_theme")
 import sphinx_rtd_theme
 
 sys.path.insert(0, os.path.abspath('..'))
-
 
 # -- Project information -----------------------------------------------------
 
@@ -83,7 +84,6 @@ pygments_style = 'sphinx'
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
 
-
 # -- Options for HTML output -------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
@@ -103,7 +103,6 @@ html_sidebars = {
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'pyexplainerdoc'
-
 
 # -- Options for LaTeX output ------------------------------------------
 
@@ -134,7 +133,6 @@ latex_documents = [
      u'Michael Fu', 'manual'),
 ]
 
-
 # -- Options for manual page output ------------------------------------
 
 # One entry per manual page. List of tuples
@@ -144,7 +142,6 @@ man_pages = [
      u'pyexplainer Documentation',
      [author], 1)
 ]
-
 
 # -- Options for Texinfo output ----------------------------------------
 

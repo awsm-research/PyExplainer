@@ -1,14 +1,14 @@
 import pandas as pd
 import numpy as np
-from sklearn.base import BaseEstimator
-from sklearn.base import TransformerMixin
-from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier, RandomForestRegressor, RandomForestClassifier
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier, RandomForestRegressor, \
+    RandomForestClassifier
 from sklearn.linear_model import LassoCV, LogisticRegressionCV
 from functools import reduce
 import sklearn
 from sklearn.utils import check_random_state
 import scipy as sp
-from rulefit import RuleCondition, Rule, RuleEnsemble, RuleFit, FriedScale
+import rulefit
 from sklearn.preprocessing import StandardScaler
 import copy
 import math
@@ -24,37 +24,26 @@ def id_generator(size=15, random_state=None):
 
     Parameters
     ----------
-    param1 : :obj:`int`
+    size : :obj:`int`
         An integer that specifies the length of the returned id, default = 15.
-    param2 : :obj:`np.random.RandomState`, default is None.
+    random_state : :obj:`np.random.RandomState`, default is None.
         A RandomState instance.
 
     Returns
     -------
     :obj:`str`
         A random identifier.
-
-    Examples
-    --------
-    >>> from pypkgs import pypkgs
-    >>> a = pd.Categorical(["character", "hits", "your", "eyeballs"])
-    >>> b = pd.Categorical(["but", "integer", "where it", "counts"])
-    >>> pypkgs.catbind(a, b)
-    [character, hits, your, eyeballs, but, integer, where it, counts]
-    Categories (8, object): [but, character, counts,
-    eyeballs, hits, integer, where it, your]
     """
-
     chars = list(string.ascii_uppercase + string.digits)
     return ''.join(random_state.choice(chars, size, replace=True))
 
 
 def data_validation(data):
-    """Validate the if the given data format is a list of dictionary.
+    """Validate that the given data format is a list of dictionary.
 
     Parameters
     ----------
-    param1 : :obj:`Any`
+    data : :obj:`Any`
         Data to be validated.
 
     Returns
@@ -62,16 +51,6 @@ def data_validation(data):
     :obj:`bool`
         True: The data is a list of dictionary.\n
         False: The data is not a list of dictionary.
-
-    Examples
-    --------
-    >>> from pypkgs import pypkgs
-    >>> a = pd.Categorical(["character", "hits", "your", "eyeballs"])
-    >>> b = pd.Categorical(["but", "integer", "where it", "counts"])
-    >>> pypkgs.catbind(a, b)
-    [character, hits, your, eyeballs, but, integer, where it, counts]
-    Categories (8, object): [but, character, counts,
-    eyeballs, hits, integer, where it, your]
     """
     valid = True
     if str(type(data)) == "<class 'list'>":
@@ -86,32 +65,7 @@ def data_validation(data):
     return valid
 
 
-class PyExplainer():
-    """A PyExplainer object is able to load training data and ML models to generate human-centric explanation and visualisation
-
-    Parameters
-    ----------
-    param1 : :obj:`pandas.core.frame.DataFrame`
-        Training data X
-    param2 : :obj:`pandas.core.series.Series`
-        Training data y
-    param3 : :obj:`pandas.core.indexes.base.Index`
-        to be done... 
-    param4 : :obj:`str`
-        to be done... 
-    param5 : :obj:`list`
-        Classification labels, default = ['Clean', 'Defect']
-    param6 : :obj:`black box model trained using sklearn`
-        A black box ML model used to generate the prediction and explanation
-
-    Examples
-    --------
-    >>> from pyexplainer_pyexplainer import PyExplainer
-    >>> ...
-    >>> ...
-    >>> ...
-    sample output to be added here
-    """
+class PyExplainer:
 
     def __init__(self,
                  X_train,
@@ -119,8 +73,45 @@ class PyExplainer():
                  indep,
                  dep,
                  class_label=['Clean', 'Defect'],
-                 blackbox_model=''
-                 ):
+                 blackbox_model=''):
+        """A PyExplainer object is able to load training data and ML models to generate human-centric explanation and visualisation
+
+        Parameters
+        ----------
+        X_train : :obj:`pandas.core.frame.DataFrame`
+            Training data X
+        y_train : :obj:`pandas.core.series.Series`
+            Training data y
+        indep : :obj:`pandas.core.indexes.base.Index`
+            to be done...
+        dep : :obj:`str`
+            to be done...
+        class_label : :obj:`list`
+            Classification labels, default = ['Clean', 'Defect']
+        blackbox_model : :obj:`black box model trained using sklearn`
+            A black box ML model used to generate the prediction and explanation
+
+        Examples
+        --------
+        >> from pyexplainer_pyexplainer import PyExplainer
+        >> from sklearn.ensemble import RandomForestClassifier
+        >> import pandas as pd
+        >> data = pd.read_csv('../tests/example-datasets/activemq-5.0.0.csv', index_col = 'File')
+        >> dep = data.columns[-4]
+        >> indep = data.columns[0:(len(data.columns) - 4)]
+        >> X_train = data.loc[:, indep]
+        >> y_train = data.loc[:, dep]
+        >> blackbox_model = RandomForestClassifier(max_depth=3, random_state=0)
+        >> blackbox_model.fit(X_train, y_train)
+        >> class_label = ['Clean', 'Defect']
+        >> samplePyExp = PyExplainer(X_train,
+                                     y_train,
+                                     indep,
+                                     dep,
+                                     class_label,
+                                     blackbox_model = blackbox_model)
+        <pyexplainer_pyexplainer.PyExplainer at 0x7fb4dce15a60>
+        """
         self.X_train = X_train
         self.y_train = y_train
         self.indep = indep
@@ -161,9 +152,9 @@ class PyExplainer():
             tmp_markers = [tmp_actual_value]
 
             plot_min = int(
-                round(max(tmp_min, tmp_threshold_value - tmp_interval), 0))*1.0
+                round(max(tmp_min, tmp_threshold_value - tmp_interval), 0)) * 1.0
             plot_max = int(
-                round(min(tmp_max, tmp_threshold_value + tmp_interval), 0))*1.0
+                round(min(tmp_max, tmp_threshold_value + tmp_interval), 0)) * 1.0
 
             # keep marker in the range
             if tmp_markers[0] > plot_max:
@@ -176,7 +167,7 @@ class PyExplainer():
             print('Min', tmp_min, 'Max', tmp_max, 'threshold', tmp_threshold_value,
                   'Actual', tmp_actual_value, 'Plot_min', plot_min, 'Plot_max', plot_max)
 
-            tmp_subtitle_text = 'Actual = '+str(tmp_actual_value)
+            tmp_subtitle_text = 'Actual = ' + str(tmp_actual_value)
             tmp_ticks = [plot_min, plot_max]
 
             if plot_max - plot_min <= 10:
@@ -185,27 +176,27 @@ class PyExplainer():
                 tmp_step = [1]
 
             bullet_total_width = 450
-            tmp_startpoints = [0, round((tmp_threshold_value - plot_min)/diff_plot_max_min * bullet_total_width, 0)]
-            tmp_widths = [round((tmp_threshold_value - plot_min)/diff_plot_max_min * bullet_total_width, 0),
-                          round((plot_max - tmp_threshold_value)/diff_plot_max_min * bullet_total_width, 0)]
+            tmp_startpoints = [0, round((tmp_threshold_value - plot_min) / diff_plot_max_min * bullet_total_width, 0)]
+            tmp_widths = [round((tmp_threshold_value - plot_min) / diff_plot_max_min * bullet_total_width, 0),
+                          round((plot_max - tmp_threshold_value) / diff_plot_max_min * bullet_total_width, 0)]
 
-            id = '#'+str(i+1)
+            id = '#' + str(i + 1)
             var_name = str(tmp_rule['variable'])
             if tmp_rule['lessthan']:
 
                 # lessthan == TRUE:
                 # The rule suggest to decrease the values to less than a certain threshold
-                tmp_title_text = id+' Decrease the values of ' + \
-                    var_name+' to less than ' + \
-                    str(tmp_actual_value)
+                tmp_title_text = id + ' Decrease the values of ' + \
+                                 var_name + ' to less than ' + \
+                                 str(tmp_actual_value)
                 tmp_colors = ["#a6d96a", "#d7191c"]
             else:
 
                 # lessthan == FALSE:
                 # The rule suggest to increase the values to more than a certain threshold
-                tmp_title_text = id+' Increase the values of ' + \
-                    var_name+' to more than ' + \
-                    str(tmp_actual_value)
+                tmp_title_text = id + ' Increase the values of ' + \
+                                 var_name + ' to more than ' + \
+                                 str(tmp_actual_value)
                 tmp_colors = ["#d7191c", "#a6d96a"]
 
             bullet_data.append({
@@ -235,12 +226,9 @@ class PyExplainer():
         return {'min_values': min_values,
                 'max_values': max_values}
 
-    '''
-    An approach to generate instance using crossover and interpolation
-    '''
-
     def __generate_instance_crossover_interpolation(self, X_test, y_test, debug=False):
-
+        """An approach to generate instance using crossover and interpolation
+        """
         categorical_vars = []
 
         X_train_i = self.X_train.copy()
@@ -300,13 +288,13 @@ class PyExplainer():
 
             dist_df['dist'] = similarity
             dist_df['t_target'] = target_train
-        #        dist_df
+            #        dist_df
             # get the unique classes of the training set
             unique_classes = dist_df.t_target.unique()
             # Sort similarity scores in to decending order
             dist_df.sort_values(by=['dist'], ascending=False, inplace=True)
 
-        #        dist_df.reset_index(inplace=True)
+            #        dist_df.reset_index(inplace=True)
 
             # Make a dataframe with top 40 elements in each class
             top_fourty_df = pd.DataFrame([])
@@ -314,7 +302,7 @@ class PyExplainer():
                 top_fourty_df = top_fourty_df.append(
                     dist_df[dist_df['t_target'] == clz].head(40))
 
-        #        top_fourty_df.reset_index(inplace=True)
+            #        top_fourty_df.reset_index(inplace=True)
 
             # get the minimum value of the top 40 elements and return the index
             cutoff_similarity = top_fourty_df.nsmallest(
@@ -390,10 +378,10 @@ class PyExplainer():
                     y_df = y.to_frame().T
 
                     if similarity_both.iloc[0]['dist'] > similarity_both.iloc[1][
-                            'dist']:  # Check similarity of x > similarity of y
+                        'dist']:  # Check similarity of x > similarity of y
                         new_ins[cat] = x_df.iloc[0][cat]
                     if similarity_both.iloc[0]['dist'] < similarity_both.iloc[1][
-                            'dist']:  # Check similarity of y > similarity of x
+                        'dist']:  # Check similarity of y > similarity of x
                         new_ins[cat] = y_df.iloc[0][cat]
                     else:
                         new_ins[cat] = random.choice(
@@ -449,14 +437,10 @@ class PyExplainer():
             return {'synthetic_data': new_df_case,
                     'sampled_class_frequency': sampled_class_frequency}
 
-    '''
-    
-    This random pertubation approach to generate instances is used by LIME to gerate synthetic instances
-    
-    '''
-
     def __generate_instance_random_pertubation(self, X_explain, y_explain, debug=False):
+        """This random pertubation approach to generate instances is used by LIME to gerate synthetic instances
 
+        """
         n_defect_class = 0
         random_seed = 0
 
@@ -500,7 +484,7 @@ class PyExplainer():
                 data = lhs(num_cols, samples=num_samples
                            ).reshape(num_samples, num_cols)
                 means = np.zeros(num_cols)
-                stdvs = np.array([1]*num_cols)
+                stdvs = np.array([1] * num_cols)
                 for i in range(num_cols):
                     data[:, i] = norm(
                         loc=means[i], scale=stdvs[i]).ppf(data[:, i])
@@ -573,7 +557,7 @@ class PyExplainer():
 
         if debug:
             print('Random seed', random_seed, 'nDefective', n_defect_class)
-        
+
         return {'synthetic_data': new_df_case,
                 'sampled_class_frequency': sampled_class_frequency}
 
@@ -586,12 +570,12 @@ class PyExplainer():
             tmp_rule = (top_k_positive_rules['rule'].iloc[i])
             tmp_rule = tmp_rule.strip()
             tmp_rule = str.split(tmp_rule, '&')
-        #    print('tmp_rule:', tmp_rule)
+            #    print('tmp_rule:', tmp_rule)
             for j in tmp_rule:
                 j = j.strip()
-                #print('subrule:', j)
+                # print('subrule:', j)
                 tmp_sub_rule = str.split(j, ' ')
-        #        print(tmp_sub_rule)
+                #        print(tmp_sub_rule)
                 tmp_variable = tmp_sub_rule[0]
                 tmp_condition_variable = tmp_sub_rule[1]
                 tmp_value = tmp_sub_rule[2]
@@ -604,7 +588,7 @@ class PyExplainer():
                         'value': tmp_value
                     })
 
-                #print(tmp_variable, tmp_condition_variable, tmp_value)
+                # print(tmp_variable, tmp_condition_variable, tmp_value)
                 if len(top_3_toavoid_rules) == 3:
                     break
             if len(top_3_toavoid_rules) == 3:
@@ -615,12 +599,12 @@ class PyExplainer():
             tmp_rule = (top_k_negative_rules['rule'].iloc[i])
             tmp_rule = tmp_rule.strip()
             tmp_rule = str.split(tmp_rule, '&')
-        #    print('tmp_rule:', tmp_rule)
+            #    print('tmp_rule:', tmp_rule)
             for j in tmp_rule:
                 j = j.strip()
-                #print('subrule:', j)
+                # print('subrule:', j)
                 tmp_sub_rule = str.split(j, ' ')
-        #        print(tmp_sub_rule)
+                #        print(tmp_sub_rule)
                 tmp_variable = tmp_sub_rule[0]
                 tmp_condition_variable = tmp_sub_rule[1]
                 tmp_value = tmp_sub_rule[2]
@@ -633,7 +617,7 @@ class PyExplainer():
                         'value': tmp_value
                     })
 
-                #print(tmp_variable, tmp_condition_variable, tmp_value)
+                # print(tmp_variable, tmp_condition_variable, tmp_value)
                 if len(top_3_tofollow_rules) == 3:
                     break
             if len(top_3_tofollow_rules) == 3:
@@ -641,7 +625,15 @@ class PyExplainer():
         return {'top_tofollow_rules': top_3_tofollow_rules,
                 'top_toavoid_rules': top_3_toavoid_rules}
 
-    def explain(self, X_explain, y_explain, top_k=3, max_rules=10, max_iter=10, cv=5, search_function='crossoverinterpolation', debug=False):
+    def explain(self,
+                X_explain,
+                y_explain,
+                top_k=3,
+                max_rules=10,
+                max_iter=10,
+                cv=5,
+                search_function='crossoverinterpolation',
+                debug=False):
 
         # Step 1 - Generate synthetic instances
         if search_function == 'crossoverinterpolation':
@@ -670,20 +662,20 @@ class PyExplainer():
                   'from', len(synthetic_predictions))
 
         # Step 3 - Build a RuleFit local model with synthetic instances
-        #indep_index = [list(synthetic_instances.columns).index(i) for i in self.indep]
-        local_rulefit_model = RuleFit(rfmode='classify',
-                                      exp_rand_tree_size=False,
-                                      random_state=0,
-                                      max_rules=max_rules,
-                                      cv=cv,
-                                      max_iter=max_iter,
-                                      n_jobs=-1)
+        # indep_index = [list(synthetic_instances.columns).index(i) for i in self.indep]
+        local_rulefit_model = rulefit.RuleFit(rfmode='classify',
+                                              exp_rand_tree_size=False,
+                                              random_state=0,
+                                              max_rules=max_rules,
+                                              cv=cv,
+                                              max_iter=max_iter,
+                                              n_jobs=-1)
         local_rulefit_model.fit(synthetic_instances.values,
-                                synthetic_predictions, 
+                                synthetic_predictions,
                                 feature_names=self.indep)
         if debug:
             print('Constructed a RuleFit model')
-        
+
         # Step 4 Get rules from theRuleFit local model
         rules = local_rulefit_model.get_rules()
         rules = rules[rules.coef != 0].sort_values("importance", ascending=False)
@@ -718,16 +710,16 @@ class PyExplainer():
 
         Examples
         --------
-        >>> from pyexplainer_pyexplainer import PyExplainer
-        >>> ...
-        >>> ...
-        >>> ...
+        >> from pyexplainer_pyexplainer import PyExplainer
+        >> ...
+        >> ...
+        >> ...
         sample output to be added here
         """
         top_rules = self.__parse_top_rules(top_k_positive_rules=pyExp_rule_obj['top_k_positive_rules'],
                                            top_k_negative_rules=pyExp_rule_obj['top_k_negative_rules'])
         self.__set_X_explain(pyExp_rule_obj['X_explain'])
-        self.__set_y_explain(pyExp_rule_obj['y_explain']) 
+        self.__set_y_explain(pyExp_rule_obj['y_explain'])
         self.__set_bullet_data(self.__generate_bullet_data(top_rules, self.__get_X_explain()))
         self.__set_risk_data(self.__generate_risk_data(self.__get_X_explain()))
 
@@ -931,7 +923,7 @@ class PyExplainer():
     def __get_risk_score(self):
         risk_score = self.__get_risk_data()[0]['riskScore'][0].strip("%")
         return float(risk_score)
-    
+
     def __get_X_explain(self):
         return self.X_explain
 
@@ -942,19 +934,19 @@ class PyExplainer():
         # step 1 - clear the bullet chart output and risk score bar output
         bullet_out = self.bullet_output
         bullet_out.clear_output()
-        
+
         # step 2 - compute new values to be visualised
         # get var changed
         bullet_data = self.__get_bullet_data()
         id = int(change['owner'].description.split(" ")[0].strip("#"))
-        var_changed = bullet_data[id-1]['varRef']
+        var_changed = bullet_data[id - 1]['varRef']
         new_value = change.new
         # modify changed var in X_explain
         X_explain = self.__get_X_explain()
         row_name = self.__get_X_explain().index[0]
         X_explain.at[row_name, var_changed] = new_value
         # modify bullet data
-        bullet_data[id-1]['markers'][0] = new_value
+        bullet_data[id - 1]['markers'][0] = new_value
         self.__set_bullet_data(bullet_data)
         # generate new risk data
         self.__set_risk_data(self.__generate_risk_data(X_explain))
@@ -1023,7 +1015,7 @@ class PyExplainer():
 
     def __set_X_explain(self, X_explain):
         self.X_explain = X_explain
-    
+
     def __set_y_explain(self, y_explain):
         self.y_explain = y_explain
 
@@ -1032,10 +1024,10 @@ class PyExplainer():
 
         Examples
         --------
-        >>> from pypkgs import pypkgs
-        >>> a = pd.Categorical(["character", "hits", "your", "eyeballs"])
-        >>> b = pd.Categorical(["but", "integer", "where it", "counts"])
-        >>> pypkgs.catbind(a, b)
+        >> from pypkgs import pypkgs
+        >> a = pd.Categorical(["character", "hits", "your", "eyeballs"])
+        >> b = pd.Categorical(["but", "integer", "where it", "counts"])
+        >> pypkgs.catbind(a, b)
         [character, hits, your, eyeballs, but, integer, where it, counts]
         Categories (8, object): [but, character, counts,
         eyeballs, hits, integer, where it, your]
@@ -1061,4 +1053,4 @@ class PyExplainer():
             display(HTML(html))
 
     def __to_js_data(self, list_of_dict):
-        return (str(list_of_dict) + ";")
+        return str(list_of_dict) + ";"

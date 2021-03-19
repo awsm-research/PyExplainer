@@ -12,6 +12,14 @@ pyexplainer.pyexplainer\_pyexplainer module
    :undoc-members:
    :show-inheritance:
 
+pyexplainer.rulefit module
+--------------------------
+
+.. automodule:: pyexplainer.rulefit
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 
