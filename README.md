@@ -1,7 +1,6 @@
 # pyexplainer 
-
-![](https://github.com/MichaelFu1998-create/pyexplainer/workflows/build/badge.svg)
-[![codecov](https://codecov.io/gh/MichaelFu1998-create/pyexplainer/branch/main/graph/badge.svg)](https://codecov.io/gh/MichaelFu1998-create/pyexplainer)[![Documentation Status](https://readthedocs.org/projects/pyexplainer/badge/?version=latest)](https://pyexplainer.readthedocs.io/en/latest/?badge=latest)
+![](https://github.com/MichaelFu1998-create/pyexplainer/workflows/build/badge.svg) [![codecov](https://codecov.io/gh/MichaelFu1998-create/pyexplainer/branch/main/graph/badge.svg)](https://codecov.io/gh/MichaelFu1998-create/pyexplainer)
+[![Documentation Status](https://readthedocs.org/projects/pyexplainer/badge/?version=latest)](https://pyexplainer.readthedocs.io/en/latest/?badge=latest)
 
 python ML explainer for SEA
 ## pyexplainer
@@ -42,7 +41,7 @@ The list of dependencies is shown upder [tool.poetry.dependencies] in ./pyprojec
 
 Installing pyexplainer is easily done using pip, simply run the following:
 
-```bash
+```bash 
 $ pip install -i https://test.pypi.org/simple/ pyexplainer
 ```
 This will also install the necessary dependencies.
