@@ -160,8 +160,397 @@
 <div class="section" id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </div>
-<div class="section" id="pyexplainer-pyexplainer-pyexplainer-module">
-<h2>pyexplainer.pyexplainer_pyexplainer module<a class="headerlink" href="#pyexplainer-pyexplainer-pyexplainer-module" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="module-pyexplainer.pyexplainer_pyexplainer">
+<span id="pyexplainer-pyexplainer-pyexplainer-module"></span><h2>pyexplainer.pyexplainer_pyexplainer module<a class="headerlink" href="#module-pyexplainer.pyexplainer_pyexplainer" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer">
+<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_pyexplainer.</span></code><code class="sig-name descname"><span class="pre">PyExplainer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['Clean',</span> <span class="pre">'Defect']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blackbox_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>A PyExplainer object is able to load training data and an ML model to generate human-centric explanation and
+visualisation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_train</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – Training data X (Features)</p></li>
+<li><p><strong>y_train</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.series.Series</span></code>) – Training data y (Label)</p></li>
+<li><p><strong>indep</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.indexes.base.Index</span></code>) – independent variables (column names)</p></li>
+<li><p><strong>dep</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – dependent variables (column names)</p></li>
+<li><p><strong>class_label</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – Classification labels, default = [‘Clean’, ‘Defect’]</p></li>
+<li><p><strong>blackbox_model</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">black</span> <span class="pre">box</span> <span class="pre">model</span> <span class="pre">trained</span> <span class="pre">using</span> <span class="pre">sklearn</span></code>) – A global black box ML model used to generate the prediction and explanation</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.explain">
+<code class="sig-name descname"><span class="pre">explain</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_explain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_explain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rules</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'crossoverinterpolation'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.explain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.explain" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate Rule Object Manually by passing X_explain and y_explain</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_explain</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – Features to be explained by the local RuleFit model</p></li>
+<li><p><strong>y_explain</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.series.Series</span></code>) – Label to be explained by the local RuleFit model</p></li>
+<li><p><strong>top_k</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, default is 3) – Number of top rules to be retrieved</p></li>
+<li><p><strong>max_rules</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, default is 10) – Number of maximum rules to be generated</p></li>
+<li><p><strong>max_iter</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, default is 10) – Maximum number of iteration to be tuned in to the local RuleFit model</p></li>
+<li><p><strong>cv</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, default is 5) – Cross Validation to be tuned in to the local RuleFit model</p></li>
+<li><p><strong>search_function</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, default is ‘crossoverinterpolation’) – Name of the search function to be used to generate the instance used by RuleFit.fit()</p></li>
+<li><p><strong>debug</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, default is False) – True for debugging mode, False otherwise.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dict rule object including all of the data related to the local RuleFit model with the following keys, ‘synthetic_data’, ‘synthetic_predictions’, ‘X_explain’, ‘y_explain’, ‘indep’, ‘dep’, ‘top_k_positive_rules’, ‘top_k_negative_rules’.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyexplainer_pyexplainer</span> <span class="kn">import</span> <span class="n">PyExplainer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../tests/example-datasets/activemq-5.0.0.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="s1">&#39;File&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dep</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">indep</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">:(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">indep</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">dep</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blackbox_model</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">class_label</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Clean&#39;</span><span class="p">,</span> <span class="s1">&#39;Defect&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pyExp</span> <span class="o">=</span> <span class="n">PyExplainer</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">indep</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">class_label</span><span class="p">,</span> <span class="n">blackbox_model</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sample_test_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../tests/example-datasets/activemq-5.0.0.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="s1">&#39;File&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_test</span> <span class="o">=</span> <span class="n">sample_test_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">indep</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_test</span> <span class="o">=</span> <span class="n">sample_test_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">dep</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sample_explain_index</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_explain</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">sample_explain_index</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_explain</span> <span class="o">=</span> <span class="n">y_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">sample_explain_index</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pyExp</span><span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="n">X_explain</span><span class="p">,</span> <span class="n">y_explain</span><span class="p">,</span> <span class="n">search_function</span> <span class="o">=</span> <span class="s1">&#39;crossoverinterpolation&#39;</span><span class="p">,</span> <span class="n">top_k</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">max_rules</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">max_iter</span> <span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_bullet_data">
+<code class="sig-name descname"><span class="pre">generate_bullet_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsed_rule_object</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_explain</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.generate_bullet_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_bullet_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate bullet chart data (a list of dict) to be implemented with d3.js chart.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>parsed_rule_object</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – Top rules parsed from Rule object.</p></li>
+<li><p><strong>X_explain</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – Explained Dataframe generated from RuleFit model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of dict that contains the data needed to generate a bullet chart.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_html">
+<code class="sig-name descname"><span class="pre">generate_html</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.generate_html"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_html" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate d3 bullet chart html and return it as a String.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>html String</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_instance_crossover_interpolation">
+<code class="sig-name descname"><span class="pre">generate_instance_crossover_interpolation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_test</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.generate_instance_crossover_interpolation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_instance_crossover_interpolation" title="Permalink to this definition">¶</a></dt>
+<dd><p>An approach to generate instance using Crossover and Interpolation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X_test</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – X_test (Testing Features)</p></li>
+<li><p><strong>y_test</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.series.Series</span></code>) – y_test (Testing Label)</p></li>
+<li><p><strong>debug</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>) – True for debugging mode, False otherwise.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dict with two keys ‘synthetic_data’ and ‘sampled_class_frequency’ generated via
+Crossover and Interpolation.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_instance_random_perturbation">
+<code class="sig-name descname"><span class="pre">generate_instance_random_perturbation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_explain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_explain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.generate_instance_random_perturbation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_instance_random_perturbation" title="Permalink to this definition">¶</a></dt>
+<dd><p>The random perturbation approach to generate synthetic instances which is also used by LIME.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_progress_bar_items">
+<code class="sig-name descname"><span class="pre">generate_progress_bar_items</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.generate_progress_bar_items"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_progress_bar_items" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate items to be set into hbox (horizontal box)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_risk_data">
+<code class="sig-name descname"><span class="pre">generate_risk_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_explain</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.generate_risk_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_risk_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate risk prediction and risk score to be visualised</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X_explain</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – Explained Dataframe generated from RuleFit model.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of dict that contains the data of risk prediction and risk score.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_sliders">
+<code class="sig-name descname"><span class="pre">generate_sliders</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.generate_sliders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_sliders" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate one or more slider widgets and return as a list.  Slider would be either IntSlider or FloatSlider depending on the value in the data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A list of slider widgets.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.get_risk_pred">
+<code class="sig-name descname"><span class="pre">get_risk_pred</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.get_risk_pred"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.get_risk_pred" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the risk prediction from risk_data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A string of risk prediction</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.get_risk_score">
+<code class="sig-name descname"><span class="pre">get_risk_score</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.get_risk_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.get_risk_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the risk score from risk_data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A float of risk score</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.on_value_change">
+<code class="sig-name descname"><span class="pre">on_value_change</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">change</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.on_value_change"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.on_value_change" title="Permalink to this definition">¶</a></dt>
+<dd><p>The callback function for the interactive slider</p>
+<p>Whenever the user interacts with the slider,
+If the slider is in the non-continuous update mode,
+only if the mouse click is released, this callback will be triggered.
+If the slider is in the continuous update mode (not recommended here),
+this function will be triggered continuously when the user is moving the slider.</p>
+<p>This callback will first clear the output of Risk Score Progress Bar and the Bullet Chart.
+Then it will call funcs to compute the new values to be visualised.
+When the computing is done, it will soon visualise the new value.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>change</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – A dict that contains the former(before changing) and later(after changing) data inside the slider</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.retrieve_min_max_values">
+<code class="sig-name descname"><span class="pre">retrieve_min_max_values</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.retrieve_min_max_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.retrieve_min_max_values" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the minimum and maximum value from X_train</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dict containing two keys, ‘min_values’ and ‘max_values’</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.run_bar_animation">
+<code class="sig-name descname"><span class="pre">run_bar_animation</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.run_bar_animation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.run_bar_animation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the animation of Risk Score Progress Bar</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.show_visualisation">
+<code class="sig-name descname"><span class="pre">show_visualisation</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.show_visualisation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.show_visualisation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Display items as follows,
+(1) Risk Score Progress Bar (made from ipywidgets)
+(2) Interactive Slider (made from ipywidgets)
+(3) Bullet Chart (Generated By D3.js)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.update_right_text">
+<code class="sig-name descname"><span class="pre">update_right_text</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">right_text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.update_right_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.update_right_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the text on the rightward side of the Risk Score Progress Bar</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>right_text</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">String</span></code>) – Text on the rightward side of the Risk Score Progress Bar</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.update_risk_score">
+<code class="sig-name descname"><span class="pre">update_risk_score</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">risk_score</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.update_risk_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.update_risk_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the risk score value inside the risk_data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>risk_score</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Value of risk score</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.visualisation_data_setup">
+<code class="sig-name descname"><span class="pre">visualisation_data_setup</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.visualisation_data_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.visualisation_data_setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the data before visualising them</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rule_obj</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – A rule dict generated either through loading the .pyobject file or the .explain(…) function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.visualise">
+<code class="sig-name descname"><span class="pre">visualise</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.visualise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.visualise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given the rule object, show all of the visualisation as follows .
+(1) Risk Score Progress Bar (made from ipywidgets)
+(2) Interactive Slider (made from ipywidgets)
+(3) Bullet Chart (Generated By D3.js)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>rule_obj</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – A rule dict generated either through loading the .pyobject file or the .explain(…) function</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyexplainer_pyexplainer</span> <span class="kn">import</span> <span class="n">PyExplainer</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../tests/example-datasets/activemq-5.0.0.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="s1">&#39;File&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dep</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">indep</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">:(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">indep</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">dep</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blackbox_model</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">class_label</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Clean&#39;</span><span class="p">,</span> <span class="s1">&#39;Defect&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pyExp</span> <span class="o">=</span> <span class="n">PyExplainer</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">indep</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">class_label</span><span class="p">,</span> <span class="n">blackbox_model</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sample_test_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../tests/example-datasets/activemq-5.0.0.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="s1">&#39;File&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_test</span> <span class="o">=</span> <span class="n">sample_test_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">indep</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_test</span> <span class="o">=</span> <span class="n">sample_test_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">dep</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sample_explain_index</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">X_explain</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">sample_explain_index</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">y_explain</span> <span class="o">=</span> <span class="n">y_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">sample_explain_index</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rule_obj</span> <span class="o">=</span> <span class="n">pyExp</span><span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="n">X_explain</span><span class="p">,</span> <span class="n">y_explain</span><span class="p">,</span> <span class="n">search_function</span> <span class="o">=</span> <span class="s1">&#39;crossoverinterpolation&#39;</span><span class="p">,</span> <span class="n">top_k</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">max_rules</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">max_iter</span> <span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pyExp</span><span class="o">.</span><span class="n">visualise</span><span class="p">(</span><span class="n">rule_obj</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyexplainer.pyexplainer_pyexplainer.data_validation">
+<code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_pyexplainer.</span></code><code class="sig-name descname"><span class="pre">data_validation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#data_validation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.data_validation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate that the given data format is a list of dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code>) – Data to be validated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><p>True: The data is a list of dictionary.</p>
+<p>False: The data is not a list of dictionary.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyexplainer.pyexplainer_pyexplainer.id_generator">
+<code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_pyexplainer.</span></code><code class="sig-name descname"><span class="pre">id_generator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">15</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#id_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.id_generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate unique ids for div tag which will contain the visualisation stuff from d3.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>size</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – An integer that specifies the length of the returned id, default = 15.</p></li>
+<li><p><strong>random_state</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">np.random.RandomState</span></code>, default is None.) – A RandomState instance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A random identifier.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyexplainer.pyexplainer_pyexplainer.parse_top_rules">
+<code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_pyexplainer.</span></code><code class="sig-name descname"><span class="pre">parse_top_rules</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">top_k_positive_rules</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_k_negative_rules</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#parse_top_rules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.parse_top_rules" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse top k positive rules and top k negative rules given positive and negative rules as DataFrame</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>top_k_positive_rules</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – Top positive rules DataFrame</p></li>
+<li><p><strong>top_k_negative_rules</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – Top negative rules DataFrame</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dict containing two keys, ‘top_tofollow_rules’ and ‘top_toavoid_rules’</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="pyexplainer.pyexplainer_pyexplainer.to_js_data">
+<code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_pyexplainer.</span></code><code class="sig-name descname"><span class="pre">to_js_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#to_js_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.to_js_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform python list to a str to be used inside the html &lt;script&gt;&lt;script/&gt;</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>list_of_dict</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – Data to be transformed.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A str to represent a list of dict ending with ‘;’</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 <div class="section" id="module-pyexplainer.rulefit">
 <span id="pyexplainer-rulefit-module"></span><h2>pyexplainer.rulefit module<a class="headerlink" href="#module-pyexplainer.rulefit" title="Permalink to this headline">¶</a></h2>

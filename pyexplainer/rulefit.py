@@ -18,8 +18,9 @@ import pandas as pd
 import numpy as np
 from sklearn.base import BaseEstimator
 from sklearn.base import TransformerMixin
-from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier, RandomForestRegressor, RandomForestClassifier
-from sklearn.linear_model import LassoCV,LogisticRegressionCV
+from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier, RandomForestRegressor, \
+                                RandomForestClassifier
+from sklearn.linear_model import LassoCV, LogisticRegressionCV
 from functools import reduce
 
 
@@ -478,7 +479,7 @@ class RuleFit(BaseEstimator, TransformerMixin):
         else:
             Cs=10 if self.Cs is None else self.Cs
             self.lscv=LogisticRegressionCV(
-                Cs=Cs, cv=self.cv, penalty='l1', max_iter=self.max_iter,
+                Cs=Cs, cv=self.cv, penalty='l2', max_iter=self.max_iter,
                 tol=self.tol, n_jobs=self.n_jobs,
                 random_state=self.random_state, solver='lbfgs')
             self.lscv.fit(X_concat, y)
