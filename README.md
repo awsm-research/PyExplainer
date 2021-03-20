@@ -1,24 +1,64 @@
 # pyexplainer 
 
-![](https://github.com/MichaelFu1998-create/pyexplainer/workflows/build/badge.svg) [![codecov](https://codecov.io/gh/MichaelFu1998-create/pyexplainer/branch/main/graph/badge.svg)](https://codecov.io/gh/MichaelFu1998-create/pyexplainer) ![Release](https://github.com/MichaelFu1998-create/pyexplainer/workflows/Release/badge.svg) [![Documentation Status](https://readthedocs.org/projects/pyexplainer/badge/?version=latest)](https://pyexplainer.readthedocs.io/en/latest/?badge=latest)
+![](https://github.com/MichaelFu1998-create/pyexplainer/workflows/build/badge.svg) [![codecov](https://codecov.io/gh/MichaelFu1998-create/pyexplainer/branch/main/graph/badge.svg)](https://codecov.io/gh/MichaelFu1998-create/pyexplainer)[![Documentation Status](https://readthedocs.org/projects/pyexplainer/badge/?version=latest)](https://pyexplainer.readthedocs.io/en/latest/?badge=latest)
 
-python ML explainer for SEA 
+python ML explainer for SEA
+## pyexplainer
+
+pyexplainer is a python package that generates explainable Machine Learning predictions from the so-called 'black-box model' such as random forest, moreover, pyexplainer provides interactive visualisation that simplifies the decision-making process for Software Engineering.
+
+TO-DO-ADD GIF of visualisation
+
+## Table Of Contents
+
+- todo
+
+## How to cite pyexplainer
+
+- todo
+
+## Dependencies
+
+- python = "^3.8"
+- scikit-learn = "^0.24.1"
+- numpy = "^1.20.1"
+- scipy = "^1.6.1"
+- ipywidgets = "^7.6.3"
+- ipython = "^7.21.0"
+- pandas = "^1.2.3"
+
+The list of dependencies is shown upder [tool.poetry.dependencies] in ./pyproject.toml, however the installer takes care of installing them for you.
 
 ## Installation
+
+Installing PyDriller is easily done using pip, simply run the following:
 
 ```bash
 $ pip install -i https://test.pypi.org/simple/ pyexplainer
 ```
+This will also install the necessary dependencies.
 
-## Features
+## Source Code
+
+If you'd like to clone from source, you can do it in two simple steps as follows:
+
+```
+> git clone https://github.com/ishepard/pydriller.git
+> cd pydriller
+```
+
+## Install the requirements and run the tests
 
 - TODO
 
-## Dependencies
+## Tutorial
 
-- TODO
+For information on how to use PyDriller, refer to the official documentation:
+- [https://pyexplainer.readthedocs.io/en/latest/](official documentation)
+- notebook file link here
+- ytvideo
 
-## Usage
+## How to contribute
 
 - TODO
 
@@ -29,6 +69,12 @@ The official documentation is hosted on Read the Docs: https://pyexplainer.readt
 ## Contributors
 
 We welcome and recognize all contributions. You can see a list of current contributors in the [contributors tab](https://github.com/MichaelFu1998-create/pyexplainer/graphs/contributors).
+
+- todo...... how to contribute?
+
+## License
+
+- TODO
 
 ### Credits
 
