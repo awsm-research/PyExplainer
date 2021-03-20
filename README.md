@@ -39,7 +39,7 @@ The list of dependencies is shown upder [tool.poetry.dependencies] in ./pyprojec
 
 ## Installation
 
-Installing PyDriller is easily done using pip, simply run the following:
+Installing pyexplainer is easily done using pip, simply run the following:
 
 ```bash
 $ pip install -i https://test.pypi.org/simple/ pyexplainer
@@ -51,8 +51,8 @@ This will also install the necessary dependencies.
 If you'd like to clone from source, you can do it in two simple steps as follows:
 
 ```
-> git clone https://github.com/ishepard/pydriller.git
-> cd pydriller
+> git clone https://github.com/awsm-research/pyExplainer.git
+> cd pyExplainer
 ```
 
 ## Install the requirements and run the tests
@@ -61,7 +61,7 @@ If you'd like to clone from source, you can do it in two simple steps as follows
 
 ## Tutorial
 
-For information on how to use PyDriller, refer to the official documentation:
+For information on how to use pyexplainer, refer to the official documentation:
 - [official documentation](https://pyexplainer.readthedocs.io/en/latest/)
 - notebook file link here
 - ytvideo
