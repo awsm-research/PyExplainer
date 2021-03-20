@@ -11,7 +11,15 @@ TO-DO-ADD GIF of visualisation
 
 ## Table Of Contents
 
-- todo
+* **[How to cite pyexplainer](#how-to-cite-pyexplainer)**
+* **[Dependencies](#dependencies)**
+* **[Installation](#installation)**
+* **[Source Code](#source-code)**
+* **[Tutorial](#tutorial)**
+* **[Contributors](#contributors)**
+* **[Documentation](#documentation)**
+* **[License](#license)**
+* **[Credits](#credits)**
 
 ## How to cite pyexplainer
 
@@ -54,23 +62,19 @@ If you'd like to clone from source, you can do it in two simple steps as follows
 ## Tutorial
 
 For information on how to use PyDriller, refer to the official documentation:
-- [https://pyexplainer.readthedocs.io/en/latest/](official documentation)
+- [official documentation](https://pyexplainer.readthedocs.io/en/latest/)
 - notebook file link here
 - ytvideo
-
-## How to contribute
-
-- TODO
-
-## Documentation
-
-The official documentation is hosted on Read the Docs: https://pyexplainer.readthedocs.io/en/latest/
 
 ## Contributors
 
 We welcome and recognize all contributions. You can see a list of current contributors in the [contributors tab](https://github.com/MichaelFu1998-create/pyexplainer/graphs/contributors).
 
 - todo...... how to contribute?
+
+## Documentation
+
+The official documentation is hosted on Read the Docs: https://pyexplainer.readthedocs.io/en/latest/
 
 ## License
 
