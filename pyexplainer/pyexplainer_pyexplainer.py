@@ -60,69 +60,6 @@ def id_generator(size=15, random_state=None):
     return ''.join(random_state.choice(chars, size, replace=True))
 
 
-def parse_top_rules(top_k_positive_rules, top_k_negative_rules):
-    """Parse top k positive rules and top k negative rules given positive and negative rules as DataFrame
-
-    Parameters
-    ----------
-    top_k_positive_rules : :obj:`pandas.core.frame.DataFrame`
-        Top positive rules DataFrame
-    top_k_negative_rules : :obj:`pandas.core.frame.DataFrame`
-        Top negative rules DataFrame
-
-    Returns
-    -------
-    :obj:`dict`
-        A dict containing two keys, 'top_tofollow_rules' and 'top_toavoid_rules'
-    """
-    top_variables = []
-    top_3_toavoid_rules = []
-    top_3_tofollow_rules = []
-
-    for i in range(len(top_k_positive_rules)):
-        tmp_rule = (top_k_positive_rules['rule'].iloc[i])
-        tmp_rule = tmp_rule.strip()
-        tmp_rule = str.split(tmp_rule, '&')
-        for j in tmp_rule:
-            j = j.strip()
-            tmp_sub_rule = str.split(j, ' ')
-            tmp_variable = tmp_sub_rule[0]
-            tmp_condition_variable = tmp_sub_rule[1]
-            tmp_value = tmp_sub_rule[2]
-            if tmp_variable not in top_variables:
-                top_variables.append(tmp_variable)
-                top_3_toavoid_rules.append({'variable': tmp_variable,
-                                            'lessthan': tmp_condition_variable[0] == '<',
-                                            'value': tmp_value})
-            if len(top_3_toavoid_rules) == 3:
-                break
-        if len(top_3_toavoid_rules) == 3:
-            break
-
-    for i in range(len(top_k_negative_rules)):
-        tmp_rule = (top_k_negative_rules['rule'].iloc[i])
-        tmp_rule = tmp_rule.strip()
-        tmp_rule = str.split(tmp_rule, '&')
-        for j in tmp_rule:
-            j = j.strip()
-            tmp_sub_rule = str.split(j, ' ')
-            tmp_variable = tmp_sub_rule[0]
-            tmp_condition_variable = tmp_sub_rule[1]
-            tmp_value = tmp_sub_rule[2]
-            if tmp_variable not in top_variables:
-                top_variables.append(tmp_variable)
-                top_3_tofollow_rules.append({'variable': tmp_variable,
-                                             'lessthan': tmp_condition_variable[0] == '<',
-                                             'value': tmp_value})
-            if len(top_3_tofollow_rules) == 3:
-                break
-        if len(top_3_tofollow_rules) == 3:
-            break
-
-    return {'top_tofollow_rules': top_3_tofollow_rules,
-            'top_toavoid_rules': top_3_toavoid_rules}
-
-
 def to_js_data(list_of_dict):
     """Transform python list to a str to be used inside the html <script><script/>
 
@@ -157,6 +94,8 @@ class PyExplainer:
         Classification labels, default = ['Clean', 'Defect']
     blackbox_model : :obj:`black box model trained using sklearn`
         A global black box ML model used to generate the prediction and explanation
+    top_k_rules : :obj:`int`
+        Number of top positive and negative rules to be retrieved
     """
 
     def __init__(self,
@@ -165,7 +104,8 @@ class PyExplainer:
                  indep,
                  dep,
                  class_label=['Clean', 'Defect'],
-                 blackbox_model=''):
+                 blackbox_model='',
+                 top_k_rules=3):
 
         self.X_train = X_train
         self.y_train = y_train
@@ -174,6 +114,7 @@ class PyExplainer:
         self.processed_features = []
         self.blackbox_model = blackbox_model
         self.class_label = class_label
+        self.top_k_rules = top_k_rules
 
         self.__set_bullet_data([{}])
         self.__set_risk_data([{}])
@@ -239,6 +180,7 @@ class PyExplainer:
         >>> y_explain = y_test.iloc[[sample_explain_index]]
         >>> pyExp.explain(X_explain, y_explain, search_function = 'crossoverinterpolation', top_k = 3, max_rules=30, max_iter =5, cv=5, debug = False)
         """
+        self.set_top_k_rules(top_k)
         # Step 1 - Generate synthetic instances
         if search_function == 'crossoverinterpolation':
             synthetic_object = self.generate_instance_crossover_interpolation(X_explain, y_explain, debug=debug)
@@ -534,8 +476,7 @@ class PyExplainer:
         target_train = self.blackbox_model.predict(X_train_i)
 
         # class variables
-        ori_dataset = pd.concat(
-            [X_train_i.reset_index(drop=True), y_train_i], axis=1)
+        # ori_dataset = pd.concat([X_train_i.reset_index(drop=True), y_train_i], axis=1)
 
         # Do feature scaling for continuous data and one hot encoding for categorical data
         scaler = StandardScaler()
@@ -553,8 +494,6 @@ class PyExplainer:
         # dataset = pd.get_dummies(dataset, prefix_sep="__", columns=self.__categorical_vars)
         trainset_normalize = copy.copy(dataset[:train_objs_num])
         cases_normalize = copy.copy(dataset[train_objs_num:])
-
-        temp_df = pd.DataFrame([])
 
         # make dataframe to store similarities of the trained instances from the explained instance
         dist_df = pd.DataFrame(index=trainset_normalize.index.copy())
@@ -729,8 +668,7 @@ class PyExplainer:
                 mean = mean[non_zero_indexes]
 
             if sampling_method == 'gaussian':
-                data = random_state.normal(0, 1, num_samples * num_cols
-                                           ).reshape(num_samples, num_cols)
+                data = random_state.normal(0, 1, num_samples * num_cols).reshape(num_samples, num_cols)
                 data = np.array(data)
             elif sampling_method == 'lhs':
                 data = lhs(num_cols, samples=num_samples).reshape(num_samples, num_cols)
@@ -752,18 +690,13 @@ class PyExplainer:
 
             if is_sparse:
                 if num_cols == 0:
-                    data = sp.sparse.csr_matrix((num_samples,
-                                                 data_row.shape[1]),
-                                                dtype=data_row.dtype)
+                    data = sp.sparse.csr_matrix((num_samples, data_row.shape[1]), dtype=data_row.dtype)
                 else:
                     indexes = np.tile(non_zero_indexes, num_samples)
-                    indptr = np.array(
-                        range(0, len(non_zero_indexes) * (num_samples + 1),
-                              len(non_zero_indexes)))
+                    indptr = np.array(range(0, len(non_zero_indexes) * (num_samples + 1), len(non_zero_indexes)))
                     data_1d_shape = data.shape[0] * data.shape[1]
                     data_1d = data.reshape(data_1d_shape)
-                    data = sp.sparse.csr_matrix((data_1d, indexes, indptr),
-                                                shape=(num_samples, data_row.shape[1]))
+                    data = sp.sparse.csr_matrix((data_1d, indexes, indptr), shape=(num_samples, data_row.shape[1]))
             categorical_features = []
             first_row = data_row
         else:
@@ -782,8 +715,10 @@ class PyExplainer:
             inverse_column[0] = data[0, column]
             data[:, column] = binary_column
             inverse[:, column] = inverse_column
+
         if discretizer is not None:
             inverse[1:] = discretizer.undiscretize(inverse[1:])
+
         inverse[0] = data_row
 
         if sp.sparse.issparse(data):
@@ -794,17 +729,14 @@ class PyExplainer:
                 scaled_data = scaled_data.tocsr()
         else:
             scaled_data = (data - scaler.mean_) / scaler.scale_
-            distances = sklearn.metrics.pairwise_distances(
-                scaled_data,
-                scaled_data[0].reshape(1, -1),
-                metric=distance_metric
-            ).ravel()
+            distances = sklearn.metrics.pairwise_distances(scaled_data,
+                                                           scaled_data[0].reshape(1, -1),
+                                                           metric=distance_metric).ravel()
 
         new_df_case = pd.DataFrame(data=scaled_data, columns=self.indep)
         sampled_class_frequency = 0
 
-        n_defect_class = np.sum(self.blackbox_model.predict(
-            new_df_case.loc[:, self.indep]))
+        n_defect_class = np.sum(self.blackbox_model.predict(new_df_case.loc[:, self.indep]))
 
         if debug:
             print('Random seed', random_seed, 'nDefective', n_defect_class)
@@ -962,6 +894,68 @@ class PyExplainer:
             html = self.generate_html()
             display(HTML(html))
 
+    def parse_top_rules(self, top_k_positive_rules, top_k_negative_rules):
+        """Parse top k positive rules and top k negative rules given positive and negative rules as DataFrame
+
+        Parameters
+        ----------
+        top_k_positive_rules : :obj:`pandas.core.frame.DataFrame`
+            Top positive rules DataFrame
+        top_k_negative_rules : :obj:`pandas.core.frame.DataFrame`
+            Top negative rules DataFrame
+
+        Returns
+        -------
+        :obj:`dict`
+            A dict containing two keys, 'top_tofollow_rules' and 'top_toavoid_rules'
+        """
+        top_variables = []
+        top_k_toavoid_rules = []
+        top_k_tofollow_rules = []
+
+        for i in range(len(top_k_positive_rules)):
+            tmp_rule = (top_k_positive_rules['rule'].iloc[i])
+            tmp_rule = tmp_rule.strip()
+            tmp_rule = str.split(tmp_rule, '&')
+            for j in tmp_rule:
+                j = j.strip()
+                tmp_sub_rule = str.split(j, ' ')
+                tmp_variable = tmp_sub_rule[0]
+                tmp_condition_variable = tmp_sub_rule[1]
+                tmp_value = tmp_sub_rule[2]
+                if tmp_variable not in top_variables:
+                    top_variables.append(tmp_variable)
+                    top_k_toavoid_rules.append({'variable': tmp_variable,
+                                                'lessthan': tmp_condition_variable[0] == '<',
+                                                'value': tmp_value})
+                if len(top_k_toavoid_rules) == self.__get_top_k_rules():
+                    break
+            if len(top_k_toavoid_rules) == self.__get_top_k_rules():
+                break
+
+        for i in range(len(top_k_negative_rules)):
+            tmp_rule = (top_k_negative_rules['rule'].iloc[i])
+            tmp_rule = tmp_rule.strip()
+            tmp_rule = str.split(tmp_rule, '&')
+            for j in tmp_rule:
+                j = j.strip()
+                tmp_sub_rule = str.split(j, ' ')
+                tmp_variable = tmp_sub_rule[0]
+                tmp_condition_variable = tmp_sub_rule[1]
+                tmp_value = tmp_sub_rule[2]
+                if tmp_variable not in top_variables:
+                    top_variables.append(tmp_variable)
+                    top_k_tofollow_rules.append({'variable': tmp_variable,
+                                                 'lessthan': tmp_condition_variable[0] == '<',
+                                                 'value': tmp_value})
+                if len(top_k_tofollow_rules) == self.__get_top_k_rules():
+                    break
+            if len(top_k_tofollow_rules) == self.__get_top_k_rules():
+                break
+
+        return {'top_tofollow_rules': top_k_tofollow_rules,
+                'top_toavoid_rules': top_k_toavoid_rules}
+
     def retrieve_min_max_values(self):
         """Retrieve the minimum and maximum value from X_train
 
@@ -1011,6 +1005,16 @@ class PyExplainer:
             count += play_speed
         # update the right text
         self.update_right_text(right_text)
+
+    def set_top_k_rules(self, top_k_rules):
+        """Setter of top_k_rules
+
+        Parameters
+        ----------
+        top_k_rules : :obj:`int`
+            Number of top positive and negative rules to be retrieved
+        """
+        self.top_k_rules = top_k_rules
 
     def show_visualisation(self):
         """Display items as follows,
@@ -1104,8 +1108,8 @@ class PyExplainer:
         rule_obj : :obj:`dict`
             A rule dict generated either through loading the .pyobject file or the .explain(...) function
         """
-        top_rules = parse_top_rules(top_k_positive_rules=rule_obj['top_k_positive_rules'],
-                                    top_k_negative_rules=rule_obj['top_k_negative_rules'])
+        top_rules = self.parse_top_rules(top_k_positive_rules=rule_obj['top_k_positive_rules'],
+                                         top_k_negative_rules=rule_obj['top_k_negative_rules'])
         self.__set_X_explain(rule_obj['X_explain'])
         self.__set_y_explain(rule_obj['y_explain'])
         self.__set_bullet_data(self.generate_bullet_data(top_rules, self.__get_X_explain()))
@@ -1140,6 +1144,16 @@ class PyExplainer:
             A list of dict that contains data needed by the d3 bullet chart
         """
         return self.risk_data
+
+    def __get_top_k_rules(self):
+        """Getter of top_k_rules
+
+        Returns
+        ----------
+        :obj:`int`
+            Number of top positive and negative rules to be retrieved
+        """
+        return self.top_k_rules
 
     def __get_X_explain(self):
         """Getter of X_explain
