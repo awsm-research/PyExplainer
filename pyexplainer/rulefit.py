@@ -24,7 +24,7 @@ from sklearn.linear_model import LassoCV, LogisticRegressionCV
 from functools import reduce
 
 
-class RuleCondition():
+class RuleCondition:
     """Class for binary rule condition
 
     Warning: this class should not be used directly.
@@ -76,7 +76,7 @@ class RuleCondition():
         return hash((self.feature_index, self.threshold, self.operator, self.feature_name))
 
 
-class Winsorizer():
+class Winsorizer:
     """Performs Winsorization 1->1*
 
     Warning: this class should not be used directly.
@@ -102,7 +102,7 @@ class Winsorizer():
         return X_
 
 
-class FriedScale():
+class FriedScale:
     """Performs scaling of linear variables according to Friedman et al. 2005 Sec 5
 
     Each variable is first Winsorized l->l*, then standardised as 0.4 x l* / std(l*)
@@ -134,7 +134,7 @@ class FriedScale():
             return X * self.scale_multipliers
 
 
-class Rule():
+class Rule:
     """Class for binary Rules from list of conditions
 
     Warning: this class should not be used directly.
@@ -220,7 +220,7 @@ def extract_rules_from_tree(tree, feature_names=None):
     return rules
 
 
-class RuleEnsemble():
+class RuleEnsemble:
     """Ensemble of binary decision rules
 
     This class implements an ensemble of decision rules that extracts rules from
@@ -374,7 +374,14 @@ class RuleFit(BaseEstimator, TransformerMixin):
         self.cv = cv
         self.tol = tol
         # LassoCV default max_iter is 1000 while LogisticRegressionCV 100.
-        self.max_iter = max_iter
+        if max_iter is not None:
+            self.max_iter = max_iter
+        else:
+            if rfmode == 'regress':
+                self.max_iter = 100
+            else:
+                self.max_iter = 1000
+
         self.n_jobs = n_jobs
         self.Cs = Cs
 

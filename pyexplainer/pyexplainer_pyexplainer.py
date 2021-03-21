@@ -11,7 +11,7 @@ import sklearn
 from IPython.core.display import display, HTML
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils import check_random_state
-from rulefit import RuleFit
+from pyexplainer.rulefit import RuleFit
 
 
 def data_validation(data):
@@ -29,11 +29,10 @@ def data_validation(data):
         False: The data is not a list of dictionary.
     """
     valid = True
-    if str(type(data)) == "<class 'list'>":
+    if isinstance(data, list):
         for i in range(len(data)):
-            if str(type(data[i])) != "<class 'dict'>":
-                print(
-                    "Data Format Error - the input data should be a list of dictionary")
+            if not isinstance(data[i], dict):
+                print("Data Format Error - the input data should be a list of dictionary")
                 valid = False
                 break
     else:
@@ -41,13 +40,13 @@ def data_validation(data):
     return valid
 
 
-def id_generator(size=15, random_state=None):
+def id_generator(size=15, random_state=check_random_state(None)):
     """Generate unique ids for div tag which will contain the visualisation stuff from d3.
 
     Parameters
     ----------
     size : :obj:`int`
-        An integer that specifies the length of the returned id, default = 15.
+        An integer that specifies the length of the returned id, default = 15. Size should be ion range 1 - 30(both included)
     random_state : :obj:`np.random.RandomState`, default is None.
         A RandomState instance.
 
@@ -56,6 +55,12 @@ def id_generator(size=15, random_state=None):
     :obj:`str`
         A random identifier.
     """
+    if not isinstance(size, int):
+        size = 15
+    if size <= 0 or size > 30:
+        size = 15
+    if not isinstance(random_state, np.random.mtrand.RandomState):
+        random_state = check_random_state(None)
     chars = list(string.ascii_uppercase + string.digits)
     return ''.join(random_state.choice(chars, size, replace=True))
 
@@ -73,7 +78,11 @@ def to_js_data(list_of_dict):
     :obj:`str`
         A str to represent a list of dict ending with ';'
     """
-    return str(list_of_dict) + ";"
+    if data_validation(list_of_dict):
+        return str(list_of_dict) + ";"
+    else:
+        print("Data to be transformed to the javascript format is not a python list of dict, hence '[{}];' is returned")
+        return '[{}];'
 
 
 class PyExplainer:
@@ -90,10 +99,10 @@ class PyExplainer:
         independent variables (column names)
     dep : :obj:`str`
         dependent variables (column names)
-    class_label : :obj:`list`
-        Classification labels, default = ['Clean', 'Defect']
     blackbox_model : :obj:`black box model trained using sklearn`
         A global black box ML model used to generate the prediction and explanation
+    class_label : :obj:`list`
+        Classification labels, default = ['Clean', 'Defect']
     top_k_rules : :obj:`int`
         Number of top positive and negative rules to be retrieved
     """
@@ -103,10 +112,9 @@ class PyExplainer:
                  y_train,
                  indep,
                  dep,
+                 blackbox_model,
                  class_label=['Clean', 'Defect'],
-                 blackbox_model='',
                  top_k_rules=3):
-
         self.X_train = X_train
         self.y_train = y_train
         self.indep = indep
@@ -160,10 +168,10 @@ class PyExplainer:
 
         Examples
         --------
-        >>> from pyexplainer_pyexplainer import PyExplainer
+        >>> from pyexplainer.pyexplainer_pyexplainer import PyExplainer
         >>> import pandas as pd
         >>> from sklearn.ensemble import RandomForestClassifier
-        >>> data = pd.read_csv('../tests/example-datasets/activemq-5.0.0.csv', index_col = 'File')
+        >>> data = pd.read_csv('../tests/pyexplainer_test_data/activemq-5.0.0.csv', index_col = 'File')
         >>> dep = data.columns[-4]
         >>> indep = data.columns[0:(len(data.columns) - 4)]
         >>> X_train = data.loc[:, indep]
@@ -172,7 +180,7 @@ class PyExplainer:
         >>> blackbox_model.fit(X_train, y_train)
         >>> class_label = ['Clean', 'Defect']
         >>> pyExp = PyExplainer(X_train, y_train, indep, dep, class_label, blackbox_model)
-        >>> sample_test_data = pd.read_csv('../tests/example-datasets/activemq-5.0.0.csv', index_col = 'File')
+        >>> sample_test_data = pd.read_csv('../tests/pyexplainer_test_data/activemq-5.0.0.csv', index_col = 'File')
         >>> X_test = sample_test_data.loc[:, indep]
         >>> y_test = sample_test_data.loc[:, dep]
         >>> sample_explain_index = 0
@@ -345,7 +353,7 @@ class PyExplainer:
         </div>
         """ % main_title
 
-        unique_id = id_generator(random_state=check_random_state(None))
+        unique_id = id_generator()
         bullet_data = to_js_data(self.__get_bullet_data())
         risk_data = to_js_data(self.__get_risk_data())
 
@@ -1076,10 +1084,10 @@ class PyExplainer:
 
         Examples
         --------
-        >>> from pyexplainer_pyexplainer import PyExplainer
+        >>> from pyexplainer.pyexplainer_pyexplainer import PyExplainer
         >>> import pandas as pd
         >>> from sklearn.ensemble import RandomForestClassifier
-        >>> data = pd.read_csv('../tests/example-datasets/activemq-5.0.0.csv', index_col = 'File')
+        >>> data = pd.read_csv('../tests/pyexplainer_test_data/activemq-5.0.0.csv', index_col = 'File')
         >>> dep = data.columns[-4]
         >>> indep = data.columns[0:(len(data.columns) - 4)]
         >>> X_train = data.loc[:, indep]
@@ -1088,7 +1096,7 @@ class PyExplainer:
         >>> blackbox_model.fit(X_train, y_train)
         >>> class_label = ['Clean', 'Defect']
         >>> pyExp = PyExplainer(X_train, y_train, indep, dep, class_label, blackbox_model)
-        >>> sample_test_data = pd.read_csv('../tests/example-datasets/activemq-5.0.0.csv', index_col = 'File')
+        >>> sample_test_data = pd.read_csv('../tests/pyexplainer_test_data/activemq-5.0.0.csv', index_col = 'File')
         >>> X_test = sample_test_data.loc[:, indep]
         >>> y_test = sample_test_data.loc[:, dep]
         >>> sample_explain_index = 0
