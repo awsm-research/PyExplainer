@@ -1,6 +1,7 @@
 # pyexplainer 
 ![](https://github.com/MichaelFu1998-create/pyexplainer/workflows/build/badge.svg) [![codecov](https://codecov.io/gh/MichaelFu1998-create/pyexplainer/branch/main/graph/badge.svg)](https://codecov.io/gh/MichaelFu1998-create/pyexplainer)
 [![Documentation Status](https://readthedocs.org/projects/pyexplainer/badge/?version=latest)](https://pyexplainer.readthedocs.io/en/latest/?badge=latest)
+[![codecov](https://codecov.io/gh/awsm-research/pyExplainer/branch/master/graph/badge.svg?token=3HQBAEXK21)](https://codecov.io/gh/awsm-research/pyExplainer)
 
 python ML explainer for SEA
 ## pyexplainer
