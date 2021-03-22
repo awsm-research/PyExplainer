@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - env:
+            ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
       - uses: actions/checkout@v1
         with:
           fetch-depth: 1
@@ -40,7 +42,6 @@ jobs:
 
       - name: Test with pytest
         env:
-          ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
           DJANGO_SETTINGS_MODULE: project.settings
           SECRETS_FILE: .confidential/ci.json
         run: poetry run pytest --cov . -n 2
