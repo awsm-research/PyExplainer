@@ -8,9 +8,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest]
+        os: [macos-latest, windows-latest]
         python-version: [3.8]
-
+    
     steps:
       - uses: actions/checkout@v2
         with:
@@ -56,11 +56,3 @@ jobs:
 
       - name: Test with pytest
         run: poetry run pytest
-
-      - name: Generate code coverage report
-        run: poetry run pytest --cov-report xml --cov=pyexplainer tests/
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v1
-        with:
-          fail_ci_if_error: true

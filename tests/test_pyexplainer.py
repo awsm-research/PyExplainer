@@ -67,7 +67,7 @@ def test_to_js_data(data, result):
 
 
 # load data
-file_path = "./pyexplainer_test_data/activemq-5.0.0.csv"
+file_path = "tests/pyexplainer_test_data/activemq-5.0.0.csv"
 if INSIDE_VIRTUAL_ENV:
     cwd = os.getcwd()
     file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.0.0.csv"
@@ -110,7 +110,7 @@ def test_pyexplainer_init_positive(X_train, y_train, indep, dep, blackbox_model,
 
 py_explainer = PyExplainer(X_train, y_train, indep, dep, blackbox_model)
 # load data
-test_file_path = "./pyexplainer_test_data/activemq-5.1.0.csv"
+test_file_path = "tests/pyexplainer_test_data/activemq-5.1.0.csv"
 if INSIDE_VIRTUAL_ENV:
     test_file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.1.0.csv"
 sample_test_data = pd.read_csv(test_file_path, index_col='File')
