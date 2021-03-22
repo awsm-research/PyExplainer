@@ -58,7 +58,7 @@ jobs:
         run: poetry run pytest
 
       - name: Generate code coverage report
-        run: poetry run pytest --cov=pyexplainer tests/
+        run: poetry run pytest --cov-report xml --cov=pyexplainer tests/
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
