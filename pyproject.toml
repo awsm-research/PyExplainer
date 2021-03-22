@@ -13,7 +13,6 @@ scipy = "^1.6.1"
 ipywidgets = "^7.6.3"
 ipython = "^7.21.0"
 pandas = "^1.2.3"
-pytest-cov = "^2.11.1"
 
 [tool.poetry.dev-dependencies]
 Sphinx = "^3.5.1"
@@ -22,6 +21,7 @@ rope = "^0.18.0"
 pytest = "^6.2.2"
 nbsphinx = "^0.8.2"
 ipykernel = "^5.5.0"
+pytest-cov = "^2.11.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
