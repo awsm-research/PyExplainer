@@ -11,7 +11,10 @@ import sklearn
 from IPython.core.display import display, HTML
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils import check_random_state
+# currently for pytest
 from pyexplainer.rulefit import RuleFit
+# currently for notebook test
+# from rulefit import RuleFit
 
 
 def data_validation(data):
@@ -98,7 +101,7 @@ class PyExplainer:
     indep : :obj:`pandas.core.indexes.base.Index`
         independent variables (column names)
     dep : :obj:`str`
-        dependent variables (column names)
+        dependent variables (column name)
     blackbox_model : :obj:`black box model trained using sklearn`
         A global black box ML model used to generate the prediction and explanation
     class_label : :obj:`list`
@@ -115,14 +118,46 @@ class PyExplainer:
                  blackbox_model,
                  class_label=['Clean', 'Defect'],
                  top_k_rules=3):
-        self.X_train = X_train
-        self.y_train = y_train
-        self.indep = indep
-        self.dep = dep
-        self.processed_features = []
+        if isinstance(X_train, pd.core.frame.DataFrame):
+            self.X_train = X_train
+        else:
+            print("X_train should be type 'pandas.core.frame.DataFrame'")
+            raise ValueError
+        if isinstance(y_train, pd.core.series.Series):
+            self.y_train = y_train
+        else:
+            print("y_train should be type 'pandas.core.series.Series'")
+            raise ValueError
+        if isinstance(indep, pd.core.indexes.base.Index):
+            self.indep = indep
+        else:
+            print("indep (feature column names) should be type 'pandas.core.indexes.base.Index'")
+            raise ValueError
+        if isinstance(dep, str):
+            self.dep = dep
+        else:
+            print("dep (label column name) should be type 'str'")
+            raise ValueError
+        # todo- validate blackbox model
         self.blackbox_model = blackbox_model
-        self.class_label = class_label
-        self.top_k_rules = top_k_rules
+        if isinstance(class_label, list):
+            if len(class_label) == 2:
+                self.class_label = class_label
+            else:
+                print("class_label should be a list with length of 2")
+                raise ValueError
+        else:
+            print("class_label should be type 'list'")
+            raise ValueError
+        if isinstance(top_k_rules, int):
+            if top_k_rules <= 0 or top_k_rules > 15:
+                print("top_k_rules should be in range 1 - 15 (both included)")
+                raise ValueError
+            else:
+                self.top_k_rules = top_k_rules
+        else:
+            print("top_k_rules should be type 'int'")
+            raise ValueError
 
         self.__set_bullet_data([{}])
         self.__set_risk_data([{}])
@@ -1022,7 +1057,10 @@ class PyExplainer:
         top_k_rules : :obj:`int`
             Number of top positive and negative rules to be retrieved
         """
-        self.top_k_rules = top_k_rules
+        if top_k_rules <= 0 or top_k_rules > 15 or isinstance(top_k_rules, int) == False:
+            return print("set top_k_rules failed, top_k_rules should be int in range 1 - 15 (both included)")
+        else:
+            self.top_k_rules = top_k_rules
 
     def show_visualisation(self):
         """Display items as follows,
