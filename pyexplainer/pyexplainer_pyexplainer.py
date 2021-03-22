@@ -12,9 +12,11 @@ from IPython.core.display import display, HTML
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils import check_random_state
 # currently for pytest
-#from pyexplainer.rulefit import RuleFit
+from pyexplainer.rulefit import RuleFit
+
+
 # currently for notebook test
-from rulefit import RuleFit
+# from rulefit import RuleFit
 
 
 def data_validation(data):
@@ -159,12 +161,12 @@ class PyExplainer:
             print("top_k_rules should be type 'int'")
             raise ValueError
 
-        self.__set_bullet_data([{}])
-        self.__set_risk_data([{}])
-        self.__set_bullet_output(widgets.Output(layout={'border': '3px solid black'}))
-        self.__set_hbox_items([])
-        self.__set_X_explain(None)
-        self.__set_y_explain(None)
+        self.bullet_data = [{}]
+        self.risk_data = [{}]
+        self.bullet_output = widgets.Output(layout={'border': '3px solid black'})
+        self.hbox_items = []
+        self.X_explain = None
+        self.y_explain = None
 
     def explain(self,
                 X_explain,
@@ -825,6 +827,16 @@ class PyExplainer:
         risk_score = self.__get_risk_data()[0]['riskScore'][0].strip("%")
         return float(risk_score)
 
+    def get_top_k_rules(self):
+        """Getter of top_k_rules
+
+        Returns
+        ----------
+        :obj:`int`
+            Number of top positive and negative rules to be retrieved
+        """
+        return self.top_k_rules
+
     def generate_progress_bar_items(self):
         """Generate items to be set into hbox (horizontal box)
 
@@ -971,9 +983,9 @@ class PyExplainer:
                     top_k_toavoid_rules.append({'variable': tmp_variable,
                                                 'lessthan': tmp_condition_variable[0] == '<',
                                                 'value': tmp_value})
-                if len(top_k_toavoid_rules) == self.__get_top_k_rules():
+                if len(top_k_toavoid_rules) == self.get_top_k_rules():
                     break
-            if len(top_k_toavoid_rules) == self.__get_top_k_rules():
+            if len(top_k_toavoid_rules) == self.get_top_k_rules():
                 break
 
         for i in range(len(top_k_negative_rules)):
@@ -991,9 +1003,9 @@ class PyExplainer:
                     top_k_tofollow_rules.append({'variable': tmp_variable,
                                                  'lessthan': tmp_condition_variable[0] == '<',
                                                  'value': tmp_value})
-                if len(top_k_tofollow_rules) == self.__get_top_k_rules():
+                if len(top_k_tofollow_rules) == self.get_top_k_rules():
                     break
-            if len(top_k_tofollow_rules) == self.__get_top_k_rules():
+            if len(top_k_tofollow_rules) == self.get_top_k_rules():
                 break
 
         return {'top_tofollow_rules': top_k_tofollow_rules,
@@ -1104,10 +1116,14 @@ class PyExplainer:
 
         Parameters
         ----------
-        right_text : :obj:`String`
+        right_text : :obj:`widgets.Label`
             Text on the rightward side of the Risk Score Progress Bar
         """
-        self.__get_hbox_items()[2] = right_text
+        if isinstance(right_text, widgets.Label):
+            self.__get_hbox_items()[2] = right_text
+        else:
+            print("The right_text to be set into hbox_items should be type 'ipywidgets.Label'")
+            raise ValueError
 
     def visualise(self, rule_obj):
         """Given the rule object, show all of the visualisation as follows .
@@ -1171,6 +1187,16 @@ class PyExplainer:
         """
         return self.bullet_data
 
+    def __get_bullet_output(self):
+        """Getter of bullet_output
+
+        Returns
+        ----------
+        :obj:`ipywidgets.Output`
+            A Output object used to wrap and locate contents of visualisation
+        """
+        return self.bullet_output
+
     def __get_hbox_items(self):
         """Getter of hbox_items
 
@@ -1190,16 +1216,6 @@ class PyExplainer:
             A list of dict that contains data needed by the d3 bullet chart
         """
         return self.risk_data
-
-    def __get_top_k_rules(self):
-        """Getter of top_k_rules
-
-        Returns
-        ----------
-        :obj:`int`
-            Number of top positive and negative rules to be retrieved
-        """
-        return self.top_k_rules
 
     def __get_X_explain(self):
         """Getter of X_explain
@@ -1229,7 +1245,11 @@ class PyExplainer:
         bullet_data : :obj:`list`
             A list of dict that contains data needed by the d3 bullet chart
         """
-        self.bullet_data = bullet_data
+        if data_validation(bullet_data):
+            self.bullet_data = bullet_data
+        else:
+            print('bullet_data is not in the format of python list of dict')
+            raise ValueError
 
     def __set_bullet_output(self, bullet_output):
         """Setter of bullet_output
@@ -1239,7 +1259,11 @@ class PyExplainer:
         bullet_output : :obj:`widgets.Output`
             A Output object used to wrap and locate contents of visualisation
         """
-        self.bullet_output = bullet_output
+        if isinstance(bullet_output, widgets.Output):
+            self.bullet_output = bullet_output
+        else:
+            print("bullet_output should be type 'ipywidgets.Output'")
+            raise ValueError
 
     def __set_hbox_items(self, hbox_items):
         """Setter of hbox_items
@@ -1249,17 +1273,32 @@ class PyExplainer:
         hbox_items : :obj:`list`
             A list of dict that contains items to be in a horizontal box
         """
-        self.hbox_items = hbox_items
+        if len(hbox_items) == 4:
+            if isinstance(hbox_items[0], widgets.Label) and isinstance(hbox_items[1], widgets.FloatProgress) \
+                    and isinstance(hbox_items[2], widgets.Label) and isinstance(hbox_items[3], widgets.Label):
+                self.hbox_items = hbox_items
+            else:
+                print("""hbox_items should be in the format of '[widgets.Label, widgets.FloatProgress, widgets.Label, 
+                                  widgets.Label]'""")
+                raise ValueError
+        else:
+            print("""hbox_items should be in the format of '[widgets.Label, widgets.FloatProgress, widgets.Label, 
+                  widgets.Label]'""")
+            raise ValueError
 
     def __set_risk_data(self, risk_data):
-        """Setter of hbox_items
+        """Setter of risk_data
 
         Parameters
         ----------
-        hbox_items : :obj:`list`
-            A list of dict that contains items to be in a horizontal box
+        risk_data : :obj:`list`
+            A list of dict that contains risk prediction and risk score info
         """
-        self.risk_data = risk_data
+        if data_validation(risk_data):
+            self.risk_data = risk_data
+        else:
+            print('risk_data is not in the format of python list of dict')
+            raise ValueError
 
     def __set_X_explain(self, X_explain):
         """Setter of X_explain
@@ -1269,7 +1308,11 @@ class PyExplainer:
         X_explain : :obj:`pandas.core.frame.DataFrame`
             An explained DataFrame containing feature cols
         """
-        self.X_explain = X_explain
+        if isinstance(X_explain, pd.core.frame.DataFrame):
+            self.X_explain = X_explain
+        else:
+            print("X_explain should be type 'pandas.core.frame.DataFrame'")
+            raise ValueError
 
     def __set_y_explain(self, y_explain):
         """Setter of y_explain
@@ -1279,4 +1322,8 @@ class PyExplainer:
         y_explain : :obj:`pandas.core.series.Series`
             An explained DataFrame containing label col
         """
-        self.y_explain = y_explain
+        if isinstance(y_explain, pd.core.series.Series):
+            self.y_explain = y_explain
+        else:
+            print("y_explain should be type 'pandas.core.series.Series'")
+            raise ValueError
