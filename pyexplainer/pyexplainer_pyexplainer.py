@@ -503,14 +503,14 @@ class PyExplainer:
         categorical_vars = []
 
         X_train_i = self.X_train.copy()
-        y_train_i = self.y_train.copy()
+        # y_train_i = self.y_train.copy()
         X_test = X_test.copy()
         y_test = y_test.copy()
 
         X_train_i.reset_index(inplace=True)
         X_test.reset_index(inplace=True)
         X_train_i = X_train_i.loc[:, self.indep]
-        y_train_i = y_train_i.reset_index()[[self.dep]]
+        # y_train_i = y_train_i.reset_index()[[self.dep]]
 
         X_test = X_test.loc[:, self.indep]
         y_test = y_test.reset_index()[[self.dep]]
@@ -705,7 +705,7 @@ class PyExplainer:
                 num_cols = len(non_zero_indexes)
                 instance_sample = data_row[:, non_zero_indexes]
                 scale = scale[non_zero_indexes]
-                mean = mean[non_zero_indexes]
+                # mean = mean[non_zero_indexes]
 
             if sampling_method == 'gaussian':
                 data = random_state.normal(0, 1, num_samples * num_cols).reshape(num_samples, num_cols)
@@ -719,8 +719,8 @@ class PyExplainer:
 
             if sample_around_instance:
                 data = data * scale + instance_sample
-            else:
-                data = data * scale + mean
+            # else:
+            #    data = data * scale + mean
 
             if is_sparse:
                 if num_cols == 0:
@@ -753,8 +753,8 @@ class PyExplainer:
             inverse[:, column] = inverse_column
         """
 
-        if discretizer is not None:
-            inverse[1:] = discretizer.undiscretize(inverse[1:])
+        # if discretizer is not None:
+        #    inverse[1:] = discretizer.undiscretize(inverse[1:])
 
         inverse[0] = data_row
 
