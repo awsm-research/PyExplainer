@@ -13,8 +13,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.utils import check_random_state
 # currently for pytest
 from pyexplainer.rulefit import RuleFit
-
-
 # currently for notebook test
 # from rulefit import RuleFit
 
@@ -674,9 +672,9 @@ class PyExplainer:
             return {'synthetic_data': new_df_case,
                     'sampled_class_frequency': sampled_class_frequency}
 
-    """ todo - to be fixed
-    def generate_instance_random_perturbation(self, X_explain, y_explain, debug=False):
-        # The random perturbation approach to generate synthetic instances which is also used by LIME.
+    # todo - documentation
+    def generate_instance_random_perturbation(self, X_explain, debug=False):
+        """The random perturbation approach to generate synthetic instances which is also used by LIME."""
         random_seed = 0
         data_row = X_explain.loc[:, self.indep].values
         num_samples = 1000
@@ -685,7 +683,7 @@ class PyExplainer:
         sample_around_instance = True
         scaler = sklearn.preprocessing.StandardScaler(with_mean=False)
         scaler.fit(self.X_train.loc[:, self.indep])
-        distance_metric = 'euclidean'
+        # distance_metric = 'euclidean'
         random_state = check_random_state(random_seed)
         is_sparse = sp.sparse.issparse(data_row)
 
@@ -696,8 +694,6 @@ class PyExplainer:
         else:
             num_cols = data_row.shape[0]
             data = np.zeros((num_samples, num_cols))
-
-        categorical_features = range(num_cols)
 
         if discretizer is None:
             instance_sample = data_row
@@ -714,13 +710,7 @@ class PyExplainer:
             if sampling_method == 'gaussian':
                 data = random_state.normal(0, 1, num_samples * num_cols).reshape(num_samples, num_cols)
                 data = np.array(data)
-            elif sampling_method == 'lhs':
-                data = lhs(num_cols, samples=num_samples).reshape(num_samples, num_cols)
-                means = np.zeros(num_cols)
-                stdvs = np.array([1] * num_cols)
-                for i in range(num_cols):
-                    data[:, i] = norm(loc=means[i], scale=stdvs[i]).ppf(data[:, i])
-                data = np.array(data)
+
             else:
                 warnings.warn('''Invalid input for sampling_method.
                                  Defaulting to Gaussian sampling.''', UserWarning)
@@ -741,14 +731,16 @@ class PyExplainer:
                     data_1d_shape = data.shape[0] * data.shape[1]
                     data_1d = data.reshape(data_1d_shape)
                     data = sp.sparse.csr_matrix((data_1d, indexes, indptr), shape=(num_samples, data_row.shape[1]))
-            categorical_features = []
-            first_row = data_row
-        else:
-            first_row = discretizer.discretize(data_row)
+
+            # first_row = data_row
+        # else:
+            # first_row = discretizer.discretize(data_row)
 
         data[0] = data_row.copy()
         inverse = data.copy()
 
+        # todo - this for-loop is for categorical columns in the future
+        """ 
         for column in categorical_features:
             values = feature_values[column]
             freqs = feature_frequencies[column]
@@ -759,6 +751,7 @@ class PyExplainer:
             inverse_column[0] = data[0, column]
             data[:, column] = binary_column
             inverse[:, column] = inverse_column
+        """
 
         if discretizer is not None:
             inverse[1:] = discretizer.undiscretize(inverse[1:])
@@ -773,9 +766,9 @@ class PyExplainer:
                 scaled_data = scaled_data.tocsr()
         else:
             scaled_data = (data - scaler.mean_) / scaler.scale_
-            distances = sklearn.metrics.pairwise_distances(scaled_data,
-                                                           scaled_data[0].reshape(1, -1),
-                                                           metric=distance_metric).ravel()
+            # distances = sklearn.metrics.pairwise_distances(scaled_data,
+            #                                               scaled_data[0].reshape(1, -1),
+            #                                               metric=distance_metric).ravel()
 
         new_df_case = pd.DataFrame(data=scaled_data, columns=self.indep)
         sampled_class_frequency = 0
@@ -787,7 +780,6 @@ class PyExplainer:
 
         return {'synthetic_data': new_df_case,
                 'sampled_class_frequency': sampled_class_frequency}
-    """
 
     def generate_risk_data(self, X_explain):
         """Generate risk prediction and risk score to be visualised

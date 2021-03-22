@@ -1,9 +1,27 @@
 import pandas as pd
 import numpy as np
 from pyexplainer.rulefit import RuleFit
+import os
+import sys
+
+
+def get_base_prefix_compat():
+    """Get base/real prefix, or sys.prefix if there is none."""
+    return getattr(sys, "base_prefix", None) or getattr(sys, "real_prefix", None) or sys.prefix
+
+
+def in_virtualenv():
+    return get_base_prefix_compat() != sys.prefix
+
+
+INSIDE_VIRTUAL_ENV = in_virtualenv()
 
 # load data
-boston_data = pd.read_csv("rulefit_test_data/boston.csv", index_col=0)
+file_path = "./rulefit_test_data/boston.csv"
+if INSIDE_VIRTUAL_ENV:
+    cwd = os.getcwd()
+    file_path = cwd + "/tests/rulefit_test_data/boston.csv"
+boston_data = pd.read_csv(file_path, index_col=0)
 
 y = boston_data.medv.values
 X = boston_data.drop("medv", axis=1)
@@ -31,5 +49,7 @@ y_proba = rf.predict_proba(X)
 assert np.min(y_proba) >= 0
 assert np.max(y_proba) <= 1
 
-# test that probabilities match actual predictions
-np.testing.assert_array_equal(np.rint(np.array(y_proba[:, 1])), y_pred)
+
+def test_probabilities_match_predictions():
+    # test that probabilities match actual predictions
+    np.testing.assert_array_equal(np.rint(np.array(y_proba[:, 1])), y_pred)

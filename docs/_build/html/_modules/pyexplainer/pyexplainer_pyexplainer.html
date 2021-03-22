@@ -167,7 +167,10 @@
 <span class="kn">from</span> <span class="nn">IPython.core.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">check_random_state</span>
-<span class="kn">from</span> <span class="nn">rulefit</span> <span class="kn">import</span> <span class="n">RuleFit</span>
+<span class="c1"># currently for pytest</span>
+<span class="kn">from</span> <span class="nn">pyexplainer.rulefit</span> <span class="kn">import</span> <span class="n">RuleFit</span>
+<span class="c1"># currently for notebook test</span>
+<span class="c1"># from rulefit import RuleFit</span>
 
 
 <div class="viewcode-block" id="data_validation"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.data_validation">[docs]</a><span class="k">def</span> <span class="nf">data_validation</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
@@ -185,11 +188,10 @@
 <span class="sd">        False: The data is not a list of dictionary.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">valid</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">))</span> <span class="o">==</span> <span class="s2">&quot;&lt;class &#39;list&#39;&gt;&quot;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)):</span>
-            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span> <span class="o">!=</span> <span class="s2">&quot;&lt;class &#39;dict&#39;&gt;&quot;</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span>
-                    <span class="s2">&quot;Data Format Error - the input data should be a list of dictionary&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data Format Error - the input data should be a list of dictionary&quot;</span><span class="p">)</span>
                 <span class="n">valid</span> <span class="o">=</span> <span class="kc">False</span>
                 <span class="k">break</span>
     <span class="k">else</span><span class="p">:</span>
@@ -197,13 +199,13 @@
     <span class="k">return</span> <span class="n">valid</span></div>
 
 
-<div class="viewcode-block" id="id_generator"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.id_generator">[docs]</a><span class="k">def</span> <span class="nf">id_generator</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="id_generator"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.id_generator">[docs]</a><span class="k">def</span> <span class="nf">id_generator</span><span class="p">(</span><span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">check_random_state</span><span class="p">(</span><span class="kc">None</span><span class="p">)):</span>
     <span class="sd">&quot;&quot;&quot;Generate unique ids for div tag which will contain the visualisation stuff from d3.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    size : :obj:`int`</span>
-<span class="sd">        An integer that specifies the length of the returned id, default = 15.</span>
+<span class="sd">        An integer that specifies the length of the returned id, default = 15. Size should be ion range 1 - 30(both included)</span>
 <span class="sd">    random_state : :obj:`np.random.RandomState`, default is None.</span>
 <span class="sd">        A RandomState instance.</span>
 
@@ -212,71 +214,14 @@
 <span class="sd">    :obj:`str`</span>
 <span class="sd">        A random identifier.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">size</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="k">if</span> <span class="n">size</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="mi">30</span><span class="p">:</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">random_state</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">mtrand</span><span class="o">.</span><span class="n">RandomState</span><span class="p">):</span>
+        <span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">chars</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span> <span class="o">+</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span><span class="p">)</span>
     <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">random_state</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">chars</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span></div>
-
-
-<div class="viewcode-block" id="parse_top_rules"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.parse_top_rules">[docs]</a><span class="k">def</span> <span class="nf">parse_top_rules</span><span class="p">(</span><span class="n">top_k_positive_rules</span><span class="p">,</span> <span class="n">top_k_negative_rules</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Parse top k positive rules and top k negative rules given positive and negative rules as DataFrame</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    top_k_positive_rules : :obj:`pandas.core.frame.DataFrame`</span>
-<span class="sd">        Top positive rules DataFrame</span>
-<span class="sd">    top_k_negative_rules : :obj:`pandas.core.frame.DataFrame`</span>
-<span class="sd">        Top negative rules DataFrame</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    :obj:`dict`</span>
-<span class="sd">        A dict containing two keys, &#39;top_tofollow_rules&#39; and &#39;top_toavoid_rules&#39;</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">top_variables</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">top_3_toavoid_rules</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">top_3_tofollow_rules</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">top_k_positive_rules</span><span class="p">)):</span>
-        <span class="n">tmp_rule</span> <span class="o">=</span> <span class="p">(</span><span class="n">top_k_positive_rules</span><span class="p">[</span><span class="s1">&#39;rule&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-        <span class="n">tmp_rule</span> <span class="o">=</span> <span class="n">tmp_rule</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="n">tmp_rule</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tmp_rule</span><span class="p">,</span> <span class="s1">&#39;&amp;&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">tmp_rule</span><span class="p">:</span>
-            <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-            <span class="n">tmp_sub_rule</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
-            <span class="n">tmp_variable</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">tmp_condition_variable</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">tmp_value</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">tmp_variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_variables</span><span class="p">:</span>
-                <span class="n">top_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_variable</span><span class="p">)</span>
-                <span class="n">top_3_toavoid_rules</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;variable&#39;</span><span class="p">:</span> <span class="n">tmp_variable</span><span class="p">,</span>
-                                            <span class="s1">&#39;lessthan&#39;</span><span class="p">:</span> <span class="n">tmp_condition_variable</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span>
-                                            <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">tmp_value</span><span class="p">})</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_3_toavoid_rules</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="k">break</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_3_toavoid_rules</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="k">break</span>
-
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">top_k_negative_rules</span><span class="p">)):</span>
-        <span class="n">tmp_rule</span> <span class="o">=</span> <span class="p">(</span><span class="n">top_k_negative_rules</span><span class="p">[</span><span class="s1">&#39;rule&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-        <span class="n">tmp_rule</span> <span class="o">=</span> <span class="n">tmp_rule</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="n">tmp_rule</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tmp_rule</span><span class="p">,</span> <span class="s1">&#39;&amp;&#39;</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">tmp_rule</span><span class="p">:</span>
-            <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-            <span class="n">tmp_sub_rule</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
-            <span class="n">tmp_variable</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">tmp_condition_variable</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">tmp_value</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">tmp_variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_variables</span><span class="p">:</span>
-                <span class="n">top_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_variable</span><span class="p">)</span>
-                <span class="n">top_3_tofollow_rules</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;variable&#39;</span><span class="p">:</span> <span class="n">tmp_variable</span><span class="p">,</span>
-                                             <span class="s1">&#39;lessthan&#39;</span><span class="p">:</span> <span class="n">tmp_condition_variable</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span>
-                                             <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">tmp_value</span><span class="p">})</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_3_tofollow_rules</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-                <span class="k">break</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_3_tofollow_rules</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="k">break</span>
-
-    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;top_tofollow_rules&#39;</span><span class="p">:</span> <span class="n">top_3_tofollow_rules</span><span class="p">,</span>
-            <span class="s1">&#39;top_toavoid_rules&#39;</span><span class="p">:</span> <span class="n">top_3_toavoid_rules</span><span class="p">}</span></div>
 
 
 <div class="viewcode-block" id="to_js_data"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.to_js_data">[docs]</a><span class="k">def</span> <span class="nf">to_js_data</span><span class="p">(</span><span class="n">list_of_dict</span><span class="p">):</span>
@@ -292,7 +237,11 @@
 <span class="sd">    :obj:`str`</span>
 <span class="sd">        A str to represent a list of dict ending with &#39;;&#39;</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">list_of_dict</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span></div>
+    <span class="k">if</span> <span class="n">data_validation</span><span class="p">(</span><span class="n">list_of_dict</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">list_of_dict</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data to be transformed to the javascript format is not a python list of dict, hence &#39;[</span><span class="si">{}</span><span class="s2">];&#39; is returned&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s1">&#39;[</span><span class="si">{}</span><span class="s1">];&#39;</span></div>
 
 
 <div class="viewcode-block" id="PyExplainer"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer">[docs]</a><span class="k">class</span> <span class="nc">PyExplainer</span><span class="p">:</span>
@@ -308,11 +257,13 @@
 <span class="sd">    indep : :obj:`pandas.core.indexes.base.Index`</span>
 <span class="sd">        independent variables (column names)</span>
 <span class="sd">    dep : :obj:`str`</span>
-<span class="sd">        dependent variables (column names)</span>
-<span class="sd">    class_label : :obj:`list`</span>
-<span class="sd">        Classification labels, default = [&#39;Clean&#39;, &#39;Defect&#39;]</span>
+<span class="sd">        dependent variables (column name)</span>
 <span class="sd">    blackbox_model : :obj:`black box model trained using sklearn`</span>
 <span class="sd">        A global black box ML model used to generate the prediction and explanation</span>
+<span class="sd">    class_label : :obj:`list`</span>
+<span class="sd">        Classification labels, default = [&#39;Clean&#39;, &#39;Defect&#39;]</span>
+<span class="sd">    top_k_rules : :obj:`int`</span>
+<span class="sd">        Number of top positive and negative rules to be retrieved</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
@@ -320,23 +271,56 @@
                  <span class="n">y_train</span><span class="p">,</span>
                  <span class="n">indep</span><span class="p">,</span>
                  <span class="n">dep</span><span class="p">,</span>
+                 <span class="n">blackbox_model</span><span class="p">,</span>
                  <span class="n">class_label</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;Clean&#39;</span><span class="p">,</span> <span class="s1">&#39;Defect&#39;</span><span class="p">],</span>
-                 <span class="n">blackbox_model</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">indep</span> <span class="o">=</span> <span class="n">indep</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dep</span> <span class="o">=</span> <span class="n">dep</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">processed_features</span> <span class="o">=</span> <span class="p">[]</span>
+                 <span class="n">top_k_rules</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_train should be type &#39;pandas.core.frame.DataFrame&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">series</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;y_train should be type &#39;pandas.core.series.Series&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">indep</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">indexes</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Index</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">indep</span> <span class="o">=</span> <span class="n">indep</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;indep (feature column names) should be type &#39;pandas.core.indexes.base.Index&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dep</span> <span class="o">=</span> <span class="n">dep</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dep (label column name) should be type &#39;str&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="c1"># todo- validate blackbox model</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span> <span class="o">=</span> <span class="n">blackbox_model</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">class_label</span> <span class="o">=</span> <span class="n">class_label</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">class_label</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">class_label</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">class_label</span> <span class="o">=</span> <span class="n">class_label</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;class_label should be a list with length of 2&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;class_label should be type &#39;list&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">top_k_rules</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">top_k_rules</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">top_k_rules</span> <span class="o">&gt;</span> <span class="mi">15</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;top_k_rules should be in range 1 - 15 (both included)&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">top_k_rules</span> <span class="o">=</span> <span class="n">top_k_rules</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;top_k_rules should be type &#39;int&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__set_bullet_data</span><span class="p">([{}])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__set_risk_data</span><span class="p">([{}])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__set_bullet_output</span><span class="p">(</span><span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="s1">&#39;3px solid black&#39;</span><span class="p">}))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__set_hbox_items</span><span class="p">([])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__set_X_explain</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__set_y_explain</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bullet_data</span> <span class="o">=</span> <span class="p">[{}]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">risk_data</span> <span class="o">=</span> <span class="p">[{}]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bullet_output</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;border&#39;</span><span class="p">:</span> <span class="s1">&#39;3px solid black&#39;</span><span class="p">})</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hbox_items</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">X_explain</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">y_explain</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="PyExplainer.explain"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.explain">[docs]</a>    <span class="k">def</span> <span class="nf">explain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                 <span class="n">X_explain</span><span class="p">,</span>
@@ -375,10 +359,10 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; from pyexplainer_pyexplainer import PyExplainer</span>
+<span class="sd">        &gt;&gt;&gt; from pyexplainer.pyexplainer_pyexplainer import PyExplainer</span>
 <span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
 <span class="sd">        &gt;&gt;&gt; from sklearn.ensemble import RandomForestClassifier</span>
-<span class="sd">        &gt;&gt;&gt; data = pd.read_csv(&#39;../tests/example-datasets/activemq-5.0.0.csv&#39;, index_col = &#39;File&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; data = pd.read_csv(&#39;../tests/pyexplainer_test_data/activemq-5.0.0.csv&#39;, index_col = &#39;File&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; dep = data.columns[-4]</span>
 <span class="sd">        &gt;&gt;&gt; indep = data.columns[0:(len(data.columns) - 4)]</span>
 <span class="sd">        &gt;&gt;&gt; X_train = data.loc[:, indep]</span>
@@ -387,7 +371,7 @@
 <span class="sd">        &gt;&gt;&gt; blackbox_model.fit(X_train, y_train)</span>
 <span class="sd">        &gt;&gt;&gt; class_label = [&#39;Clean&#39;, &#39;Defect&#39;]</span>
 <span class="sd">        &gt;&gt;&gt; pyExp = PyExplainer(X_train, y_train, indep, dep, class_label, blackbox_model)</span>
-<span class="sd">        &gt;&gt;&gt; sample_test_data = pd.read_csv(&#39;../tests/example-datasets/activemq-5.0.0.csv&#39;, index_col = &#39;File&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; sample_test_data = pd.read_csv(&#39;../tests/pyexplainer_test_data/activemq-5.0.0.csv&#39;, index_col = &#39;File&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; X_test = sample_test_data.loc[:, indep]</span>
 <span class="sd">        &gt;&gt;&gt; y_test = sample_test_data.loc[:, dep]</span>
 <span class="sd">        &gt;&gt;&gt; sample_explain_index = 0</span>
@@ -395,6 +379,7 @@
 <span class="sd">        &gt;&gt;&gt; y_explain = y_test.iloc[[sample_explain_index]]</span>
 <span class="sd">        &gt;&gt;&gt; pyExp.explain(X_explain, y_explain, search_function = &#39;crossoverinterpolation&#39;, top_k = 3, max_rules=30, max_iter =5, cv=5, debug = False)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_top_k_rules</span><span class="p">(</span><span class="n">top_k</span><span class="p">)</span>
         <span class="c1"># Step 1 - Generate synthetic instances</span>
         <span class="k">if</span> <span class="n">search_function</span> <span class="o">==</span> <span class="s1">&#39;crossoverinterpolation&#39;</span><span class="p">:</span>
             <span class="n">synthetic_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_instance_crossover_interpolation</span><span class="p">(</span><span class="n">X_explain</span><span class="p">,</span> <span class="n">y_explain</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
@@ -559,7 +544,7 @@
 <span class="s2">        &lt;/div&gt;</span>
 <span class="s2">        &quot;&quot;&quot;</span> <span class="o">%</span> <span class="n">main_title</span>
 
-        <span class="n">unique_id</span> <span class="o">=</span> <span class="n">id_generator</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="n">check_random_state</span><span class="p">(</span><span class="kc">None</span><span class="p">))</span>
+        <span class="n">unique_id</span> <span class="o">=</span> <span class="n">id_generator</span><span class="p">()</span>
         <span class="n">bullet_data</span> <span class="o">=</span> <span class="n">to_js_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_bullet_data</span><span class="p">())</span>
         <span class="n">risk_data</span> <span class="o">=</span> <span class="n">to_js_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_risk_data</span><span class="p">())</span>
 
@@ -690,8 +675,7 @@
         <span class="n">target_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train_i</span><span class="p">)</span>
 
         <span class="c1"># class variables</span>
-        <span class="n">ori_dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
-            <span class="p">[</span><span class="n">X_train_i</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">),</span> <span class="n">y_train_i</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># ori_dataset = pd.concat([X_train_i.reset_index(drop=True), y_train_i], axis=1)</span>
 
         <span class="c1"># Do feature scaling for continuous data and one hot encoding for categorical data</span>
         <span class="n">scaler</span> <span class="o">=</span> <span class="n">StandardScaler</span><span class="p">()</span>
@@ -709,8 +693,6 @@
         <span class="c1"># dataset = pd.get_dummies(dataset, prefix_sep=&quot;__&quot;, columns=self.__categorical_vars)</span>
         <span class="n">trainset_normalize</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">dataset</span><span class="p">[:</span><span class="n">train_objs_num</span><span class="p">])</span>
         <span class="n">cases_normalize</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="n">train_objs_num</span><span class="p">:])</span>
-
-        <span class="n">temp_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([])</span>
 
         <span class="c1"># make dataframe to store similarities of the trained instances from the explained instance</span>
         <span class="n">dist_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">trainset_normalize</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
@@ -846,10 +828,9 @@
             <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;synthetic_data&#39;</span><span class="p">:</span> <span class="n">new_df_case</span><span class="p">,</span>
                     <span class="s1">&#39;sampled_class_frequency&#39;</span><span class="p">:</span> <span class="n">sampled_class_frequency</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="PyExplainer.generate_instance_random_perturbation"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_instance_random_perturbation">[docs]</a>    <span class="k">def</span> <span class="nf">generate_instance_random_perturbation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_explain</span><span class="p">,</span> <span class="n">y_explain</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The random perturbation approach to generate synthetic instances which is also used by LIME.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
+    <span class="c1"># todo - documentation</span>
+<div class="viewcode-block" id="PyExplainer.generate_instance_random_perturbation"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_instance_random_perturbation">[docs]</a>    <span class="k">def</span> <span class="nf">generate_instance_random_perturbation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_explain</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;The random perturbation approach to generate synthetic instances which is also used by LIME.&quot;&quot;&quot;</span>
         <span class="n">random_seed</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">data_row</span> <span class="o">=</span> <span class="n">X_explain</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
         <span class="n">num_samples</span> <span class="o">=</span> <span class="mi">1000</span>
@@ -858,7 +839,7 @@
         <span class="n">sample_around_instance</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="n">scaler</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">StandardScaler</span><span class="p">(</span><span class="n">with_mean</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">scaler</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">])</span>
-        <span class="n">distance_metric</span> <span class="o">=</span> <span class="s1">&#39;euclidean&#39;</span>
+        <span class="c1"># distance_metric = &#39;euclidean&#39;</span>
         <span class="n">random_state</span> <span class="o">=</span> <span class="n">check_random_state</span><span class="p">(</span><span class="n">random_seed</span><span class="p">)</span>
         <span class="n">is_sparse</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">data_row</span><span class="p">)</span>
 
@@ -869,8 +850,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">num_cols</span> <span class="o">=</span> <span class="n">data_row</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">))</span>
-
-        <span class="n">categorical_features</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_cols</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">discretizer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">instance_sample</span> <span class="o">=</span> <span class="n">data_row</span>
@@ -885,16 +864,9 @@
                 <span class="n">mean</span> <span class="o">=</span> <span class="n">mean</span><span class="p">[</span><span class="n">non_zero_indexes</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="n">sampling_method</span> <span class="o">==</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span> <span class="o">*</span> <span class="n">num_cols</span>
-                                           <span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">)</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span> <span class="o">*</span> <span class="n">num_cols</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">)</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">sampling_method</span> <span class="o">==</span> <span class="s1">&#39;lhs&#39;</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">lhs</span><span class="p">(</span><span class="n">num_cols</span><span class="p">,</span> <span class="n">samples</span><span class="o">=</span><span class="n">num_samples</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">)</span>
-                <span class="n">means</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">num_cols</span><span class="p">)</span>
-                <span class="n">stdvs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_cols</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_cols</span><span class="p">):</span>
-                    <span class="n">data</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="n">means</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">scale</span><span class="o">=</span><span class="n">stdvs</span><span class="p">[</span><span class="n">i</span><span class="p">])</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="n">data</span><span class="p">[:,</span> <span class="n">i</span><span class="p">])</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;&#39;&#39;Invalid input for sampling_method.</span>
 <span class="s1">                                 Defaulting to Gaussian sampling.&#39;&#39;&#39;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
@@ -908,38 +880,38 @@
 
             <span class="k">if</span> <span class="n">is_sparse</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">num_cols</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="n">data</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">((</span><span class="n">num_samples</span><span class="p">,</span>
-                                                 <span class="n">data_row</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
-                                                <span class="n">dtype</span><span class="o">=</span><span class="n">data_row</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">((</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">data_row</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">data_row</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">indexes</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">non_zero_indexes</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
-                    <span class="n">indptr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                        <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_zero_indexes</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_samples</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
-                              <span class="nb">len</span><span class="p">(</span><span class="n">non_zero_indexes</span><span class="p">)))</span>
+                    <span class="n">indptr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_zero_indexes</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">num_samples</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_zero_indexes</span><span class="p">)))</span>
                     <span class="n">data_1d_shape</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">data_1d</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">data_1d_shape</span><span class="p">)</span>
-                    <span class="n">data</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">((</span><span class="n">data_1d</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">indptr</span><span class="p">),</span>
-                                                <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">data_row</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
-            <span class="n">categorical_features</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">first_row</span> <span class="o">=</span> <span class="n">data_row</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">first_row</span> <span class="o">=</span> <span class="n">discretizer</span><span class="o">.</span><span class="n">discretize</span><span class="p">(</span><span class="n">data_row</span><span class="p">)</span>
+                    <span class="n">data</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">csr_matrix</span><span class="p">((</span><span class="n">data_1d</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">indptr</span><span class="p">),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">data_row</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+
+            <span class="c1"># first_row = data_row</span>
+        <span class="c1"># else:</span>
+            <span class="c1"># first_row = discretizer.discretize(data_row)</span>
 
         <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_row</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">inverse</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">categorical_features</span><span class="p">:</span>
-            <span class="n">values</span> <span class="o">=</span> <span class="n">feature_values</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
-            <span class="n">freqs</span> <span class="o">=</span> <span class="n">feature_frequencies</span><span class="p">[</span><span class="n">column</span><span class="p">]</span>
-            <span class="n">inverse_column</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">num_samples</span><span class="p">,</span>
-                                                 <span class="n">replace</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">freqs</span><span class="p">)</span>
-            <span class="n">binary_column</span> <span class="o">=</span> <span class="p">(</span><span class="n">inverse_column</span> <span class="o">==</span> <span class="n">first_row</span><span class="p">[</span><span class="n">column</span><span class="p">])</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-            <span class="n">binary_column</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-            <span class="n">inverse_column</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="n">column</span><span class="p">]</span>
-            <span class="n">data</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">binary_column</span>
-            <span class="n">inverse</span><span class="p">[:,</span> <span class="n">column</span><span class="p">]</span> <span class="o">=</span> <span class="n">inverse_column</span>
+        <span class="c1"># todo - this for-loop is for categorical columns in the future</span>
+        <span class="sd">&quot;&quot;&quot; </span>
+<span class="sd">        for column in categorical_features:</span>
+<span class="sd">            values = feature_values[column]</span>
+<span class="sd">            freqs = feature_frequencies[column]</span>
+<span class="sd">            inverse_column = random_state.choice(values, size=num_samples,</span>
+<span class="sd">                                                 replace=True, p=freqs)</span>
+<span class="sd">            binary_column = (inverse_column == first_row[column]).astype(int)</span>
+<span class="sd">            binary_column[0] = 1</span>
+<span class="sd">            inverse_column[0] = data[0, column]</span>
+<span class="sd">            data[:, column] = binary_column</span>
+<span class="sd">            inverse[:, column] = inverse_column</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="k">if</span> <span class="n">discretizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">inverse</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">discretizer</span><span class="o">.</span><span class="n">undiscretize</span><span class="p">(</span><span class="n">inverse</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
         <span class="n">inverse</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_row</span>
 
         <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">sparse</span><span class="o">.</span><span class="n">issparse</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
@@ -950,17 +922,14 @@
                 <span class="n">scaled_data</span> <span class="o">=</span> <span class="n">scaled_data</span><span class="o">.</span><span class="n">tocsr</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">scaled_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span> <span class="o">-</span> <span class="n">scaler</span><span class="o">.</span><span class="n">mean_</span><span class="p">)</span> <span class="o">/</span> <span class="n">scaler</span><span class="o">.</span><span class="n">scale_</span>
-            <span class="n">distances</span> <span class="o">=</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">pairwise_distances</span><span class="p">(</span>
-                <span class="n">scaled_data</span><span class="p">,</span>
-                <span class="n">scaled_data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
-                <span class="n">metric</span><span class="o">=</span><span class="n">distance_metric</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">ravel</span><span class="p">()</span>
+            <span class="c1"># distances = sklearn.metrics.pairwise_distances(scaled_data,</span>
+            <span class="c1">#                                               scaled_data[0].reshape(1, -1),</span>
+            <span class="c1">#                                               metric=distance_metric).ravel()</span>
 
         <span class="n">new_df_case</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">scaled_data</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">)</span>
         <span class="n">sampled_class_frequency</span> <span class="o">=</span> <span class="mi">0</span>
 
-        <span class="n">n_defect_class</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
-            <span class="n">new_df_case</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]))</span>
+        <span class="n">n_defect_class</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">new_df_case</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]))</span>
 
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Random seed&#39;</span><span class="p">,</span> <span class="n">random_seed</span><span class="p">,</span> <span class="s1">&#39;nDefective&#39;</span><span class="p">,</span> <span class="n">n_defect_class</span><span class="p">)</span>
@@ -1005,6 +974,16 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">risk_score</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_risk_data</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;riskScore&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;%&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">risk_score</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="PyExplainer.get_top_k_rules"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.get_top_k_rules">[docs]</a>    <span class="k">def</span> <span class="nf">get_top_k_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Getter of top_k_rules</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ----------</span>
+<span class="sd">        :obj:`int`</span>
+<span class="sd">            Number of top positive and negative rules to be retrieved</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">top_k_rules</span></div>
 
 <div class="viewcode-block" id="PyExplainer.generate_progress_bar_items"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_progress_bar_items">[docs]</a>    <span class="k">def</span> <span class="nf">generate_progress_bar_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate items to be set into hbox (horizontal box)</span>
@@ -1118,6 +1097,68 @@
             <span class="n">html</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_html</span><span class="p">()</span>
             <span class="n">display</span><span class="p">(</span><span class="n">HTML</span><span class="p">(</span><span class="n">html</span><span class="p">))</span></div>
 
+<div class="viewcode-block" id="PyExplainer.parse_top_rules"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.parse_top_rules">[docs]</a>    <span class="k">def</span> <span class="nf">parse_top_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">top_k_positive_rules</span><span class="p">,</span> <span class="n">top_k_negative_rules</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse top k positive rules and top k negative rules given positive and negative rules as DataFrame</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        top_k_positive_rules : :obj:`pandas.core.frame.DataFrame`</span>
+<span class="sd">            Top positive rules DataFrame</span>
+<span class="sd">        top_k_negative_rules : :obj:`pandas.core.frame.DataFrame`</span>
+<span class="sd">            Top negative rules DataFrame</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`dict`</span>
+<span class="sd">            A dict containing two keys, &#39;top_tofollow_rules&#39; and &#39;top_toavoid_rules&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">top_variables</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">top_k_toavoid_rules</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">top_k_tofollow_rules</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">top_k_positive_rules</span><span class="p">)):</span>
+            <span class="n">tmp_rule</span> <span class="o">=</span> <span class="p">(</span><span class="n">top_k_positive_rules</span><span class="p">[</span><span class="s1">&#39;rule&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">tmp_rule</span> <span class="o">=</span> <span class="n">tmp_rule</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">tmp_rule</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tmp_rule</span><span class="p">,</span> <span class="s1">&#39;&amp;&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">tmp_rule</span><span class="p">:</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">tmp_sub_rule</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+                <span class="n">tmp_variable</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">tmp_condition_variable</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">tmp_value</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">tmp_variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_variables</span><span class="p">:</span>
+                    <span class="n">top_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_variable</span><span class="p">)</span>
+                    <span class="n">top_k_toavoid_rules</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;variable&#39;</span><span class="p">:</span> <span class="n">tmp_variable</span><span class="p">,</span>
+                                                <span class="s1">&#39;lessthan&#39;</span><span class="p">:</span> <span class="n">tmp_condition_variable</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span>
+                                                <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">tmp_value</span><span class="p">})</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_k_toavoid_rules</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_top_k_rules</span><span class="p">():</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_k_toavoid_rules</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_top_k_rules</span><span class="p">():</span>
+                <span class="k">break</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">top_k_negative_rules</span><span class="p">)):</span>
+            <span class="n">tmp_rule</span> <span class="o">=</span> <span class="p">(</span><span class="n">top_k_negative_rules</span><span class="p">[</span><span class="s1">&#39;rule&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">tmp_rule</span> <span class="o">=</span> <span class="n">tmp_rule</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">tmp_rule</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">tmp_rule</span><span class="p">,</span> <span class="s1">&#39;&amp;&#39;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">tmp_rule</span><span class="p">:</span>
+                <span class="n">j</span> <span class="o">=</span> <span class="n">j</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="n">tmp_sub_rule</span> <span class="o">=</span> <span class="nb">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">j</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+                <span class="n">tmp_variable</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">tmp_condition_variable</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">tmp_value</span> <span class="o">=</span> <span class="n">tmp_sub_rule</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">tmp_variable</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">top_variables</span><span class="p">:</span>
+                    <span class="n">top_variables</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_variable</span><span class="p">)</span>
+                    <span class="n">top_k_tofollow_rules</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;variable&#39;</span><span class="p">:</span> <span class="n">tmp_variable</span><span class="p">,</span>
+                                                 <span class="s1">&#39;lessthan&#39;</span><span class="p">:</span> <span class="n">tmp_condition_variable</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&lt;&#39;</span><span class="p">,</span>
+                                                 <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">tmp_value</span><span class="p">})</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_k_tofollow_rules</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_top_k_rules</span><span class="p">():</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_k_tofollow_rules</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_top_k_rules</span><span class="p">():</span>
+                <span class="k">break</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;top_tofollow_rules&#39;</span><span class="p">:</span> <span class="n">top_k_tofollow_rules</span><span class="p">,</span>
+                <span class="s1">&#39;top_toavoid_rules&#39;</span><span class="p">:</span> <span class="n">top_k_toavoid_rules</span><span class="p">}</span></div>
+
 <div class="viewcode-block" id="PyExplainer.retrieve_min_max_values"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.retrieve_min_max_values">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_min_max_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve the minimum and maximum value from X_train</span>
 
@@ -1168,6 +1209,19 @@
         <span class="c1"># update the right text</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_right_text</span><span class="p">(</span><span class="n">right_text</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="PyExplainer.set_top_k_rules"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.set_top_k_rules">[docs]</a>    <span class="k">def</span> <span class="nf">set_top_k_rules</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">top_k_rules</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Setter of top_k_rules</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        top_k_rules : :obj:`int`</span>
+<span class="sd">            Number of top positive and negative rules to be retrieved</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">top_k_rules</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">top_k_rules</span> <span class="o">&gt;</span> <span class="mi">15</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">top_k_rules</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="o">==</span> <span class="kc">False</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;set top_k_rules failed, top_k_rules should be int in range 1 - 15 (both included)&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">top_k_rules</span> <span class="o">=</span> <span class="n">top_k_rules</span></div>
+
 <div class="viewcode-block" id="PyExplainer.show_visualisation"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.show_visualisation">[docs]</a>    <span class="k">def</span> <span class="nf">show_visualisation</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Display items as follows,</span>
 <span class="sd">        (1) Risk Score Progress Bar (made from ipywidgets)</span>
@@ -1210,10 +1264,14 @@
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        right_text : :obj:`String`</span>
+<span class="sd">        right_text : :obj:`widgets.Label`</span>
 <span class="sd">            Text on the rightward side of the Risk Score Progress Bar</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__get_hbox_items</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">right_text</span></div>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">right_text</span><span class="p">,</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Label</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__get_hbox_items</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">right_text</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The right_text to be set into hbox_items should be type &#39;ipywidgets.Label&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span></div>
 
 <div class="viewcode-block" id="PyExplainer.visualise"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.visualise">[docs]</a>    <span class="k">def</span> <span class="nf">visualise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule_obj</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Given the rule object, show all of the visualisation as follows .</span>
@@ -1228,10 +1286,10 @@
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; from pyexplainer_pyexplainer import PyExplainer</span>
+<span class="sd">        &gt;&gt;&gt; from pyexplainer.pyexplainer_pyexplainer import PyExplainer</span>
 <span class="sd">        &gt;&gt;&gt; import pandas as pd</span>
 <span class="sd">        &gt;&gt;&gt; from sklearn.ensemble import RandomForestClassifier</span>
-<span class="sd">        &gt;&gt;&gt; data = pd.read_csv(&#39;../tests/example-datasets/activemq-5.0.0.csv&#39;, index_col = &#39;File&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; data = pd.read_csv(&#39;../tests/pyexplainer_test_data/activemq-5.0.0.csv&#39;, index_col = &#39;File&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; dep = data.columns[-4]</span>
 <span class="sd">        &gt;&gt;&gt; indep = data.columns[0:(len(data.columns) - 4)]</span>
 <span class="sd">        &gt;&gt;&gt; X_train = data.loc[:, indep]</span>
@@ -1240,7 +1298,7 @@
 <span class="sd">        &gt;&gt;&gt; blackbox_model.fit(X_train, y_train)</span>
 <span class="sd">        &gt;&gt;&gt; class_label = [&#39;Clean&#39;, &#39;Defect&#39;]</span>
 <span class="sd">        &gt;&gt;&gt; pyExp = PyExplainer(X_train, y_train, indep, dep, class_label, blackbox_model)</span>
-<span class="sd">        &gt;&gt;&gt; sample_test_data = pd.read_csv(&#39;../tests/example-datasets/activemq-5.0.0.csv&#39;, index_col = &#39;File&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; sample_test_data = pd.read_csv(&#39;../tests/pyexplainer_test_data/activemq-5.0.0.csv&#39;, index_col = &#39;File&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; X_test = sample_test_data.loc[:, indep]</span>
 <span class="sd">        &gt;&gt;&gt; y_test = sample_test_data.loc[:, dep]</span>
 <span class="sd">        &gt;&gt;&gt; sample_explain_index = 0</span>
@@ -1260,8 +1318,8 @@
 <span class="sd">        rule_obj : :obj:`dict`</span>
 <span class="sd">            A rule dict generated either through loading the .pyobject file or the .explain(...) function</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">top_rules</span> <span class="o">=</span> <span class="n">parse_top_rules</span><span class="p">(</span><span class="n">top_k_positive_rules</span><span class="o">=</span><span class="n">rule_obj</span><span class="p">[</span><span class="s1">&#39;top_k_positive_rules&#39;</span><span class="p">],</span>
-                                    <span class="n">top_k_negative_rules</span><span class="o">=</span><span class="n">rule_obj</span><span class="p">[</span><span class="s1">&#39;top_k_negative_rules&#39;</span><span class="p">])</span>
+        <span class="n">top_rules</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parse_top_rules</span><span class="p">(</span><span class="n">top_k_positive_rules</span><span class="o">=</span><span class="n">rule_obj</span><span class="p">[</span><span class="s1">&#39;top_k_positive_rules&#39;</span><span class="p">],</span>
+                                         <span class="n">top_k_negative_rules</span><span class="o">=</span><span class="n">rule_obj</span><span class="p">[</span><span class="s1">&#39;top_k_negative_rules&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__set_X_explain</span><span class="p">(</span><span class="n">rule_obj</span><span class="p">[</span><span class="s1">&#39;X_explain&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__set_y_explain</span><span class="p">(</span><span class="n">rule_obj</span><span class="p">[</span><span class="s1">&#39;y_explain&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__set_bullet_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generate_bullet_data</span><span class="p">(</span><span class="n">top_rules</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_X_explain</span><span class="p">()))</span>
@@ -1276,6 +1334,16 @@
 <span class="sd">            A list of dict that contains data needed by the d3 bullet chart</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bullet_data</span>
+
+    <span class="k">def</span> <span class="nf">__get_bullet_output</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Getter of bullet_output</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        ----------</span>
+<span class="sd">        :obj:`ipywidgets.Output`</span>
+<span class="sd">            A Output object used to wrap and locate contents of visualisation</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">bullet_output</span>
 
     <span class="k">def</span> <span class="nf">__get_hbox_items</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Getter of hbox_items</span>
@@ -1325,7 +1393,11 @@
 <span class="sd">        bullet_data : :obj:`list`</span>
 <span class="sd">            A list of dict that contains data needed by the d3 bullet chart</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bullet_data</span> <span class="o">=</span> <span class="n">bullet_data</span>
+        <span class="k">if</span> <span class="n">data_validation</span><span class="p">(</span><span class="n">bullet_data</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bullet_data</span> <span class="o">=</span> <span class="n">bullet_data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;bullet_data is not in the format of python list of dict&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
 
     <span class="k">def</span> <span class="nf">__set_bullet_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bullet_output</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Setter of bullet_output</span>
@@ -1335,7 +1407,11 @@
 <span class="sd">        bullet_output : :obj:`widgets.Output`</span>
 <span class="sd">            A Output object used to wrap and locate contents of visualisation</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">bullet_output</span> <span class="o">=</span> <span class="n">bullet_output</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bullet_output</span><span class="p">,</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Output</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bullet_output</span> <span class="o">=</span> <span class="n">bullet_output</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;bullet_output should be type &#39;ipywidgets.Output&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
 
     <span class="k">def</span> <span class="nf">__set_hbox_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hbox_items</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Setter of hbox_items</span>
@@ -1345,17 +1421,32 @@
 <span class="sd">        hbox_items : :obj:`list`</span>
 <span class="sd">            A list of dict that contains items to be in a horizontal box</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hbox_items</span> <span class="o">=</span> <span class="n">hbox_items</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hbox_items</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hbox_items</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Label</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hbox_items</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">widgets</span><span class="o">.</span><span class="n">FloatProgress</span><span class="p">)</span> \
+                    <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hbox_items</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Label</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">hbox_items</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Label</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">hbox_items</span> <span class="o">=</span> <span class="n">hbox_items</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;hbox_items should be in the format of &#39;[widgets.Label, widgets.FloatProgress, widgets.Label, </span>
+<span class="s2">                                  widgets.Label]&#39;&quot;&quot;&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;hbox_items should be in the format of &#39;[widgets.Label, widgets.FloatProgress, widgets.Label, </span>
+<span class="s2">                  widgets.Label]&#39;&quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
 
     <span class="k">def</span> <span class="nf">__set_risk_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">risk_data</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Setter of hbox_items</span>
+        <span class="sd">&quot;&quot;&quot;Setter of risk_data</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        hbox_items : :obj:`list`</span>
-<span class="sd">            A list of dict that contains items to be in a horizontal box</span>
+<span class="sd">        risk_data : :obj:`list`</span>
+<span class="sd">            A list of dict that contains risk prediction and risk score info</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">risk_data</span> <span class="o">=</span> <span class="n">risk_data</span>
+        <span class="k">if</span> <span class="n">data_validation</span><span class="p">(</span><span class="n">risk_data</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">risk_data</span> <span class="o">=</span> <span class="n">risk_data</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;risk_data is not in the format of python list of dict&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
 
     <span class="k">def</span> <span class="nf">__set_X_explain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_explain</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Setter of X_explain</span>
@@ -1365,7 +1456,11 @@
 <span class="sd">        X_explain : :obj:`pandas.core.frame.DataFrame`</span>
 <span class="sd">            An explained DataFrame containing feature cols</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">X_explain</span> <span class="o">=</span> <span class="n">X_explain</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X_explain</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">X_explain</span> <span class="o">=</span> <span class="n">X_explain</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_explain should be type &#39;pandas.core.frame.DataFrame&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
 
     <span class="k">def</span> <span class="nf">__set_y_explain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_explain</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Setter of y_explain</span>
@@ -1375,7 +1470,11 @@
 <span class="sd">        y_explain : :obj:`pandas.core.series.Series`</span>
 <span class="sd">            An explained DataFrame containing label col</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">y_explain</span> <span class="o">=</span> <span class="n">y_explain</span></div>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y_explain</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">series</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">y_explain</span> <span class="o">=</span> <span class="n">y_explain</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;y_explain should be type &#39;pandas.core.series.Series&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span></div>
 </pre></div>
 
            </div>

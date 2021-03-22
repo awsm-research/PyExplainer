@@ -6,10 +6,24 @@ from pyexplainer import pyexplainer_pyexplainer
 from pyexplainer.pyexplainer_pyexplainer import PyExplainer
 from sklearn.utils import check_random_state
 from sklearn.ensemble import RandomForestClassifier
+import os
+import sys
+
+
+def get_base_prefix_compat():
+    """Get base/real prefix, or sys.prefix if there is none."""
+    return getattr(sys, "base_prefix", None) or getattr(sys, "real_prefix", None) or sys.prefix
+
+
+def in_virtualenv():
+    return get_base_prefix_compat() != sys.prefix
+
+
+INSIDE_VIRTUAL_ENV = in_virtualenv()
 
 
 def test_version():
-    assert __version__ == '0.1.0'
+    assert __version__ == '0.1.1'
 
 
 @pytest.mark.parametrize('data, result',
@@ -52,7 +66,13 @@ def test_to_js_data(data, result):
     assert pyexplainer_pyexplainer.to_js_data(data) == result
 
 
-test_data = pd.read_csv('../tests/pyexplainer_test_data/activemq-5.0.0.csv', index_col='File')
+# load data
+file_path = "./pyexplainer_test_data/activemq-5.0.0.csv"
+if INSIDE_VIRTUAL_ENV:
+    cwd = os.getcwd()
+    file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.0.0.csv"
+test_data = pd.read_csv(file_path, index_col='File')
+
 dep = test_data.columns[-4]
 indep = test_data.columns[0:(len(test_data.columns) - 4)]
 X_train = test_data.loc[:, indep]
@@ -89,7 +109,12 @@ def test_pyexplainer_init_positive(X_train, y_train, indep, dep, blackbox_model,
 
 
 py_explainer = PyExplainer(X_train, y_train, indep, dep, blackbox_model)
-sample_test_data = pd.read_csv('../tests/pyexplainer_test_data/activemq-5.0.0.csv', index_col = 'File')
+# load data
+test_file_path = "./pyexplainer_test_data/activemq-5.1.0.csv"
+if INSIDE_VIRTUAL_ENV:
+    test_file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.1.0.csv"
+sample_test_data = pd.read_csv(test_file_path, index_col='File')
+
 X_test = sample_test_data.loc[:, indep]
 y_test = sample_test_data.loc[:, dep]
 sample_explain_index = 0
