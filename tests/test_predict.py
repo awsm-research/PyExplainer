@@ -3,6 +3,7 @@ import numpy as np
 from pyexplainer.rulefit import RuleFit
 import os
 import sys
+from pathlib import Path
 
 
 def get_base_prefix_compat():
@@ -17,10 +18,12 @@ def in_virtualenv():
 INSIDE_VIRTUAL_ENV = in_virtualenv()
 
 # load data
-file_path = "./rulefit_test_data/boston.csv"
+file_path = Path("tests/rulefit_test_data/boston.csv")
+
 if INSIDE_VIRTUAL_ENV:
     cwd = os.getcwd()
     file_path = cwd + "/tests/rulefit_test_data/boston.csv"
+
 boston_data = pd.read_csv(file_path, index_col=0)
 
 y = boston_data.medv.values
