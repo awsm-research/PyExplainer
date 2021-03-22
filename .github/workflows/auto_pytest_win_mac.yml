@@ -1,54 +1,51 @@
-name: Tests
+name: Auto pytest without codecov
 
 on: [push]
 
 jobs:
-  tests:
-    name: ${{ matrix.os }} / ${{ matrix.python-version }}
-    runs-on: ${{ matrix.os }}-latest
+
+  test:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [Ubuntu, MacOS, Windows]
+        os: [MacOS-latest, Windows-latest]
         python-version: [3.8]
+
     steps:
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+        env:
+            ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
+        env:
+            ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
-      - name: Get full Python version
-        id: full-python-version
-        shell: bash
-        run: echo ::set-output name=version::$(python -c "import sys; print('-'.join(str(v) for v in sys.version_info))")
+      - name: Install Poetry
+        uses: dschep/install-poetry-action@v1.2
+        env:
+            ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
-      - name: Bootstrap poetry
-        shell: bash
-        run: |
-          python -m ensurepip
-          python -m pip install --upgrade pip
-          python -m pip install .
-      - name: Configure poetry
-        shell: bash
-        run: python -m poetry config virtualenvs.in-project true
-
-      - name: Set up cache
-        uses: actions/cache@v2
+      - name: Cache Poetry virtualenv
+        uses: actions/cache@v1
         id: cache
         with:
-          path: .venv
-          key: venv-${{ runner.os }}-${{ steps.full-python-version.outputs.version }}-${{ hashFiles('**/poetry.lock') }}
+          path: ~/.virtualenvs
+          key: poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            poetry-${{ hashFiles('**/poetry.lock') }}
+        env:
+            ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
-      - name: Ensure cache is healthy
-        if: steps.cache.outputs.cache-hit == 'true'
-        shell: bash
-        run: timeout 10s python -m poetry run pip --version || rm -rf .venv
+      - name: Install Dependencies
+        run: poetry install
+        if: steps.cache.outputs.cache-hit != 'true'
+        env:
+            ACTIONS_ALLOW_UNSECURE_COMMANDS: 'true'
 
-      - name: Install dependencies
-        shell: bash
-        run: python -m poetry install
-
-      - name: Run pytest
-        shell: bash
-        run: python -m poetry run python -m pytest -v tests
+      - name: Test with pytest
+        run: poetry run pytest
