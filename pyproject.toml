@@ -13,6 +13,7 @@ scipy = "^1.6.1"
 ipywidgets = "^7.6.3"
 ipython = "^7.21.0"
 pandas = "^1.2.3"
+pytest-cov = "^2.11.1"
 
 [tool.poetry.dev-dependencies]
 Sphinx = "^3.5.1"
