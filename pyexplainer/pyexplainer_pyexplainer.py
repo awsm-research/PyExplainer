@@ -12,9 +12,9 @@ from IPython.core.display import display, HTML
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils import check_random_state
 # currently for pytest
-from pyexplainer.rulefit import RuleFit
+#from pyexplainer.rulefit import RuleFit
 # currently for notebook test
-# from rulefit import RuleFit
+from rulefit import RuleFit
 
 
 def data_validation(data):
@@ -672,10 +672,9 @@ class PyExplainer:
             return {'synthetic_data': new_df_case,
                     'sampled_class_frequency': sampled_class_frequency}
 
+    """ todo - to be fixed
     def generate_instance_random_perturbation(self, X_explain, y_explain, debug=False):
-        """The random perturbation approach to generate synthetic instances which is also used by LIME.
-
-        """
+        # The random perturbation approach to generate synthetic instances which is also used by LIME.
         random_seed = 0
         data_row = X_explain.loc[:, self.indep].values
         num_samples = 1000
@@ -786,6 +785,7 @@ class PyExplainer:
 
         return {'synthetic_data': new_df_case,
                 'sampled_class_frequency': sampled_class_frequency}
+    """
 
     def generate_risk_data(self, X_explain):
         """Generate risk prediction and risk score to be visualised
