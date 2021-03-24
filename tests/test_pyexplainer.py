@@ -8,6 +8,7 @@ from sklearn.utils import check_random_state
 from sklearn.ensemble import RandomForestClassifier
 import os
 import sys
+import pickle
 
 
 def get_base_prefix_compat():
@@ -20,6 +21,42 @@ def in_virtualenv():
 
 
 INSIDE_VIRTUAL_ENV = in_virtualenv()
+
+
+# load data
+cwd = os.getcwd()
+file_path = cwd + "/pyexplainer_test_data/activemq-5.0.0.zip"
+model_file_path = cwd + '/rf_models/rf_model1.pkl'
+
+if INSIDE_VIRTUAL_ENV:
+    cwd = os.getcwd()
+    file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.0.0.zip"
+    model_file_path = cwd + "/tests/rf_models/rf_model1.pkl"
+
+test_data = pd.read_csv(file_path, index_col='File')
+
+dep = test_data.columns[-4]
+indep = test_data.columns[0:(len(test_data.columns) - 4)]
+X_train = test_data.loc[:, indep]
+y_train = test_data.loc[:, dep]
+
+with open(model_file_path, 'rb') as file:
+    blackbox_model = pickle.load(file)
+
+class_label = ['clean', 'defect']
+
+py_explainer = PyExplainer(X_train, y_train, indep, dep, blackbox_model)
+# load data
+cwd = os.getcwd()
+test_file_path = cwd + "/pyexplainer_test_data/activemq-5.1.0.zip"
+if INSIDE_VIRTUAL_ENV:
+    test_file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.1.0.zip"
+sample_test_data = pd.read_csv(test_file_path, index_col='File')
+X_test = sample_test_data.loc[:, indep]
+y_test = sample_test_data.loc[:, dep]
+sample_explain_index = 0
+testing_X_explain = X_test.iloc[[sample_explain_index]]
+testing_y_explain = y_test.iloc[[sample_explain_index]]
 
 
 def test_version():
@@ -66,32 +103,17 @@ def test_to_js_data(data, result):
     assert pyexplainer_pyexplainer.to_js_data(data) == result
 
 
-# load data
-file_path = "tests/pyexplainer_test_data/activemq-5.0.0.csv"
-if INSIDE_VIRTUAL_ENV:
-    cwd = os.getcwd()
-    file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.0.0.csv"
-test_data = pd.read_csv(file_path, index_col='File')
-
-dep = test_data.columns[-4]
-indep = test_data.columns[0:(len(test_data.columns) - 4)]
-X_train = test_data.loc[:, indep]
-y_train = test_data.loc[:, dep]
-blackbox_model = RandomForestClassifier(max_depth=3, random_state=0)
-blackbox_model.fit(X_train, y_train)
-class_label = ['clean', 'defect']
-
-
 @pytest.mark.parametrize('X_train, y_train, indep, dep, blackbox_model, class_label, top_k_rules, result',
                          [
                              (X_train, y_train, indep, dep, blackbox_model, class_label, 0, 'ValueError'),
                              (X_train, y_train, indep, dep, blackbox_model, class_label, 16, 'ValueError'),
                              (X_train, y_train, indep, dep, blackbox_model, ['clean'], 3, 'ValueError'),
+                             (X_train, y_train, indep, dep, "wrong model", class_label, 3, 'ValueError'),
                              (X_train, y_train, indep, 123, blackbox_model, class_label, 3, 'ValueError'),
                              (X_train, y_train, {}, dep, blackbox_model, class_label, 3, 'ValueError'),
                              (X_train, y_train, [], dep, blackbox_model, class_label, 3, 'ValueError'),
                              (X_train, [], indep, dep, blackbox_model, class_label, 3, 'ValueError'),
-                             ([], y_train, indep, dep, blackbox_model, class_label, 3, 'ValueError')
+                             ([], y_train, indep, dep, blackbox_model, class_label, 3, 'ValueError'),
                          ])
 def test_pyexplainer_init_negative(X_train, y_train, indep, dep, blackbox_model, class_label, top_k_rules, result):
     with pytest.raises(Exception) as e_info:
@@ -106,20 +128,6 @@ def test_pyexplainer_init_negative(X_train, y_train, indep, dep, blackbox_model,
                          ])
 def test_pyexplainer_init_positive(X_train, y_train, indep, dep, blackbox_model, class_label, top_k_rules):
     PyExplainer(X_train, y_train, indep, dep, blackbox_model, class_label, top_k_rules)
-
-
-py_explainer = PyExplainer(X_train, y_train, indep, dep, blackbox_model)
-# load data
-test_file_path = "tests/pyexplainer_test_data/activemq-5.1.0.csv"
-if INSIDE_VIRTUAL_ENV:
-    test_file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.1.0.csv"
-sample_test_data = pd.read_csv(test_file_path, index_col='File')
-
-X_test = sample_test_data.loc[:, indep]
-y_test = sample_test_data.loc[:, dep]
-sample_explain_index = 0
-testing_X_explain = X_test.iloc[[sample_explain_index]]
-testing_y_explain = y_test.iloc[[sample_explain_index]]
 
 
 # explain

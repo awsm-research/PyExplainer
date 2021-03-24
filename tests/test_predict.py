@@ -18,11 +18,12 @@ def in_virtualenv():
 INSIDE_VIRTUAL_ENV = in_virtualenv()
 
 # load data
-file_path = Path("tests/rulefit_test_data/boston.csv")
+cwd = os.getcwd()
+file_path = cwd + "/rulefit_test_data/boston.zip"
 
 if INSIDE_VIRTUAL_ENV:
     cwd = os.getcwd()
-    file_path = cwd + "/tests/rulefit_test_data/boston.csv"
+    file_path = cwd + "/tests/rulefit_test_data/boston.zip"
 
 boston_data = pd.read_csv(file_path, index_col=0)
 

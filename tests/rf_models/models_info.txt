@@ -1,0 +1,2 @@
+rf_model1.pkl = RandomForestClassifier(max_depth=3, random_state=0)
+

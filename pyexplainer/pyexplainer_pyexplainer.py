@@ -11,6 +11,7 @@ import sklearn
 from IPython.core.display import display, HTML
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils import check_random_state
+from sklearn.ensemble import RandomForestClassifier
 # currently for pytest
 from pyexplainer.rulefit import RuleFit
 # currently for notebook test
@@ -102,8 +103,8 @@ class PyExplainer:
         independent variables (column names)
     dep : :obj:`str`
         dependent variables (column name)
-    blackbox_model : :obj:`black box model trained using sklearn`
-        A global black box ML model used to generate the prediction and explanation
+    blackbox_model : :obj:`sklearn.ensemble.RandomForestClassifier`
+        A global random forest model trained from sklearn
     class_label : :obj:`list`
         Classification labels, default = ['Clean', 'Defect']
     top_k_rules : :obj:`int`
@@ -139,7 +140,12 @@ class PyExplainer:
             print("dep (label column name) should be type 'str'")
             raise ValueError
         # todo- validate blackbox model
-        self.blackbox_model = blackbox_model
+        if isinstance(blackbox_model, sklearn.ensemble.RandomForestClassifier):
+            self.blackbox_model = blackbox_model
+        else:
+            print("The blackbox_model should be a Random Forest model trained from sklearn ("
+                  "sklearn.ensemble.RandomForestClassifier)")
+            raise ValueError
         if isinstance(class_label, list):
             if len(class_label) == 2:
                 self.class_label = class_label
