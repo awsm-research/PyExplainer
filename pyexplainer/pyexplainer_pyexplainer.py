@@ -14,6 +14,8 @@ from sklearn.utils import check_random_state
 from sklearn.ensemble import RandomForestClassifier
 # currently for pytest
 from pyexplainer.rulefit import RuleFit
+
+
 # currently for notebook test
 # from rulefit import RuleFit
 
@@ -123,29 +125,29 @@ class PyExplainer:
             self.X_train = X_train
         else:
             print("X_train should be type 'pandas.core.frame.DataFrame'")
-            raise ValueError
+            raise TypeError
         if isinstance(y_train, pd.core.series.Series):
             self.y_train = y_train
         else:
             print("y_train should be type 'pandas.core.series.Series'")
-            raise ValueError
+            raise TypeError
         if isinstance(indep, pd.core.indexes.base.Index):
             self.indep = indep
         else:
             print("indep (feature column names) should be type 'pandas.core.indexes.base.Index'")
-            raise ValueError
+            raise TypeError
         if isinstance(dep, str):
             self.dep = dep
         else:
             print("dep (label column name) should be type 'str'")
-            raise ValueError
+            raise TypeError
         # todo- validate blackbox model
         if isinstance(blackbox_model, sklearn.ensemble.RandomForestClassifier):
             self.blackbox_model = blackbox_model
         else:
             print("The blackbox_model should be a Random Forest model trained from sklearn ("
                   "sklearn.ensemble.RandomForestClassifier)")
-            raise ValueError
+            raise TypeError
         if isinstance(class_label, list):
             if len(class_label) == 2:
                 self.class_label = class_label
@@ -154,7 +156,7 @@ class PyExplainer:
                 raise ValueError
         else:
             print("class_label should be type 'list'")
-            raise ValueError
+            raise TypeError
         if isinstance(top_k_rules, int):
             if top_k_rules <= 0 or top_k_rules > 15:
                 print("top_k_rules should be in range 1 - 15 (both included)")
@@ -163,7 +165,7 @@ class PyExplainer:
                 self.top_k_rules = top_k_rules
         else:
             print("top_k_rules should be type 'int'")
-            raise ValueError
+            raise TypeError
 
         self.bullet_data = [{}]
         self.risk_data = [{}]
@@ -179,7 +181,7 @@ class PyExplainer:
                 max_rules=10,
                 max_iter=10,
                 cv=5,
-                search_function='crossoverinterpolation',
+                search_function='CrossoverInterpolation',
                 debug=False):
         """Generate Rule Object Manually by passing X_explain and y_explain
 
@@ -229,18 +231,25 @@ class PyExplainer:
         >>> y_explain = y_test.iloc[[sample_explain_index]]
         >>> pyExp.explain(X_explain, y_explain, search_function = 'crossoverinterpolation', top_k = 3, max_rules=30, max_iter =5, cv=5, debug = False)
         """
+        # check if X_explain is a DF
+        if not isinstance(X_explain, pd.core.frame.DataFrame):
+            print("X_explain (X_test) should be type 'pandas.core.frame.DataFrame'")
+            raise ValueError
+        # check if X_explain has the same num of cols as X_train
+        if len(X_explain.columns) != len(X_explain.columns):
+            print("X_explain should have the same number of columns as X_train")
+            raise ValueError
+        # check if y_explain is a Series
+        if not isinstance(y_explain, pd.core.series.Series):
+            print("y_explain (y_test) should be type 'pandas.core.series.Series'")
+            raise ValueError
         self.set_top_k_rules(top_k)
         # Step 1 - Generate synthetic instances
-        if search_function == 'crossoverinterpolation':
+        if search_function.lower() == 'crossoverinterpolation':
             synthetic_object = self.generate_instance_crossover_interpolation(X_explain, y_explain, debug=debug)
-        elif search_function == 'randomperturbation':
+        elif search_function.lower() == 'randomperturbation':
             # This random perturbation approach to generate instances is used by LIME to gerate synthetic instances
-            synthetic_object = self.generate_instance_random_perturbation(X_explain=X_explain,
-                                                                          y_explain=y_explain,
-                                                                          debug=debug)
-        else:
-            # TODO
-            print('TODO')
+            synthetic_object = self.generate_instance_random_perturbation(X_explain=X_explain,debug=debug)
 
         # Step 2 - Generate predictions of synthetic instances using the global model
         synthetic_instances = synthetic_object['synthetic_data'].loc[:, self.indep]
@@ -285,7 +294,7 @@ class PyExplainer:
                     'top_k_negative_rules': top_k_negative_rules}
         return rule_obj
 
-    def generate_bullet_data(self, parsed_rule_object, X_explain):
+    def generate_bullet_data(self, parsed_rule_object):
         """Generate bullet chart data (a list of dict) to be implemented with d3.js chart.
 
         Parameters
@@ -300,7 +309,8 @@ class PyExplainer:
         :obj:`list`
             A list of dict that contains the data needed to generate a bullet chart.
         """
-        min_max_values = self.retrieve_min_max_values()
+        X_explain = self.__get_X_explain()
+        min_max_values = self.retrieve_X_explain_min_max_values()
         # Version 01 - only visualise for what to follow (Rules => Clean)
         bullet_data = []
 
@@ -740,7 +750,7 @@ class PyExplainer:
 
             # first_row = data_row
         # else:
-            # first_row = discretizer.discretize(data_row)
+        # first_row = discretizer.discretize(data_row)
 
         data[0] = data_row.copy()
         inverse = data.copy()
@@ -962,6 +972,13 @@ class PyExplainer:
         :obj:`dict`
             A dict containing two keys, 'top_tofollow_rules' and 'top_toavoid_rules'
         """
+        if len(top_k_positive_rules) < len(top_k_negative_rules):
+            smaller_top_rule = len(top_k_positive_rules)
+        else:
+            smaller_top_rule = len(top_k_negative_rules)
+        if self.get_top_k_rules() > smaller_top_rule:
+            self.set_top_k_rules(smaller_top_rule)
+
         top_variables = []
         top_k_toavoid_rules = []
         top_k_tofollow_rules = []
@@ -1009,7 +1026,7 @@ class PyExplainer:
         return {'top_tofollow_rules': top_k_tofollow_rules,
                 'top_toavoid_rules': top_k_toavoid_rules}
 
-    def retrieve_min_max_values(self):
+    def retrieve_X_explain_min_max_values(self):
         """Retrieve the minimum and maximum value from X_train
 
         Returns
@@ -1121,7 +1138,7 @@ class PyExplainer:
             self.__get_hbox_items()[2] = right_text
         else:
             print("The right_text to be set into hbox_items should be type 'ipywidgets.Label'")
-            raise ValueError
+            raise TypeError
 
     def visualise(self, rule_obj):
         """Given the rule object, show all of the visualisation as follows .
@@ -1154,7 +1171,7 @@ class PyExplainer:
         >>> sample_explain_index = 0
         >>> X_explain = X_test.iloc[[sample_explain_index]]
         >>> y_explain = y_test.iloc[[sample_explain_index]]
-        >>> rule_obj = pyExp.explain(X_explain, y_explain, search_function = 'crossoverinterpolation', top_k = 3, max_rules=30, max_iter =5, cv=5, debug = False)
+        >>> rule_obj = pyExp.explain(X_explain, y_explain, search_function = 'CrossoverInterpolation', top_k = 3, max_rules=30, max_iter =5, cv=5, debug = False)
         >>> pyExp.visualise(rule_obj)
         """
         self.visualisation_data_setup(rule_obj)
@@ -1172,7 +1189,7 @@ class PyExplainer:
                                          top_k_negative_rules=rule_obj['top_k_negative_rules'])
         self.__set_X_explain(rule_obj['X_explain'])
         self.__set_y_explain(rule_obj['y_explain'])
-        self.__set_bullet_data(self.generate_bullet_data(top_rules, self.__get_X_explain()))
+        self.__set_bullet_data(self.generate_bullet_data(top_rules))
         self.__set_risk_data(self.generate_risk_data(self.__get_X_explain()))
 
     def __get_bullet_data(self):
@@ -1261,7 +1278,7 @@ class PyExplainer:
             self.bullet_output = bullet_output
         else:
             print("bullet_output should be type 'ipywidgets.Output'")
-            raise ValueError
+            raise TypeError
 
     def __set_hbox_items(self, hbox_items):
         """Setter of hbox_items
@@ -1278,11 +1295,11 @@ class PyExplainer:
             else:
                 print("""hbox_items should be in the format of '[widgets.Label, widgets.FloatProgress, widgets.Label, 
                                   widgets.Label]'""")
-                raise ValueError
+                raise TypeError
         else:
             print("""hbox_items should be in the format of '[widgets.Label, widgets.FloatProgress, widgets.Label, 
                   widgets.Label]'""")
-            raise ValueError
+            raise TypeError
 
     def __set_risk_data(self, risk_data):
         """Setter of risk_data
@@ -1310,7 +1327,7 @@ class PyExplainer:
             self.X_explain = X_explain
         else:
             print("X_explain should be type 'pandas.core.frame.DataFrame'")
-            raise ValueError
+            raise TypeError
 
     def __set_y_explain(self, y_explain):
         """Setter of y_explain
@@ -1324,4 +1341,4 @@ class PyExplainer:
             self.y_explain = y_explain
         else:
             print("y_explain should be type 'pandas.core.series.Series'")
-            raise ValueError
+            raise TypeError

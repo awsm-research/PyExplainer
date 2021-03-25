@@ -1,14 +1,15 @@
 import pytest
 import pandas as pd
+import numpy as np
 import ipywidgets as widgets
 from pyexplainer import __version__
 from pyexplainer import pyexplainer_pyexplainer
 from pyexplainer.pyexplainer_pyexplainer import PyExplainer
 from sklearn.utils import check_random_state
-from sklearn.ensemble import RandomForestClassifier
 import os
 import sys
 import pickle
+from bs4 import BeautifulSoup
 
 
 def get_base_prefix_compat():
@@ -22,16 +23,19 @@ def in_virtualenv():
 
 INSIDE_VIRTUAL_ENV = in_virtualenv()
 
-
 # load data
 cwd = os.getcwd()
 file_path = cwd + "/pyexplainer_test_data/activemq-5.0.0.zip"
 model_file_path = cwd + '/rf_models/rf_model1.pkl'
+test_file_path = cwd + "/pyexplainer_test_data/activemq-5.1.0.zip"
+rule_object_path = cwd + '/rule_objects/pyExplainer_obj.pyobject'
 
 if INSIDE_VIRTUAL_ENV:
     cwd = os.getcwd()
     file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.0.0.zip"
     model_file_path = cwd + "/tests/rf_models/rf_model1.pkl"
+    test_file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.1.0.zip"
+    rule_object_path = cwd + "/tests/rule_objects/pyExplainer_obj.pyobject"
 
 test_data = pd.read_csv(file_path, index_col='File')
 
@@ -40,23 +44,48 @@ indep = test_data.columns[0:(len(test_data.columns) - 4)]
 X_train = test_data.loc[:, indep]
 y_train = test_data.loc[:, dep]
 
+# load model from .pkl file
 with open(model_file_path, 'rb') as file:
     blackbox_model = pickle.load(file)
+
+# blackbox_model = RandomForestClassifier(max_depth=3, random_state=0)
+# blackbox_model.fit(X_train, y_train)
+# write model to pickle - done
+# with open(model_file_path, 'wb') as file:
+#    pickle.dump(obj=blackbox_model, file=file)
 
 class_label = ['clean', 'defect']
 
 py_explainer = PyExplainer(X_train, y_train, indep, dep, blackbox_model)
 # load data
 cwd = os.getcwd()
-test_file_path = cwd + "/pyexplainer_test_data/activemq-5.1.0.zip"
-if INSIDE_VIRTUAL_ENV:
-    test_file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.1.0.zip"
 sample_test_data = pd.read_csv(test_file_path, index_col='File')
 X_test = sample_test_data.loc[:, indep]
 y_test = sample_test_data.loc[:, dep]
 sample_explain_index = 0
 testing_X_explain = X_test.iloc[[sample_explain_index]]
 testing_y_explain = y_test.iloc[[sample_explain_index]]
+testing_bullet_data = [{'title': '#1 Increase the values of CountStmt to more than 10',
+                        'subtitle': 'Actual = 10',
+                        'ticks': [2.0, 196.0],
+                        'step': [1],
+                        'startPoints': [0, 222.0],
+                        'widths': [222.0, 228.0],
+                        'colors': ['#d7191c', '#a6d96a'],
+                        'markers': [10],
+                        'varRef': 'CountStmt'},
+                       {'title': '#2 Decrease the values of MAJOR_COMMIT to less than 1',
+                        'subtitle': 'Actual = 1',
+                        'ticks': [1.0, 2.0],
+                        'step': [0.1],
+                        'startPoints': [0, 248.0],
+                        'widths': [248.0, 202.0],
+                        'colors': ['#a6d96a', '#d7191c'],
+                        'markers': [1],
+                        'varRef': 'MAJOR_COMMIT'}]
+
+with open(rule_object_path, 'rb') as file:
+    test_rule_object = pickle.load(file)
 
 
 def test_version():
@@ -108,12 +137,12 @@ def test_to_js_data(data, result):
                              (X_train, y_train, indep, dep, blackbox_model, class_label, 0, 'ValueError'),
                              (X_train, y_train, indep, dep, blackbox_model, class_label, 16, 'ValueError'),
                              (X_train, y_train, indep, dep, blackbox_model, ['clean'], 3, 'ValueError'),
-                             (X_train, y_train, indep, dep, "wrong model", class_label, 3, 'ValueError'),
-                             (X_train, y_train, indep, 123, blackbox_model, class_label, 3, 'ValueError'),
-                             (X_train, y_train, {}, dep, blackbox_model, class_label, 3, 'ValueError'),
-                             (X_train, y_train, [], dep, blackbox_model, class_label, 3, 'ValueError'),
-                             (X_train, [], indep, dep, blackbox_model, class_label, 3, 'ValueError'),
-                             ([], y_train, indep, dep, blackbox_model, class_label, 3, 'ValueError'),
+                             (X_train, y_train, indep, dep, "wrong model", class_label, 3, 'TypeError'),
+                             (X_train, y_train, indep, 123, blackbox_model, class_label, 3, 'TypeError'),
+                             (X_train, y_train, {}, dep, blackbox_model, class_label, 3, 'TypeError'),
+                             (X_train, y_train, [], dep, blackbox_model, class_label, 3, 'TypeError'),
+                             (X_train, [], indep, dep, blackbox_model, class_label, 3, 'TypeError'),
+                             ([], y_train, indep, dep, blackbox_model, class_label, 3, 'TypeError'),
                          ])
 def test_pyexplainer_init_negative(X_train, y_train, indep, dep, blackbox_model, class_label, top_k_rules, result):
     with pytest.raises(Exception) as e_info:
@@ -130,13 +159,67 @@ def test_pyexplainer_init_positive(X_train, y_train, indep, dep, blackbox_model,
     PyExplainer(X_train, y_train, indep, dep, blackbox_model, class_label, top_k_rules)
 
 
-# explain
+rule_obj_keys = ['synthetic_data', 'synthetic_predictions', 'X_explain', 'y_explain', 'indep',
+                 'dep', 'top_k_positive_rules', 'top_k_negative_rules']
 
 
-# generate_bullet_data
+@pytest.mark.parametrize('exp_X_test, exp_y_test, top_k, max_rules, max_iter, cv, search_function, debug, result',
+                         [
+                             (X_test, y_test, 3, 10, 10, 5, 'CrossoverInterpolation', False, rule_obj_keys),
+                             #(X_test, y_test, 3, 10, 100, 5, 'RandomPerturbation', True, rule_obj_keys)
+                         ])
+def test_explain_positive(exp_X_test, exp_y_test, top_k, max_rules, max_iter, cv, search_function, debug, result):
+    py_explainer.X_train = X_train
+    py_explainer.y_train = y_train
+    rule_object = py_explainer.explain(exp_X_test, exp_y_test, top_k, max_rules, max_iter, cv, search_function, debug)
+    assert list(rule_object.keys()) == result
+    assert isinstance(rule_object['synthetic_data'], pd.core.frame.DataFrame)
+    assert isinstance(rule_object['synthetic_predictions'], np.ndarray)
+    assert isinstance(rule_object['X_explain'], pd.core.frame.DataFrame)
+    assert isinstance(rule_object['y_explain'], pd.core.series.Series)
+    assert isinstance(rule_object['indep'], pd.core.indexes.base.Index)
+    assert isinstance(rule_object['dep'], str)
+    assert isinstance(rule_object['top_k_positive_rules'], pd.core.frame.DataFrame)
+    assert isinstance(rule_object['top_k_negative_rules'], pd.core.frame.DataFrame)
 
 
-# generate_html
+@pytest.mark.parametrize('rule_object, X_explain',
+                         [
+                             (test_rule_object, testing_X_explain)
+                         ])
+def test_generate_bullet_data(rule_object, X_explain):
+    py_explainer.top_k_rules = 3
+    py_explainer.X_explain = X_explain
+    top_rules = py_explainer.parse_top_rules(top_k_positive_rules=rule_object['top_k_positive_rules'],
+                                             top_k_negative_rules=rule_object['top_k_negative_rules'])
+    bullet_data = py_explainer.generate_bullet_data(top_rules)
+    assert pyexplainer_pyexplainer.data_validation(bullet_data)
+    for dict_data in bullet_data:
+        assert isinstance(dict_data['title'], str)
+        assert isinstance(dict_data['subtitle'], str)
+        assert isinstance(dict_data['ticks'], list) and len(dict_data['ticks']) == 2
+        assert isinstance(dict_data['step'], list) and len(dict_data['step']) == 1
+
+        assert len(dict_data['startPoints']) == len(dict_data['widths'])
+        assert isinstance(dict_data['startPoints'], list) and dict_data['startPoints'][0] == 0
+        for i in range(1, len(dict_data['startPoints'])):
+            dict_data['startPoints'][i] = dict_data['startPoints'][i-1] + dict_data['widths'][i-1]
+        assert isinstance(dict_data['widths'], list) and 440 < sum(dict_data['widths']) < 460
+
+        assert isinstance(dict_data['colors'], list)
+        assert isinstance(dict_data['markers'], list) and \
+               dict_data['ticks'][0] <= dict_data['markers'][0] <= dict_data['ticks'][1]
+        assert isinstance(dict_data['varRef'], str)
+
+
+@pytest.mark.parametrize('rule_object, result',
+                         [
+                             (test_rule_object, True)
+                         ])
+def test_generate_html(rule_object, result):
+    py_explainer.visualisation_data_setup(rule_object)
+    html = py_explainer.generate_html()
+    assert bool(BeautifulSoup(html, "html.parser").find()) is result
 
 
 # generate_instance_crossover_interpolation
@@ -145,7 +228,13 @@ def test_pyexplainer_init_positive(X_train, y_train, indep, dep, blackbox_model,
 # generate_instance_random_perturbation
 
 
-# generate_risk_data
+@pytest.mark.parametrize('X_explain, result',
+                         [
+                             (testing_X_explain, ['riskScore', 'riskPred'])
+                         ])
+def test_generate_risk_data(X_explain, result):
+    risk_data = py_explainer.generate_risk_data(X_explain)
+    assert list(risk_data[0].keys()) == result
 
 
 @pytest.mark.parametrize('risk_data, result',
@@ -186,16 +275,40 @@ def test_generate_progress_bar_items():
     assert isinstance(py_explainer.hbox_items[3], widgets.Label) is True
 
 
-# test_generate_sliders
+@pytest.mark.parametrize('bullet_data, result',
+                         [
+                             (testing_bullet_data, True)
+                         ])
+def test_generate_sliders(bullet_data, result):
+    py_explainer.bullet_data = bullet_data
+    sliders = py_explainer.generate_sliders()
+    assert len(sliders) == len(bullet_data)
+    for sld in sliders:
+        assert isinstance(sld, widgets.IntSlider) or isinstance(sld, widgets.FloatSlider) is result
 
 
 # on_value_change
 
 
-# parse_top_rules
+@pytest.mark.parametrize('top_k_positive_rules, top_k_negative_rules, top_k_rules, result',
+                         [
+                             (test_rule_object['top_k_positive_rules'], test_rule_object['top_k_negative_rules'], 1, 1),
+                             (test_rule_object['top_k_positive_rules'], test_rule_object['top_k_negative_rules'], 15,
+                              len(test_rule_object['top_k_positive_rules'])),
+                             (test_rule_object['top_k_positive_rules'], test_rule_object['top_k_negative_rules'], 3, 3)
+                         ])
+def test_parse_top_rules(top_k_positive_rules, top_k_negative_rules, top_k_rules, result):
+    py_explainer.top_k_rules = top_k_rules
+    top_rules = py_explainer.parse_top_rules(top_k_positive_rules, top_k_negative_rules)
+    assert len(top_rules['top_tofollow_rules']) == result
+    assert len(top_rules['top_toavoid_rules']) == result
 
 
-# retrieve_min_max_values
+def test_retrieve_X_explain_min_max_values():
+    py_explainer.X_train = X_train
+    min_max = py_explainer.retrieve_X_explain_min_max_values()
+    assert min_max['min_values'].equals(X_train.min())
+    assert min_max['max_values'].equals(X_train.max())
 
 
 # run_bar_animation
@@ -230,8 +343,8 @@ def test_update_risk_score(risk_score, result):
 
 @pytest.mark.parametrize('right_text, result',
                          [
-                             ("testing text", 'ValueError'),
-                             (123, 'ValueError')
+                             ("testing text", 'TypeError'),
+                             (123, 'TypeError')
                          ])
 def test_update_right_text_negative(right_text, result):
     with pytest.raises(Exception) as e_info:
@@ -251,10 +364,36 @@ def test_update_right_text_positive(right_text):
     py_explainer.update_right_text(right_text)
 
 
-# visualise
-
-
-# visualisation_data_setup
+@pytest.mark.parametrize('rule_object, result',
+                         [
+                             (test_rule_object, [test_rule_object['X_explain'],
+                                                 test_rule_object['y_explain'],
+                                                 [{'title': '#1 Increase the values of CountStmt to more than 10',
+                                                   'subtitle': 'Actual = 10', 'ticks': [2.0, 196.0], 'step': [1],
+                                                   'startPoints': [0, 222.0], 'widths': [222.0, 228.0],
+                                                   'colors': ['#d7191c', '#a6d96a'], 'markers': [10],
+                                                   'varRef': 'CountStmt'},
+                                                  {'title': '#2 Decrease the values of MAJOR_COMMIT to less than 1',
+                                                   'subtitle': 'Actual = 1', 'ticks': [1.0, 2.0], 'step': [0.1],
+                                                   'startPoints': [0, 248.0], 'widths': [248.0, 202.0],
+                                                   'colors': ['#a6d96a', '#d7191c'], 'markers': [1],
+                                                   'varRef': 'MAJOR_COMMIT'},
+                                                  {'title': '#3 Decrease the values of COMM to less than 1',
+                                                   'subtitle': 'Actual = 1', 'ticks': [1, 8.0], 'step': [0.1],
+                                                   'startPoints': [0, 289.0], 'widths': [289.0, 161.0],
+                                                   'colors': ['#a6d96a', '#d7191c'], 'markers': [1], 'varRef': 'COMM'}],
+                                                 [{'riskScore': ['8%'], 'riskPred': ['Clean']}]])
+                         ])
+def test_visualisation_data_setup(rule_object, result):
+    py_explainer.X_explain = None
+    py_explainer.y_explain = None
+    py_explainer.bullet_data = None
+    py_explainer.risk_data = None
+    py_explainer.visualisation_data_setup(rule_object)
+    assert py_explainer.X_explain.equals(result[0])
+    assert py_explainer.y_explain.equals(result[1])
+    assert py_explainer.bullet_data == result[2]
+    assert py_explainer.risk_data == result[3]
 
 
 """ functions starting with double underscore """
@@ -270,26 +409,6 @@ def test_set_bullet_data_negative(bullet_data, result):
     with pytest.raises(Exception) as e_info:
         py_explainer._PyExplainer__set_bullet_data(bullet_data)
     assert e_info.typename == result
-
-
-testing_bullet_data = [{'title': '#1 Increase the values of CountStmt to more than 10',
-                        'subtitle': 'Actual = 10',
-                        'ticks': [2.0, 196.0],
-                        'step': [1],
-                        'startPoints': [0, 222.0],
-                        'widths': [222.0, 228.0],
-                        'colors': ['#d7191c', '#a6d96a'],
-                        'markers': [10],
-                        'varRef': 'CountStmt'},
-                       {'title': '#2 Decrease the values of MAJOR_COMMIT to less than 1',
-                        'subtitle': 'Actual = 1',
-                        'ticks': [1.0, 2.0],
-                        'step': [0.1],
-                        'startPoints': [0, 248.0],
-                        'widths': [248.0, 202.0],
-                        'colors': ['#a6d96a', '#d7191c'],
-                        'markers': [1],
-                        'varRef': 'MAJOR_COMMIT'}]
 
 
 @pytest.mark.parametrize('bullet_data, result',
@@ -312,8 +431,8 @@ testing_float_progress = widgets.FloatProgress(value=0,
 
 @pytest.mark.parametrize('bullet_output, result',
                          [
-                             (widgets.Label("test"), 'ValueError'),
-                             ("abc", 'ValueError')
+                             (widgets.Label("test"), 'TypeError'),
+                             ("abc", 'TypeError')
                          ])
 def test_set_bullet_output_negative(bullet_output, result):
     py_explainer.bullet_output = None
@@ -338,8 +457,8 @@ def test_get_and_set_bullet_output_positive(bullet_output, result):
 @pytest.mark.parametrize('hbox_items, result',
                          [
                              ([testing_float_progress, widgets.Label("test"),
-                               widgets.Label("test"), widgets.Label("test")], 'ValueError'),
-                             ([widgets.Label("test"), testing_float_progress, widgets.Label("test")], 'ValueError')
+                               widgets.Label("test"), widgets.Label("test")], 'TypeError'),
+                             ([widgets.Label("test"), testing_float_progress, widgets.Label("test")], 'TypeError')
                          ])
 def test_set_hbox_items_negative(hbox_items, result):
     py_explainer.hbox_items = None
@@ -386,8 +505,8 @@ def test_get_and_set_risk_data_positive(risk_data, result):
 
 @pytest.mark.parametrize('X_explain, result',
                          [
-                             (list(testing_X_explain), 'ValueError'),
-                             (testing_y_explain, 'ValueError')
+                             (list(testing_X_explain), 'TypeError'),
+                             (testing_y_explain, 'TypeError')
                          ])
 def test_set_X_explain_negative(X_explain, result):
     py_explainer.X_explain = None
@@ -408,8 +527,8 @@ def test_get_and_set_X_explain_positive(X_explain, result):
 
 @pytest.mark.parametrize('y_explain, result',
                          [
-                             (testing_X_explain, 'ValueError'),
-                             (list(testing_y_explain), 'ValueError')
+                             (testing_X_explain, 'TypeError'),
+                             (list(testing_y_explain), 'TypeError')
                          ])
 def test_set_y_explain_negative(y_explain, result):
     py_explainer.y_explain = None
