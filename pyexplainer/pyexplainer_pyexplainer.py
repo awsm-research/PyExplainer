@@ -1,5 +1,6 @@
 import copy
 import math
+import os
 import random
 import string
 import warnings
@@ -12,12 +13,7 @@ from IPython.core.display import display, HTML
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils import check_random_state
 from sklearn.ensemble import RandomForestClassifier
-# currently for pytest
 from pyexplainer.rulefit import RuleFit
-
-
-# currently for notebook test
-# from rulefit import RuleFit
 
 
 def data_validation(data):
@@ -188,9 +184,9 @@ class PyExplainer:
         Parameters
         ----------
         X_explain : :obj:`pandas.core.frame.DataFrame`
-            Features to be explained by the local RuleFit model
+            Features to be explained by the local RuleFit model, can be seen as X_test
         y_explain : :obj:`pandas.core.series.Series`
-            Label to be explained by the local RuleFit model
+            Label to be explained by the local RuleFit model, can be seen as y_test
         top_k : :obj:`int`, default is 3
             Number of top rules to be retrieved
         max_rules : :obj:`int`, default is 10
@@ -249,11 +245,23 @@ class PyExplainer:
             synthetic_object = self.generate_instance_crossover_interpolation(X_explain, y_explain, debug=debug)
         elif search_function.lower() == 'randomperturbation':
             # This random perturbation approach to generate instances is used by LIME to gerate synthetic instances
-            synthetic_object = self.generate_instance_random_perturbation(X_explain=X_explain,debug=debug)
+            synthetic_object = self.generate_instance_random_perturbation(X_explain=X_explain, debug=debug)
 
         # Step 2 - Generate predictions of synthetic instances using the global model
         synthetic_instances = synthetic_object['synthetic_data'].loc[:, self.indep]
         synthetic_predictions = self.blackbox_model.predict(synthetic_instances)
+        if 1 in synthetic_predictions and 0 in synthetic_predictions:
+            one_class_problem = False
+        else:
+            one_class_problem = True
+        if one_class_problem:
+            print("Random Perturbation only generated one class for the prediction column which means\
+                   Random Perturbation is not compatible with the current data.\
+                   The 'Crossover and Interpolation' approach is used as the alternative.")
+            synthetic_object = self.generate_instance_crossover_interpolation(X_explain, y_explain, debug=debug)
+            synthetic_instances = synthetic_object['synthetic_data'].loc[:, self.indep]
+            synthetic_predictions = self.blackbox_model.predict(synthetic_instances)
+
         if debug:
             n_defect_class = np.sum(synthetic_predictions)
             print('nDefect=', n_defect_class,
@@ -342,9 +350,13 @@ class PyExplainer:
                 tmp_step = [1]
 
             bullet_total_width = 450
-            tmp_startpoints = [0, round((tmp_threshold_value - plot_min) / diff_plot_max_min * bullet_total_width, 0)]
-            tmp_widths = [round((tmp_threshold_value - plot_min) / diff_plot_max_min * bullet_total_width, 0),
-                          round((plot_max - tmp_threshold_value) / diff_plot_max_min * bullet_total_width, 0)]
+            tmp_start_points = [0, round((tmp_threshold_value - plot_min) / diff_plot_max_min * bullet_total_width
+                                        if diff_plot_max_min * bullet_total_width else 0, 0)]
+
+            tmp_widths = [round((tmp_threshold_value - plot_min) / diff_plot_max_min * bullet_total_width
+                                if diff_plot_max_min * bullet_total_width else 0, 0),
+                          round((plot_max - tmp_threshold_value) / diff_plot_max_min * bullet_total_width
+                                if diff_plot_max_min * bullet_total_width else 0, 0)]
 
             id = '#' + str(i + 1)
             var_name = str(tmp_rule['variable'])
@@ -368,7 +380,7 @@ class PyExplainer:
                 "subtitle": tmp_subtitle_text,
                 "ticks": tmp_ticks,
                 "step": tmp_step,
-                "startPoints": tmp_startpoints,
+                "startPoints": tmp_start_points,
                 "widths": tmp_widths,
                 "colors": tmp_colors,
                 "markers": tmp_markers,
@@ -384,18 +396,22 @@ class PyExplainer:
         :obj:`str`
             html String
         """
+        this_dir, _ = os.path.split(__file__)
+        with open(os.path.join(this_dir, 'css/styles.css'), encoding="utf8") as f:
+            style_css = f.read()
+        with open(os.path.join(this_dir, 'js/d3.min.js'), encoding="utf8") as f:
+            d3_js = f.read()
+        with open(os.path.join(this_dir, 'js/bullet.js'), encoding="utf8") as f:
+            bullet_js = f.read()
 
-        css_filepath = "css/styles.css"
         css_stylesheet = """
-            <link rel="stylesheet" href="%s" />
-        """ % css_filepath
+        <style>%s</style>
+        """ % style_css
 
-        d3_filepath = "js/d3.min.js"
-        bulletjs_filepath = "js/bullet.js"
         d3_script = """
-        <script src="%s"></script>
-        <script src="%s"></script>
-        """ % (d3_filepath, bulletjs_filepath)
+        <script>%s</script>
+        <script>%s</script>
+        """ % (d3_js, bullet_js)
 
         main_title = "What to do to decrease the risk of having defects?"
         title = """
@@ -498,15 +514,15 @@ class PyExplainer:
 
         return html
 
-    def generate_instance_crossover_interpolation(self, X_test, y_test, debug=False):
+    def generate_instance_crossover_interpolation(self, X_explain, y_explain, debug=False):
         """An approach to generate instance using Crossover and Interpolation
 
         Parameters
         ----------
-        X_test : :obj:`pandas.core.frame.DataFrame`
-            X_test (Testing Features)
-        y_test : :obj:`pandas.core.series.Series`
-            y_test (Testing Label)
+        X_explain : :obj:`pandas.core.frame.DataFrame`
+            X_explain (Testing Features)
+        y_explain : :obj:`pandas.core.series.Series`
+            y_explain (Testing Label)
         debug : :obj:`bool`
             True for debugging mode, False otherwise.
 
@@ -520,16 +536,16 @@ class PyExplainer:
 
         X_train_i = self.X_train.copy()
         # y_train_i = self.y_train.copy()
-        X_test = X_test.copy()
-        y_test = y_test.copy()
+        X_explain = X_explain.copy()
+        y_explain = y_explain.copy()
 
         X_train_i.reset_index(inplace=True)
-        X_test.reset_index(inplace=True)
+        X_explain.reset_index(inplace=True)
         X_train_i = X_train_i.loc[:, self.indep]
         # y_train_i = y_train_i.reset_index()[[self.dep]]
 
-        X_test = X_test.loc[:, self.indep]
-        y_test = y_test.reset_index()[[self.dep]]
+        X_explain = X_explain.loc[:, self.indep]
+        y_explain = y_explain.reset_index()[[self.dep]]
 
         # get the global model predictions for the training set
         target_train = self.blackbox_model.predict(X_train_i)
@@ -542,7 +558,7 @@ class PyExplainer:
         trainset_normalize = X_train_i.copy()
         if debug:
             print(list(X_train_i), "columns")
-        cases_normalize = X_test.copy()
+        cases_normalize = X_explain.copy()
 
         train_objs_num = len(trainset_normalize)
         dataset = pd.concat(objs=[trainset_normalize, cases_normalize], axis=0)
@@ -611,7 +627,7 @@ class PyExplainer:
             train_set_neigh = X_train_i[X_train_i.index.isin(final_neighbours_similarity_df.index)]
             if debug:
                 print(train_set_neigh, "train set neigh")
-            train_class_neigh = y_test[y_test.index.isin(final_neighbours_similarity_df.index)]
+            train_class_neigh = y_explain[y_explain.index.isin(final_neighbours_similarity_df.index)]
             # train_neigh_df = train_set_neigh.join(train_class_neigh)
             # class_neigh = train_class_neigh.groupby([self.dep]).size()
 
@@ -682,7 +698,7 @@ class PyExplainer:
 
             new_df_case = pd.concat([predict_dataset, target_df], axis=1)
             new_df_case = np.round(new_df_case, 2)
-            new_df_case.rename(columns={0: y_test.columns[0]}, inplace=True)
+            new_df_case.rename(columns={0: y_explain.columns[0]}, inplace=True)
             sampled_class_frequency = new_df_case.groupby([self.dep]).size()
 
             return {'synthetic_data': new_df_case,
@@ -810,8 +826,9 @@ class PyExplainer:
         :obj:`list`
             A list of dict that contains the data of risk prediction and risk score.
         """
+        risk_pred = int(self.blackbox_model.predict(X_explain)[0])
         return [{"riskScore": [str(int(round(self.blackbox_model.predict_proba(X_explain)[0][1] * 100, 0))) + '%'],
-                 "riskPred": [self.class_label[self.blackbox_model.predict(X_explain)[0]]],
+                 "riskPred": [self.class_label[risk_pred]]
                  }]
 
     def get_risk_pred(self):
@@ -869,7 +886,7 @@ class PyExplainer:
         """
         slider_widgets = []
         data = self.__get_bullet_data()
-        style = {'description_width': '40%', 'widget_width': '60%'}
+        style = {'description_width': '40%'}
         layout = widgets.Layout(width='99%', height='20px')
 
         for d in data:

@@ -89,7 +89,7 @@ with open(rule_object_path, 'rb') as file:
 
 
 def test_version():
-    assert __version__ == '0.1.1'
+    assert __version__ == '0.1.3'
 
 
 @pytest.mark.parametrize('data, result',
@@ -163,15 +163,18 @@ rule_obj_keys = ['synthetic_data', 'synthetic_predictions', 'X_explain', 'y_expl
                  'dep', 'top_k_positive_rules', 'top_k_negative_rules']
 
 
-@pytest.mark.parametrize('exp_X_test, exp_y_test, top_k, max_rules, max_iter, cv, search_function, debug, result',
+@pytest.mark.parametrize('exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, result',
                          [
-                             (X_test, y_test, 3, 10, 10, 5, 'CrossoverInterpolation', False, rule_obj_keys),
-                             #(X_test, y_test, 3, 10, 100, 5, 'RandomPerturbation', True, rule_obj_keys)
+                             (testing_X_explain, testing_y_explain, 3, 10, 10, 5,
+                              'CrossoverInterpolation', False, rule_obj_keys),
+                             (testing_X_explain, testing_y_explain, 3, 10, 10, 5,
+                              'RandomPerturbation', True, rule_obj_keys)
                          ])
-def test_explain_positive(exp_X_test, exp_y_test, top_k, max_rules, max_iter, cv, search_function, debug, result):
+def test_explain_positive(exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, result):
     py_explainer.X_train = X_train
     py_explainer.y_train = y_train
-    rule_object = py_explainer.explain(exp_X_test, exp_y_test, top_k, max_rules, max_iter, cv, search_function, debug)
+    rule_object = py_explainer.explain(exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv,
+                                       search_function, debug)
     assert list(rule_object.keys()) == result
     assert isinstance(rule_object['synthetic_data'], pd.core.frame.DataFrame)
     assert isinstance(rule_object['synthetic_predictions'], np.ndarray)
@@ -203,7 +206,7 @@ def test_generate_bullet_data(rule_object, X_explain):
         assert len(dict_data['startPoints']) == len(dict_data['widths'])
         assert isinstance(dict_data['startPoints'], list) and dict_data['startPoints'][0] == 0
         for i in range(1, len(dict_data['startPoints'])):
-            dict_data['startPoints'][i] = dict_data['startPoints'][i-1] + dict_data['widths'][i-1]
+            dict_data['startPoints'][i] = dict_data['startPoints'][i - 1] + dict_data['widths'][i - 1]
         assert isinstance(dict_data['widths'], list) and 440 < sum(dict_data['widths']) < 460
 
         assert isinstance(dict_data['colors'], list)
@@ -222,10 +225,29 @@ def test_generate_html(rule_object, result):
     assert bool(BeautifulSoup(html, "html.parser").find()) is result
 
 
-# generate_instance_crossover_interpolation
+@pytest.mark.parametrize('X_explain, y_explain',
+                         [
+                             (testing_X_explain, testing_y_explain)
+                         ])
+def test_generate_instance_crossover_interpolation(X_explain, y_explain):
+    py_explainer.X_train = X_train
+    py_explainer.y_train = y_train
+    py_explainer.dep = dep
+    synthetic_data = py_explainer.generate_instance_crossover_interpolation(X_explain, y_explain)
+    assert isinstance(synthetic_data['synthetic_data'], pd.core.frame.DataFrame)
+    assert synthetic_data['sampled_class_frequency'].equals(synthetic_data['synthetic_data'] \
+                                                            .groupby([py_explainer.dep]).size())
 
 
-# generate_instance_random_perturbation
+@pytest.mark.parametrize('X_explain',
+                         [
+                             testing_X_explain
+                         ])
+def test_generate_instance_random_perturbation(X_explain):
+    py_explainer.X_train = X_train
+    py_explainer.y_train = y_train
+    synthetic_data = py_explainer.generate_instance_random_perturbation(X_explain)
+    assert isinstance(synthetic_data['synthetic_data'], pd.core.frame.DataFrame)
 
 
 @pytest.mark.parametrize('X_explain, result',
@@ -287,9 +309,6 @@ def test_generate_sliders(bullet_data, result):
         assert isinstance(sld, widgets.IntSlider) or isinstance(sld, widgets.FloatSlider) is result
 
 
-# on_value_change
-
-
 @pytest.mark.parametrize('top_k_positive_rules, top_k_negative_rules, top_k_rules, result',
                          [
                              (test_rule_object['top_k_positive_rules'], test_rule_object['top_k_negative_rules'], 1, 1),
@@ -311,9 +330,6 @@ def test_retrieve_X_explain_min_max_values():
     assert min_max['max_values'].equals(X_train.max())
 
 
-# run_bar_animation
-
-
 @pytest.mark.parametrize('top_k_rules, result',
                          [
                              (0, 3),
@@ -325,9 +341,6 @@ def test_set_top_k_rules(top_k_rules, result):
     py_explainer.top_k_rules = 3
     py_explainer.set_top_k_rules(top_k_rules)
     assert py_explainer.top_k_rules == result
-
-
-# show_visualisation
 
 
 @pytest.mark.parametrize('risk_score, result',
@@ -545,3 +558,11 @@ def test_get_set_y_explain_positive(y_explain, result):
     py_explainer.y_explain = None
     py_explainer._PyExplainer__set_y_explain(y_explain)
     assert py_explainer._PyExplainer__get_y_explain().equals(result)
+
+
+"""Test the visualisation using Jupyter Notebook Kernel"""
+# todo - how to test on_value_change
+
+
+def test_visualisation():
+    os.system("jupyter nbconvert --to notebook --execute test_visualisation.ipynb --output test_visualisation.ipynb")
