@@ -1,6 +1,7 @@
 import copy
 import math
 import os
+import sys
 import random
 import string
 import warnings
@@ -14,6 +15,18 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.utils import check_random_state
 from sklearn.ensemble import RandomForestClassifier
 from pyexplainer.rulefit import RuleFit
+
+
+def get_base_prefix_compat():
+    """Get base/real prefix, or sys.prefix if there is none."""
+    return getattr(sys, "base_prefix", None) or getattr(sys, "real_prefix", None) or sys.prefix
+
+
+def in_virtualenv():
+    return get_base_prefix_compat() != sys.prefix
+
+
+INSIDE_VIRTUAL_ENV = in_virtualenv()
 
 
 def data_validation(data):
@@ -46,6 +59,10 @@ def get_default_data_and_model():
     cwd = os.getcwd()
     parent_dir = os.path.dirname(cwd)
     path_train = parent_dir + "/tests/pyexplainer_test_data/activemq-5.0.0.zip"
+    path_test = parent_dir + "/tests/pyexplainer_test_data/activemq-5.1.0.zip"
+    if INSIDE_VIRTUAL_ENV:
+        path_train = cwd + "/tests/pyexplainer_test_data/activemq-5.0.0.zip"
+        path_test = cwd + "/tests/pyexplainer_test_data/activemq-5.1.0.zip"
     training_data = pd.read_csv(path_train, index_col='File')
     dependent_vars = training_data.columns[-4]
     selected_features = ["ADEV", "AvgCyclomaticModified", "AvgEssential", "AvgLineBlank", "AvgLineComment",
@@ -66,7 +83,6 @@ def get_default_data_and_model():
     blackbox_model = RandomForestClassifier(max_depth=3, random_state=0)
     blackbox_model.fit(X_train, y_train)
 
-    path_test = parent_dir + "/tests/pyexplainer_test_data/activemq-5.1.0.zip"
     testing_data = pd.read_csv(path_test, index_col='File')
     X_test = testing_data.loc[:, independent_vars]
     y_test = testing_data.loc[:, dependent_vars]
