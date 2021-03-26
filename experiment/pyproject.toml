@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "pyexplainer"
+version = "0.1.0"
+description = "ML explainer for SEA"
+authors = ["Michael <michaelfu1998@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.8"
+scikit-learn = "^0.24.1"
+numpy = "^1.20.1"
+scipy = "^1.6.1"
+ipywidgets = "^7.6.3"
+ipython = "^7.21.0"
+pandas = "^1.2.3"
+
+[tool.poetry.dev-dependencies]
+Sphinx = "^3.5.1"
+sphinxcontrib-napoleon = "^0.7"
+rope = "^0.18.0"
+pytest = "^6.2.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.urls]
+"Repository" = "https://github.com/awsm-research/pyExplainer"

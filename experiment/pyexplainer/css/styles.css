@@ -1,0 +1,66 @@
+.box {
+  height: 10px;
+  width: 10px;
+  clear: both;
+  margin-left: 0.5vw;
+  display: inline-block;
+}
+
+.orange {
+  background-color: #fa8128;
+}
+
+.green {
+  background-color: #00ff00;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+.bullet {
+  font: 10px sans-serif;
+}
+.bullet .marker {
+  stroke: #000;
+  stroke-width: 4px;
+}
+.bullet .title {
+  font-size: 12px;
+  font-weight: bold;
+  fill: #000;
+}
+.bullet .subtitle {
+  fill: #999;
+}
+.bullet .tick {
+  fill: #000;
+}
+
+.d3-target-bullet {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  padding-top: 0;
+  position: relative;
+  width: 100vw;
+  overflow: auto;
+}
+
+.d3-target-bullet .riskPred {
+  font-family: "Helvetica Neue";
+  font-weight: bold;
+  padding-left: 3vw;
+}
+
+.d3-target-bullet .riskScore {
+  font-family: "Helvetica Neue";
+  font-weight: bold;
+  padding-left: 3vw;
+}
+
+.bullet-chart {
+  background-color: white;
+  overflow: auto;
+}

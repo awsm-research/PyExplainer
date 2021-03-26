@@ -1,0 +1,1 @@
+python train_pyExp.py -proj_name qt -local_model_type rulefit

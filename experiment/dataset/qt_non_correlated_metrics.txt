@@ -1,0 +1,16 @@
+la
+ld
+nd
+ns
+ent
+nrev
+rtime
+hcmt
+self
+ndev
+age
+app
+asexp
+rsexp
+asawr
+rsawr
