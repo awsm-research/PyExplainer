@@ -40,6 +40,7 @@ if INSIDE_VIRTUAL_ENV:
     model_file_path = cwd + "/tests/rf_models/rf_model1.pkl"
     test_file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.1.0.zip"
     rule_object_path = cwd + "/tests/rule_objects/rule_object.pyobject"
+    top_rules_path = cwd + '/tests/rule_objects/top_rules.pyobject'
 
 train_data = pd.read_csv(file_path, index_col='File')
 
