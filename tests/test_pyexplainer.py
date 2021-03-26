@@ -59,11 +59,12 @@ indep = all_cols
 X_train = train_data.loc[:, indep]
 y_train = train_data.loc[:, dep]
 
-""" write model to pickle - done """
+""" write model to pickle - done 
 blackbox_model = RandomForestClassifier(max_depth=3, random_state=0)
 blackbox_model.fit(X_train, y_train)
 with open(model_file_path, 'wb+') as file:
     pickle.dump(obj=blackbox_model, file=file)
+"""
 
 """ load model from .pkl file """
 with open(model_file_path, 'rb') as file:
@@ -82,7 +83,7 @@ sample_explain_index = 24
 testing_X_explain = X_test.iloc[[sample_explain_index]]
 testing_y_explain = y_test.iloc[[sample_explain_index]]
 
-"""Create and Write rule_object - done"""
+"""Create and Write rule_object - done
 test_rule_object = py_explainer.explain(X_explain=testing_X_explain,
                                         y_explain=testing_y_explain,
                                         search_function='crossoverinterpolation',
@@ -93,6 +94,7 @@ test_rule_object = py_explainer.explain(X_explain=testing_X_explain,
                                         debug=False)
 with open(rule_object_path, 'wb+') as file:
     pickle.dump(test_rule_object, file)
+"""
 
 """Load rule_object"""
 with open(rule_object_path, 'rb') as file:
@@ -101,11 +103,12 @@ with open(rule_object_path, 'rb') as file:
 py_explainer.X_explain = testing_X_explain
 py_explainer.y_explain = testing_y_explain
 
-"""Write top_rules - done"""
+"""Write top_rules - done
 top_rules = py_explainer.parse_top_rules(top_k_positive_rules=test_rule_object['top_k_positive_rules'],
                                          top_k_negative_rules=test_rule_object['top_k_negative_rules'])
 with open(top_rules_path, 'wb+') as file:
     pickle.dump(top_rules, file)
+"""
 
 """Load top_rules"""
 with open(top_rules_path, 'rb') as file:
