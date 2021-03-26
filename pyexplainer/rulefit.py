@@ -176,6 +176,7 @@ class Rule:
 
 def extract_rules_from_tree(tree, feature_names=None):
     """Helper to turn a tree into as set of rules
+
     """
     rules = set()
 
@@ -420,7 +421,7 @@ class RuleFit(BaseEstimator, TransformerMixin):
                 if type(self.tree_generator) not in [GradientBoostingClassifier, RandomForestClassifier]:
                     raise ValueError("RuleFit only works with RandomForest and BoostingClassifier")
 
-            ## fit tree generator
+            # fit tree generator
             if not self.exp_rand_tree_size:  # simply fit with constant tree size
                 self.tree_generator.fit(X, y)
             else:  # randomise tree size as per Friedman 2005 Sec 3.3
@@ -450,17 +451,17 @@ class RuleFit(BaseEstimator, TransformerMixin):
                                                                                     RandomForestClassifier):
                 tree_list = [[x] for x in self.tree_generator.estimators_]
 
-            ## extract rules
+            # extract rules
             self.rule_ensemble = RuleEnsemble(tree_list=tree_list,
                                               feature_names=self.feature_names)
 
-            ## concatenate original features and rules
+            # concatenate original features and rules
             X_rules = self.rule_ensemble.transform(X)
 
-        ## standardise linear variables if requested (for regression model only)
+        # standardise linear variables if requested (for regression model only)
         if 'l' in self.model_type:
 
-            ## standard deviation and mean of winsorized features
+            # standard deviation and mean of winsorized features
             self.winsorizer.train(X)
             winsorized_X = self.winsorizer.trim(X)
             self.stddev = np.std(winsorized_X, axis=0)
@@ -472,7 +473,7 @@ class RuleFit(BaseEstimator, TransformerMixin):
             else:
                 X_regn = X.copy()
 
-        ## Compile Training data
+        # Compile Training data
         X_concat = np.zeros([X.shape[0], 0])
         if 'l' in self.model_type:
             X_concat = np.concatenate((X_concat, X_regn), axis=1)
@@ -480,7 +481,7 @@ class RuleFit(BaseEstimator, TransformerMixin):
             if X_rules.shape[0] > 0:
                 X_concat = np.concatenate((X_concat, X_rules), axis=1)
 
-        ## fit Lasso
+        # fit Lasso
         if self.rfmode == 'regress':
             if self.Cs is None:  # use defaultshasattr(self.Cs, "__len__"):
                 n_alphas = 100
@@ -624,35 +625,33 @@ class RuleFit(BaseEstimator, TransformerMixin):
         return rules
 
     def get_feature_importance(self, exclude_zero_coef=False, subregion=None, scaled=False):
-        """
-        Returns feature importance for input features to RuleFit model.
+        """Returns feature importance for input features to RuleFit model.
 
         Parameters:
         -----------
-            exclude_zero_coef: If True, returns only the rules with an estimated
-                           coefficient not equalt to  zero.
+        exclude_zero_coef: If True, returns only the rules with an estimated
+                       coefficient not equalt to zero.
 
-            subregion: If None (default) returns global importances (FP 2004 eq. 28/29), else returns importance over
-                           subregion of inputs (FP 2004 eq. 30/31/32).
-                           
-            scaled: If True, will scale the importances to have a max of 100.
+        subregion: If None (default) returns global importances (FP 2004 eq. 28/29), else returns importance over
+                       subregion of inputs (FP 2004 eq. 30/31/32).
+
+        scaled: If True, will scale the importances to have a max of 100.
             
         Returns:
         --------
-            return_df (pandas DataFrame): DataFrame for feature names and feature importances (FP 2004 eq. 35)
+        return_df (pandas DataFrame): DataFrame for feature names and feature importances (FP 2004 eq. 35)
         """
 
         def find_mk(rule: str):
-            """
-            Finds the number of features in a given rule from the get_rules method.
+            """Finds the number of features in a given rule from the get_rules method.
 
             Parameters:
             -----------
-                rule (str): 
+            rule (str):
                 
             Returns:
             --------
-                var_count (int): 
+            var_count (int):
             """
 
             ## Count the number of features found in a rule

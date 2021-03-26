@@ -42,6 +42,47 @@ def data_validation(data):
     return valid
 
 
+def get_default_data_and_model():
+    cwd = os.getcwd()
+    parent_dir = os.path.dirname(cwd)
+    path_train = parent_dir + "/tests/pyexplainer_test_data/activemq-5.0.0.zip"
+    training_data = pd.read_csv(path_train, index_col='File')
+    dependent_vars = training_data.columns[-4]
+    selected_features = ["ADEV", "AvgCyclomaticModified", "AvgEssential", "AvgLineBlank", "AvgLineComment",
+                         "CountClassBase", "CountClassCoupled", "CountClassDerived", "CountDeclClass",
+                         "CountDeclClassMethod", "CountDeclClassVariable", "CountDeclInstanceVariable",
+                         "CountDeclMethodDefault", "CountDeclMethodPrivate", "CountDeclMethodProtected",
+                         "CountDeclMethodPublic", "CountInput_Mean", "CountInput_Min", "CountOutput_Min", "MAJOR_LINE",
+                         "MaxInheritanceTree", "MaxNesting_Min", "MINOR_COMMIT", "OWN_COMMIT", "OWN_LINE",
+                         "PercentLackOfCohesion", "RatioCommentToCode"]
+    all_cols = training_data.columns
+    for col in all_cols:
+        if col not in selected_features:
+            all_cols = all_cols.drop(col)
+    independent_vars = all_cols
+    X_train = training_data.loc[:, independent_vars]
+    y_train = training_data.loc[:, dependent_vars]
+
+    blackbox_model = RandomForestClassifier(max_depth=3, random_state=0)
+    blackbox_model.fit(X_train, y_train)
+
+    path_test = parent_dir + "/tests/pyexplainer_test_data/activemq-5.1.0.zip"
+    testing_data = pd.read_csv(path_test, index_col='File')
+    X_test = testing_data.loc[:, independent_vars]
+    y_test = testing_data.loc[:, dependent_vars]
+
+    sample_explain_index = 0
+    X_explain = X_test.iloc[[sample_explain_index]]
+    y_explain = y_test.iloc[[sample_explain_index]]
+    return {'X_train': X_train,
+            'y_train': y_train,
+            'indep': independent_vars,
+            'dep': dependent_vars,
+            'blackbox_model': blackbox_model,
+            'X_explain': X_explain,
+            'y_explain': y_explain}
+
+
 def id_generator(size=15, random_state=check_random_state(None)):
     """Generate unique ids for div tag which will contain the visualisation stuff from d3.
 
@@ -137,7 +178,6 @@ class PyExplainer:
         else:
             print("dep (label column name) should be type 'str'")
             raise TypeError
-        # todo- validate blackbox model
         if isinstance(blackbox_model, sklearn.ensemble.RandomForestClassifier):
             self.blackbox_model = blackbox_model
         else:
@@ -174,8 +214,8 @@ class PyExplainer:
                 X_explain,
                 y_explain,
                 top_k=3,
-                max_rules=10,
-                max_iter=10,
+                max_rules=2000,
+                max_iter=10000,
                 cv=5,
                 search_function='CrossoverInterpolation',
                 debug=False):
@@ -218,14 +258,14 @@ class PyExplainer:
         >>> blackbox_model = RandomForestClassifier(max_depth=3, random_state=0)
         >>> blackbox_model.fit(X_train, y_train)
         >>> class_label = ['Clean', 'Defect']
-        >>> pyExp = PyExplainer(X_train, y_train, indep, dep, class_label, blackbox_model)
+        >>> py_explainer = PyExplainer(X_train, y_train, indep, dep, class_label, blackbox_model)
         >>> sample_test_data = pd.read_csv('../tests/pyexplainer_test_data/activemq-5.0.0.csv', index_col = 'File')
         >>> X_test = sample_test_data.loc[:, indep]
         >>> y_test = sample_test_data.loc[:, dep]
         >>> sample_explain_index = 0
         >>> X_explain = X_test.iloc[[sample_explain_index]]
         >>> y_explain = y_test.iloc[[sample_explain_index]]
-        >>> pyExp.explain(X_explain, y_explain, search_function = 'crossoverinterpolation', top_k = 3, max_rules=30, max_iter =5, cv=5, debug = False)
+        >>> py_explainer.explain(X_explain, y_explain, search_function = 'crossoverinterpolation', top_k = 3, max_rules=30, max_iter =5, cv=5, debug = False)
         """
         # check if X_explain is a DF
         if not isinstance(X_explain, pd.core.frame.DataFrame):
@@ -299,7 +339,8 @@ class PyExplainer:
                     'indep': self.indep,
                     'dep': self.dep,
                     'top_k_positive_rules': top_k_positive_rules,
-                    'top_k_negative_rules': top_k_negative_rules}
+                    'top_k_negative_rules': top_k_negative_rules,
+                    'local_rulefit_model': local_rulefit_model}
         return rule_obj
 
     def generate_bullet_data(self, parsed_rule_object):
@@ -309,8 +350,6 @@ class PyExplainer:
         ----------
         parsed_rule_object : :obj:`dict`
             Top rules parsed from Rule object.
-        X_explain : :obj:`pandas.core.frame.DataFrame`
-            Explained Dataframe generated from RuleFit model.
 
         Returns
         -------
@@ -331,8 +370,8 @@ class PyExplainer:
             tmp_threshold_value = round(float(tmp_rule['value']), 2)
             tmp_actual_value = round(X_explain[tmp_rule['variable']][0], 2)
             tmp_markers = [tmp_actual_value]
-            plot_min = int(round(max(tmp_min, tmp_threshold_value - tmp_interval), 0)) * 1.0
-            plot_max = int(round(min(tmp_max, tmp_threshold_value + tmp_interval), 0)) * 1.0
+            plot_min = int(round(max(tmp_min, tmp_threshold_value - tmp_interval), 0))  # * 1.0
+            plot_max = int(round(min(tmp_max, tmp_threshold_value + tmp_interval), 0))  # * 1.0
 
             # keep marker in the range
             if tmp_markers[0] > plot_max:
@@ -350,8 +389,9 @@ class PyExplainer:
                 tmp_step = [1]
 
             bullet_total_width = 450
+
             tmp_start_points = [0, round((tmp_threshold_value - plot_min) / diff_plot_max_min * bullet_total_width
-                                        if diff_plot_max_min * bullet_total_width else 0, 0)]
+                                         if diff_plot_max_min * bullet_total_width else 0, 0)]
 
             tmp_widths = [round((tmp_threshold_value - plot_min) / diff_plot_max_min * bullet_total_width
                                 if diff_plot_max_min * bullet_total_width else 0, 0),
@@ -415,7 +455,7 @@ class PyExplainer:
 
         main_title = "What to do to decrease the risk of having defects?"
         title = """
-        <div style="position: relative; top: 0; width: 100vw; left: 27vw;">
+        <div style="position: relative; top: 0; width: 100vw; left: 20vw;">
             <b>%s</b>
         </div>
         """ % main_title
@@ -529,8 +569,7 @@ class PyExplainer:
         Returns
         -------
         :obj:`dict`
-            A dict with two keys 'synthetic_data' and 'sampled_class_frequency' generated via
-            Crossover and Interpolation.
+            A dict with two keys 'synthetic_data' and 'sampled_class_frequency' generated via Crossover and Interpolation.
         """
         categorical_vars = []
 
@@ -704,9 +743,22 @@ class PyExplainer:
             return {'synthetic_data': new_df_case,
                     'sampled_class_frequency': sampled_class_frequency}
 
-    # todo - documentation
     def generate_instance_random_perturbation(self, X_explain, debug=False):
-        """The random perturbation approach to generate synthetic instances which is also used by LIME."""
+        """The random perturbation approach to generate synthetic instances which is also used by LIME.
+
+        Parameters
+        ----------
+        X_explain : :obj:`pandas.core.frame.DataFrame`
+            X_explain (Testing Features)
+        debug : :obj:`bool`
+            True for debugging mode, False otherwise.
+
+        Returns
+        -------
+        :obj:`dict`
+            A dict with two keys 'synthetic_data' and 'sampled_class_frequency' generated via Random Perturbation.
+
+        """
         random_seed = 0
         data_row = X_explain.loc[:, self.indep].values
         num_samples = 1000
@@ -989,10 +1041,7 @@ class PyExplainer:
         :obj:`dict`
             A dict containing two keys, 'top_tofollow_rules' and 'top_toavoid_rules'
         """
-        if len(top_k_positive_rules) < len(top_k_negative_rules):
-            smaller_top_rule = len(top_k_positive_rules)
-        else:
-            smaller_top_rule = len(top_k_negative_rules)
+        smaller_top_rule = min([len(top_k_positive_rules), len(top_k_negative_rules)])
         if self.get_top_k_rules() > smaller_top_rule:
             self.set_top_k_rules(smaller_top_rule)
 
