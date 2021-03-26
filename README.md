@@ -9,7 +9,7 @@ python ML explainer for SEA
 
 pyexplainer is a python package that generates explainable Machine Learning predictions from the so-called 'black-box model' such as random forest, moreover, pyexplainer provides interactive visualisation that simplifies the decision-making process for Software Engineering.
 
-TO-DO-ADD GIF of visualisation
+![alt text](https://github.com/MichaelFu1998-create/portfolio/blob/master/img/pyexplainer/pyexplainer_snap_demo.gif)
 
 ## Table Of Contents
 
