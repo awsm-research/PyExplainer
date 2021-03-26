@@ -29,13 +29,13 @@ TO-DO-ADD GIF of visualisation
 
 ## Dependencies
 
-- python = "^3.8"
-- scikit-learn = "^0.24.1"
-- numpy = "^1.20.1"
-- scipy = "^1.6.1"
-- ipywidgets = "^7.6.3"
-- ipython = "^7.21.0"
-- pandas = "^1.2.3"
+- python = "3.8"
+- scikit-learn = "0.24.1"
+- numpy = "1.20.1"
+- scipy = "1.6.1"
+- ipywidgets = "7.6.3"
+- ipython = "7.21.0"
+- pandas = "1.2.3"
 
 The list of dependencies is shown upder [tool.poetry.dependencies] in ./pyproject.toml, however the installer takes care of installing them for you.
 
