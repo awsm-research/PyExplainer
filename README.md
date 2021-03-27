@@ -46,7 +46,7 @@ The list of dependencies is shown upder [tool.poetry.dependencies] in ./pyprojec
 Installing pyexplainer is easily done using pip, simply run the following:
 
 ```bash 
-$ pip install -i https://test.pypi.org/simple/ pyexplainer
+$ pip install -u pyexplainer
 ```
 This will also install the necessary dependencies.
 
