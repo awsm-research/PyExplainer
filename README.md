@@ -9,6 +9,8 @@ python ML explainer for SEA
 
 pyexplainer is a python package that generates explainable Machine Learning predictions from the so-called 'black-box model' such as random forest, moreover, pyexplainer provides interactive visualisation that simplifies the decision-making process for Software Engineering.
 
+Here is a snapshot of how it works
+
 ![alt text](https://github.com/MichaelFu1998-create/portfolio/blob/master/img/pyexplainer/pyexplainer_snap_demo.gif)
 
 ## Table Of Contents
@@ -48,6 +50,8 @@ $ pip install -i https://test.pypi.org/simple/ pyexplainer
 ```
 This will also install the necessary dependencies.
 
+For more approaches to install, please click [here](https://pyexplainer.readthedocs.io/en/latest/installation.html)
+
 ## Source Code
 
 If you'd like to clone from source, you can do it in two simple steps as follows:
@@ -64,13 +68,16 @@ If you'd like to clone from source, you can do it in two simple steps as follows
 ## Tutorial
 
 For information on how to use pyexplainer, refer to the official documentation:
-- [official documentation](https://pyexplainer.readthedocs.io/en/latest/)
+- Video for testing >>> to be modified
+
+[![Tutorial](http://img.youtube.com/vi/kBlGMHiPf1U/0.jpg)](http://www.youtube.com/watch?v=kBlGMHiPf1U "Tutorial")
 - notebook file link here
-- ytvideo
+- [official documentation](https://pyexplainer.readthedocs.io/en/latest/)
+
 
 ## Contributors
 
-We welcome and recognize all contributions. You can see a list of current contributors in the [contributors tab](https://github.com/MichaelFu1998-create/pyexplainer/graphs/contributors).
+We welcome and recognize all contributions. You can see a list of current contributors in the [contributors tab](https://github.com/awsm-research/pyExplainer/graphs/contributors).
 
 - todo...... how to contribute?
 
