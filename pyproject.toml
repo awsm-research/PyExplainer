@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyexplainer"
-version = "0.1.3"
+version = "0.1.5"
 description = "ML explainer for SEA"
 authors = ["Michael <michaelfu1998@gmail.com>"]
 license = "MIT"
