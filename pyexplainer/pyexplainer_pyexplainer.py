@@ -56,11 +56,11 @@ def data_validation(data):
 
 
 def get_default_data_and_model():
-    cwd = os.getcwd()
-    parent_dir = os.path.dirname(cwd)
-    path_train = parent_dir + "/tests/pyexplainer_test_data/activemq-5.0.0.zip"
-    path_test = parent_dir + "/tests/pyexplainer_test_data/activemq-5.1.0.zip"
+    this_dir, _ = os.path.split(__file__)
+    path_train = this_dir + "/default_data/activemq-5.0.0.zip"
+    path_test = this_dir + "/default_data/activemq-5.1.0.zip"
     if INSIDE_VIRTUAL_ENV:
+        cwd = os.getcwd()
         path_train = cwd + "/tests/pyexplainer_test_data/activemq-5.0.0.zip"
         path_test = cwd + "/tests/pyexplainer_test_data/activemq-5.1.0.zip"
     training_data = pd.read_csv(path_train, index_col='File')
