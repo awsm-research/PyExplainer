@@ -9,7 +9,9 @@ python ML explainer for SEA
 
 pyexplainer is a python package that generates explainable Machine Learning predictions from the so-called 'black-box model' such as random forest, moreover, pyexplainer provides interactive visualisation that simplifies the decision-making process for Software Engineering.
 
-TO-DO-ADD GIF of visualisation
+Here is a snapshot of how it works
+
+![alt text](https://github.com/MichaelFu1998-create/portfolio/blob/master/img/pyexplainer/pyexplainer_snap_demo.gif)
 
 ## Table Of Contents
 
@@ -29,13 +31,13 @@ TO-DO-ADD GIF of visualisation
 
 ## Dependencies
 
-- python = "^3.8"
-- scikit-learn = "^0.24.1"
-- numpy = "^1.20.1"
-- scipy = "^1.6.1"
-- ipywidgets = "^7.6.3"
-- ipython = "^7.21.0"
-- pandas = "^1.2.3"
+- python = "3.8"
+- scikit-learn = "0.24.1"
+- numpy = "1.20.1"
+- scipy = "1.6.1"
+- ipywidgets = "7.6.3"
+- ipython = "7.21.0"
+- pandas = "1.2.3"
 
 The list of dependencies is shown upder [tool.poetry.dependencies] in ./pyproject.toml, however the installer takes care of installing them for you.
 
@@ -44,9 +46,11 @@ The list of dependencies is shown upder [tool.poetry.dependencies] in ./pyprojec
 Installing pyexplainer is easily done using pip, simply run the following:
 
 ```bash 
-$ pip install -i https://test.pypi.org/simple/ pyexplainer
+$ pip install pyexplainer
 ```
 This will also install the necessary dependencies.
+
+For more approaches to install, please click [here](https://pyexplainer.readthedocs.io/en/latest/installation.html)
 
 ## Source Code
 
@@ -64,13 +68,16 @@ If you'd like to clone from source, you can do it in two simple steps as follows
 ## Tutorial
 
 For information on how to use pyexplainer, refer to the official documentation:
-- [official documentation](https://pyexplainer.readthedocs.io/en/latest/)
+- Video for testing >>> to be modified
+
+[![Tutorial](http://img.youtube.com/vi/kBlGMHiPf1U/0.jpg)](http://www.youtube.com/watch?v=kBlGMHiPf1U "Tutorial")
 - notebook file link here
-- ytvideo
+- [official documentation](https://pyexplainer.readthedocs.io/en/latest/)
+
 
 ## Contributors
 
-We welcome and recognize all contributions. You can see a list of current contributors in the [contributors tab](https://github.com/MichaelFu1998-create/pyexplainer/graphs/contributors).
+We welcome and recognize all contributions. You can see a list of current contributors in the [contributors tab](https://github.com/awsm-research/pyExplainer/graphs/contributors).
 
 - todo...... how to contribute?
 

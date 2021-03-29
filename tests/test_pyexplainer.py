@@ -1,10 +1,13 @@
+import pyexplainer
 import pytest
 import pandas as pd
 import numpy as np
 import ipywidgets as widgets
+import sklearn
+from sklearn.ensemble import RandomForestClassifier
 from pyexplainer import __version__
-from pyexplainer import pyexplainer_pyexplainer
 from pyexplainer.pyexplainer_pyexplainer import PyExplainer
+from pyexplainer import pyexplainer_pyexplainer
 from sklearn.utils import check_random_state
 import os
 import sys
@@ -23,36 +26,50 @@ def in_virtualenv():
 
 INSIDE_VIRTUAL_ENV = in_virtualenv()
 
-# load data
+# data paths
 cwd = os.getcwd()
 file_path = cwd + "/pyexplainer_test_data/activemq-5.0.0.zip"
 model_file_path = cwd + '/rf_models/rf_model1.pkl'
 test_file_path = cwd + "/pyexplainer_test_data/activemq-5.1.0.zip"
-rule_object_path = cwd + '/rule_objects/pyExplainer_obj.pyobject'
+rule_object_path = cwd + '/rule_objects/rule_object.pyobject'
+top_rules_path = cwd + '/rule_objects/top_rules.pyobject'
 
 if INSIDE_VIRTUAL_ENV:
     cwd = os.getcwd()
     file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.0.0.zip"
     model_file_path = cwd + "/tests/rf_models/rf_model1.pkl"
     test_file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.1.0.zip"
-    rule_object_path = cwd + "/tests/rule_objects/pyExplainer_obj.pyobject"
+    rule_object_path = cwd + "/tests/rule_objects/rule_object.pyobject"
+    top_rules_path = cwd + '/tests/rule_objects/top_rules.pyobject'
 
-test_data = pd.read_csv(file_path, index_col='File')
+train_data = pd.read_csv(file_path, index_col='File')
 
-dep = test_data.columns[-4]
-indep = test_data.columns[0:(len(test_data.columns) - 4)]
-X_train = test_data.loc[:, indep]
-y_train = test_data.loc[:, dep]
+dep = train_data.columns[-4]
+selected_features = ["ADEV", "AvgCyclomaticModified", "AvgEssential", "AvgLineBlank", "AvgLineComment",
+                     "CountClassBase", "CountClassCoupled", "CountClassDerived", "CountDeclClass",
+                     "CountDeclClassMethod", "CountDeclClassVariable", "CountDeclInstanceVariable",
+                     "CountDeclMethodDefault", "CountDeclMethodPrivate", "CountDeclMethodProtected",
+                     "CountDeclMethodPublic", "CountInput_Mean", "CountInput_Min", "CountOutput_Min", "MAJOR_LINE",
+                     "MaxInheritanceTree", "MaxNesting_Min", "MINOR_COMMIT", "OWN_COMMIT", "OWN_LINE",
+                     "PercentLackOfCohesion", "RatioCommentToCode"]
+all_cols = train_data.columns
+for col in all_cols:
+    if col not in selected_features:
+        all_cols = all_cols.drop(col)
+indep = all_cols
+X_train = train_data.loc[:, indep]
+y_train = train_data.loc[:, dep]
 
-# load model from .pkl file
+""" write model to pickle - done 
+blackbox_model = RandomForestClassifier(max_depth=3, random_state=0)
+blackbox_model.fit(X_train, y_train)
+with open(model_file_path, 'wb+') as file:
+    pickle.dump(obj=blackbox_model, file=file)
+"""
+
+""" load model from .pkl file """
 with open(model_file_path, 'rb') as file:
     blackbox_model = pickle.load(file)
-
-# blackbox_model = RandomForestClassifier(max_depth=3, random_state=0)
-# blackbox_model.fit(X_train, y_train)
-# write model to pickle - done
-# with open(model_file_path, 'wb') as file:
-#    pickle.dump(obj=blackbox_model, file=file)
 
 class_label = ['clean', 'defect']
 
@@ -62,34 +79,48 @@ cwd = os.getcwd()
 sample_test_data = pd.read_csv(test_file_path, index_col='File')
 X_test = sample_test_data.loc[:, indep]
 y_test = sample_test_data.loc[:, dep]
-sample_explain_index = 0
+
+sample_explain_index = 24
 testing_X_explain = X_test.iloc[[sample_explain_index]]
 testing_y_explain = y_test.iloc[[sample_explain_index]]
-testing_bullet_data = [{'title': '#1 Increase the values of CountStmt to more than 10',
-                        'subtitle': 'Actual = 10',
-                        'ticks': [2.0, 196.0],
-                        'step': [1],
-                        'startPoints': [0, 222.0],
-                        'widths': [222.0, 228.0],
-                        'colors': ['#d7191c', '#a6d96a'],
-                        'markers': [10],
-                        'varRef': 'CountStmt'},
-                       {'title': '#2 Decrease the values of MAJOR_COMMIT to less than 1',
-                        'subtitle': 'Actual = 1',
-                        'ticks': [1.0, 2.0],
-                        'step': [0.1],
-                        'startPoints': [0, 248.0],
-                        'widths': [248.0, 202.0],
-                        'colors': ['#a6d96a', '#d7191c'],
-                        'markers': [1],
-                        'varRef': 'MAJOR_COMMIT'}]
 
+"""Create and Write rule_object - done
+test_rule_object = py_explainer.explain(X_explain=testing_X_explain,
+                                        y_explain=testing_y_explain,
+                                        search_function='crossoverinterpolation',
+                                        top_k=3,
+                                        max_rules=30,
+                                        max_iter=10000,
+                                        cv=5,
+                                        debug=False)
+with open(rule_object_path, 'wb+') as file:
+    pickle.dump(test_rule_object, file)
+"""
+
+"""Load rule_object"""
 with open(rule_object_path, 'rb') as file:
     test_rule_object = pickle.load(file)
 
+py_explainer.X_explain = testing_X_explain
+py_explainer.y_explain = testing_y_explain
+
+"""Write top_rules - done
+top_rules = py_explainer.parse_top_rules(top_k_positive_rules=test_rule_object['top_k_positive_rules'],
+                                         top_k_negative_rules=test_rule_object['top_k_negative_rules'])
+with open(top_rules_path, 'wb+') as file:
+    pickle.dump(top_rules, file)
+"""
+
+"""Load top_rules"""
+with open(top_rules_path, 'rb') as file:
+    top_rules = pickle.load(file)
+
+testing_bullet_data = py_explainer.generate_bullet_data(top_rules)
+testing_risk_data = py_explainer.generate_risk_data(py_explainer.X_explain)
+
 
 def test_version():
-    assert __version__ == '0.1.3'
+    assert __version__ == '0.1.5'
 
 
 @pytest.mark.parametrize('data, result',
@@ -102,6 +133,15 @@ def test_version():
                          ])
 def test_data_validation(data, result):
     assert pyexplainer_pyexplainer.data_validation(data) is result
+
+
+def test_get_default_data_and_model():
+    default = pyexplainer_pyexplainer.get_default_data_and_model()
+    assert isinstance(default['X_train'], pd.core.frame.DataFrame)
+    assert isinstance(default['y_train'], pd.core.series.Series)
+    assert isinstance(default['indep'], pd.core.indexes.base.Index)
+    assert isinstance(default['dep'], str)
+    assert isinstance(default['blackbox_model'], sklearn.ensemble.RandomForestClassifier)
 
 
 @pytest.mark.parametrize('size, random_state, result',
@@ -160,14 +200,14 @@ def test_pyexplainer_init_positive(X_train, y_train, indep, dep, blackbox_model,
 
 
 rule_obj_keys = ['synthetic_data', 'synthetic_predictions', 'X_explain', 'y_explain', 'indep',
-                 'dep', 'top_k_positive_rules', 'top_k_negative_rules']
+                 'dep', 'top_k_positive_rules', 'top_k_negative_rules', 'local_rulefit_model']
 
 
 @pytest.mark.parametrize('exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, result',
                          [
-                             (testing_X_explain, testing_y_explain, 3, 10, 10, 5,
+                             (testing_X_explain, testing_y_explain, 3, 10, 10000, 5,
                               'CrossoverInterpolation', False, rule_obj_keys),
-                             (testing_X_explain, testing_y_explain, 3, 10, 10, 5,
+                             (testing_X_explain, testing_y_explain, 3, 10, 10000, 5,
                               'RandomPerturbation', True, rule_obj_keys)
                          ])
 def test_explain_positive(exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, result):
@@ -184,6 +224,7 @@ def test_explain_positive(exp_X_explain, exp_y_explain, top_k, max_rules, max_it
     assert isinstance(rule_object['dep'], str)
     assert isinstance(rule_object['top_k_positive_rules'], pd.core.frame.DataFrame)
     assert isinstance(rule_object['top_k_negative_rules'], pd.core.frame.DataFrame)
+    assert isinstance(rule_object['local_rulefit_model'], pyexplainer.rulefit.RuleFit)
 
 
 @pytest.mark.parametrize('rule_object, X_explain',
@@ -309,18 +350,20 @@ def test_generate_sliders(bullet_data, result):
         assert isinstance(sld, widgets.IntSlider) or isinstance(sld, widgets.FloatSlider) is result
 
 
-@pytest.mark.parametrize('top_k_positive_rules, top_k_negative_rules, top_k_rules, result',
+@pytest.mark.parametrize('top_k_positive_rules, top_k_negative_rules, top_k_rules, max_rules',
                          [
-                             (test_rule_object['top_k_positive_rules'], test_rule_object['top_k_negative_rules'], 1, 1),
+                             (
+                                     test_rule_object['top_k_positive_rules'], test_rule_object['top_k_negative_rules'],
+                                     1, 15),
                              (test_rule_object['top_k_positive_rules'], test_rule_object['top_k_negative_rules'], 15,
-                              len(test_rule_object['top_k_positive_rules'])),
-                             (test_rule_object['top_k_positive_rules'], test_rule_object['top_k_negative_rules'], 3, 3)
+                              15),
+                             (test_rule_object['top_k_positive_rules'], test_rule_object['top_k_negative_rules'], 3, 15)
                          ])
-def test_parse_top_rules(top_k_positive_rules, top_k_negative_rules, top_k_rules, result):
+def test_parse_top_rules(top_k_positive_rules, top_k_negative_rules, top_k_rules, max_rules):
     py_explainer.top_k_rules = top_k_rules
     top_rules = py_explainer.parse_top_rules(top_k_positive_rules, top_k_negative_rules)
-    assert len(top_rules['top_tofollow_rules']) == result
-    assert len(top_rules['top_toavoid_rules']) == result
+    assert 0 <= len(top_rules['top_tofollow_rules']) <= max_rules
+    assert 0 <= len(top_rules['top_toavoid_rules']) <= max_rules
 
 
 def test_retrieve_X_explain_min_max_values():
@@ -379,23 +422,10 @@ def test_update_right_text_positive(right_text):
 
 @pytest.mark.parametrize('rule_object, result',
                          [
-                             (test_rule_object, [test_rule_object['X_explain'],
-                                                 test_rule_object['y_explain'],
-                                                 [{'title': '#1 Increase the values of CountStmt to more than 10',
-                                                   'subtitle': 'Actual = 10', 'ticks': [2.0, 196.0], 'step': [1],
-                                                   'startPoints': [0, 222.0], 'widths': [222.0, 228.0],
-                                                   'colors': ['#d7191c', '#a6d96a'], 'markers': [10],
-                                                   'varRef': 'CountStmt'},
-                                                  {'title': '#2 Decrease the values of MAJOR_COMMIT to less than 1',
-                                                   'subtitle': 'Actual = 1', 'ticks': [1.0, 2.0], 'step': [0.1],
-                                                   'startPoints': [0, 248.0], 'widths': [248.0, 202.0],
-                                                   'colors': ['#a6d96a', '#d7191c'], 'markers': [1],
-                                                   'varRef': 'MAJOR_COMMIT'},
-                                                  {'title': '#3 Decrease the values of COMM to less than 1',
-                                                   'subtitle': 'Actual = 1', 'ticks': [1, 8.0], 'step': [0.1],
-                                                   'startPoints': [0, 289.0], 'widths': [289.0, 161.0],
-                                                   'colors': ['#a6d96a', '#d7191c'], 'markers': [1], 'varRef': 'COMM'}],
-                                                 [{'riskScore': ['8%'], 'riskPred': ['Clean']}]])
+                             (test_rule_object,
+                              [test_rule_object['X_explain'], test_rule_object['y_explain'],
+                               testing_bullet_data,
+                               testing_risk_data])
                          ])
 def test_visualisation_data_setup(rule_object, result):
     py_explainer.X_explain = None

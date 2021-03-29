@@ -332,6 +332,7 @@
 
 <div class="viewcode-block" id="extract_rules_from_tree"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.rulefit.extract_rules_from_tree">[docs]</a><span class="k">def</span> <span class="nf">extract_rules_from_tree</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">feature_names</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Helper to turn a tree into as set of rules</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">rules</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
@@ -780,35 +781,33 @@
         <span class="k">return</span> <span class="n">rules</span></div>
 
 <div class="viewcode-block" id="RuleFit.get_feature_importance"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.rulefit.RuleFit.get_feature_importance">[docs]</a>    <span class="k">def</span> <span class="nf">get_feature_importance</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exclude_zero_coef</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">subregion</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">scaled</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Returns feature importance for input features to RuleFit model.</span>
+        <span class="sd">&quot;&quot;&quot;Returns feature importance for input features to RuleFit model.</span>
 
 <span class="sd">        Parameters:</span>
 <span class="sd">        -----------</span>
-<span class="sd">            exclude_zero_coef: If True, returns only the rules with an estimated</span>
-<span class="sd">                           coefficient not equalt to  zero.</span>
+<span class="sd">        exclude_zero_coef: If True, returns only the rules with an estimated</span>
+<span class="sd">                       coefficient not equalt to zero.</span>
 
-<span class="sd">            subregion: If None (default) returns global importances (FP 2004 eq. 28/29), else returns importance over</span>
-<span class="sd">                           subregion of inputs (FP 2004 eq. 30/31/32).</span>
-<span class="sd">                           </span>
-<span class="sd">            scaled: If True, will scale the importances to have a max of 100.</span>
+<span class="sd">        subregion: If None (default) returns global importances (FP 2004 eq. 28/29), else returns importance over</span>
+<span class="sd">                       subregion of inputs (FP 2004 eq. 30/31/32).</span>
+
+<span class="sd">        scaled: If True, will scale the importances to have a max of 100.</span>
 <span class="sd">            </span>
 <span class="sd">        Returns:</span>
 <span class="sd">        --------</span>
-<span class="sd">            return_df (pandas DataFrame): DataFrame for feature names and feature importances (FP 2004 eq. 35)</span>
+<span class="sd">        return_df (pandas DataFrame): DataFrame for feature names and feature importances (FP 2004 eq. 35)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">def</span> <span class="nf">find_mk</span><span class="p">(</span><span class="n">rule</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">            Finds the number of features in a given rule from the get_rules method.</span>
+            <span class="sd">&quot;&quot;&quot;Finds the number of features in a given rule from the get_rules method.</span>
 
 <span class="sd">            Parameters:</span>
 <span class="sd">            -----------</span>
-<span class="sd">                rule (str): </span>
+<span class="sd">            rule (str):</span>
 <span class="sd">                </span>
 <span class="sd">            Returns:</span>
 <span class="sd">            --------</span>
-<span class="sd">                var_count (int): </span>
+<span class="sd">            var_count (int):</span>
 <span class="sd">            &quot;&quot;&quot;</span>
 
             <span class="c1">## Count the number of features found in a rule</span>

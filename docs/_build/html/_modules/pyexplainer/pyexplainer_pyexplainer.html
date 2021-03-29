@@ -156,6 +156,7 @@
   <h1>Source code for pyexplainer.pyexplainer_pyexplainer</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">string</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
@@ -167,10 +168,8 @@
 <span class="kn">from</span> <span class="nn">IPython.core.display</span> <span class="kn">import</span> <span class="n">display</span><span class="p">,</span> <span class="n">HTML</span>
 <span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">StandardScaler</span>
 <span class="kn">from</span> <span class="nn">sklearn.utils</span> <span class="kn">import</span> <span class="n">check_random_state</span>
-<span class="c1"># currently for pytest</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
 <span class="kn">from</span> <span class="nn">pyexplainer.rulefit</span> <span class="kn">import</span> <span class="n">RuleFit</span>
-<span class="c1"># currently for notebook test</span>
-<span class="c1"># from rulefit import RuleFit</span>
 
 
 <div class="viewcode-block" id="data_validation"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.data_validation">[docs]</a><span class="k">def</span> <span class="nf">data_validation</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
@@ -258,8 +257,8 @@
 <span class="sd">        independent variables (column names)</span>
 <span class="sd">    dep : :obj:`str`</span>
 <span class="sd">        dependent variables (column name)</span>
-<span class="sd">    blackbox_model : :obj:`black box model trained using sklearn`</span>
-<span class="sd">        A global black box ML model used to generate the prediction and explanation</span>
+<span class="sd">    blackbox_model : :obj:`sklearn.ensemble.RandomForestClassifier`</span>
+<span class="sd">        A global random forest model trained from sklearn</span>
 <span class="sd">    class_label : :obj:`list`</span>
 <span class="sd">        Classification labels, default = [&#39;Clean&#39;, &#39;Defect&#39;]</span>
 <span class="sd">    top_k_rules : :obj:`int`</span>
@@ -278,24 +277,28 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span> <span class="o">=</span> <span class="n">X_train</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_train should be type &#39;pandas.core.frame.DataFrame&#39;&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y_train</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">series</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span> <span class="o">=</span> <span class="n">y_train</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;y_train should be type &#39;pandas.core.series.Series&#39;&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">indep</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">indexes</span><span class="o">.</span><span class="n">base</span><span class="o">.</span><span class="n">Index</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">indep</span> <span class="o">=</span> <span class="n">indep</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;indep (feature column names) should be type &#39;pandas.core.indexes.base.Index&#39;&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dep</span> <span class="o">=</span> <span class="n">dep</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dep (label column name) should be type &#39;str&#39;&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span>
-        <span class="c1"># todo- validate blackbox model</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span> <span class="o">=</span> <span class="n">blackbox_model</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">blackbox_model</span><span class="p">,</span> <span class="n">sklearn</span><span class="o">.</span><span class="n">ensemble</span><span class="o">.</span><span class="n">RandomForestClassifier</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span> <span class="o">=</span> <span class="n">blackbox_model</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The blackbox_model should be a Random Forest model trained from sklearn (&quot;</span>
+                  <span class="s2">&quot;sklearn.ensemble.RandomForestClassifier)&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">class_label</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">class_label</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">class_label</span> <span class="o">=</span> <span class="n">class_label</span>
@@ -304,7 +307,7 @@
                 <span class="k">raise</span> <span class="ne">ValueError</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;class_label should be type &#39;list&#39;&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">top_k_rules</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">top_k_rules</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">top_k_rules</span> <span class="o">&gt;</span> <span class="mi">15</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;top_k_rules should be in range 1 - 15 (both included)&quot;</span><span class="p">)</span>
@@ -313,7 +316,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">top_k_rules</span> <span class="o">=</span> <span class="n">top_k_rules</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;top_k_rules should be type &#39;int&#39;&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">bullet_data</span> <span class="o">=</span> <span class="p">[{}]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">risk_data</span> <span class="o">=</span> <span class="p">[{}]</span>
@@ -329,16 +332,16 @@
                 <span class="n">max_rules</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
                 <span class="n">max_iter</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
                 <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
-                <span class="n">search_function</span><span class="o">=</span><span class="s1">&#39;crossoverinterpolation&#39;</span><span class="p">,</span>
+                <span class="n">search_function</span><span class="o">=</span><span class="s1">&#39;CrossoverInterpolation&#39;</span><span class="p">,</span>
                 <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate Rule Object Manually by passing X_explain and y_explain</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        X_explain : :obj:`pandas.core.frame.DataFrame`</span>
-<span class="sd">            Features to be explained by the local RuleFit model</span>
+<span class="sd">            Features to be explained by the local RuleFit model, can be seen as X_test</span>
 <span class="sd">        y_explain : :obj:`pandas.core.series.Series`</span>
-<span class="sd">            Label to be explained by the local RuleFit model</span>
+<span class="sd">            Label to be explained by the local RuleFit model, can be seen as y_test</span>
 <span class="sd">        top_k : :obj:`int`, default is 3</span>
 <span class="sd">            Number of top rules to be retrieved</span>
 <span class="sd">        max_rules : :obj:`int`, default is 10</span>
@@ -370,31 +373,50 @@
 <span class="sd">        &gt;&gt;&gt; blackbox_model = RandomForestClassifier(max_depth=3, random_state=0)</span>
 <span class="sd">        &gt;&gt;&gt; blackbox_model.fit(X_train, y_train)</span>
 <span class="sd">        &gt;&gt;&gt; class_label = [&#39;Clean&#39;, &#39;Defect&#39;]</span>
-<span class="sd">        &gt;&gt;&gt; pyExp = PyExplainer(X_train, y_train, indep, dep, class_label, blackbox_model)</span>
+<span class="sd">        &gt;&gt;&gt; py_explainer = PyExplainer(X_train, y_train, indep, dep, class_label, blackbox_model)</span>
 <span class="sd">        &gt;&gt;&gt; sample_test_data = pd.read_csv(&#39;../tests/pyexplainer_test_data/activemq-5.0.0.csv&#39;, index_col = &#39;File&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; X_test = sample_test_data.loc[:, indep]</span>
 <span class="sd">        &gt;&gt;&gt; y_test = sample_test_data.loc[:, dep]</span>
 <span class="sd">        &gt;&gt;&gt; sample_explain_index = 0</span>
 <span class="sd">        &gt;&gt;&gt; X_explain = X_test.iloc[[sample_explain_index]]</span>
 <span class="sd">        &gt;&gt;&gt; y_explain = y_test.iloc[[sample_explain_index]]</span>
-<span class="sd">        &gt;&gt;&gt; pyExp.explain(X_explain, y_explain, search_function = &#39;crossoverinterpolation&#39;, top_k = 3, max_rules=30, max_iter =5, cv=5, debug = False)</span>
+<span class="sd">        &gt;&gt;&gt; py_explainer.explain(X_explain, y_explain, search_function = &#39;crossoverinterpolation&#39;, top_k = 3, max_rules=30, max_iter =5, cv=5, debug = False)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check if X_explain is a DF</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">X_explain</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_explain (X_test) should be type &#39;pandas.core.frame.DataFrame&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="c1"># check if X_explain has the same num of cols as X_train</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_explain</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">X_explain</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_explain should have the same number of columns as X_train&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
+        <span class="c1"># check if y_explain is a Series</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y_explain</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">series</span><span class="o">.</span><span class="n">Series</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;y_explain (y_test) should be type &#39;pandas.core.series.Series&#39;&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_top_k_rules</span><span class="p">(</span><span class="n">top_k</span><span class="p">)</span>
         <span class="c1"># Step 1 - Generate synthetic instances</span>
-        <span class="k">if</span> <span class="n">search_function</span> <span class="o">==</span> <span class="s1">&#39;crossoverinterpolation&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">search_function</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;crossoverinterpolation&#39;</span><span class="p">:</span>
             <span class="n">synthetic_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_instance_crossover_interpolation</span><span class="p">(</span><span class="n">X_explain</span><span class="p">,</span> <span class="n">y_explain</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">search_function</span> <span class="o">==</span> <span class="s1">&#39;randomperturbation&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">search_function</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;randomperturbation&#39;</span><span class="p">:</span>
             <span class="c1"># This random perturbation approach to generate instances is used by LIME to gerate synthetic instances</span>
-            <span class="n">synthetic_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_instance_random_perturbation</span><span class="p">(</span><span class="n">X_explain</span><span class="o">=</span><span class="n">X_explain</span><span class="p">,</span>
-                                                                          <span class="n">y_explain</span><span class="o">=</span><span class="n">y_explain</span><span class="p">,</span>
-                                                                          <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># TODO</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;TODO&#39;</span><span class="p">)</span>
+            <span class="n">synthetic_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_instance_random_perturbation</span><span class="p">(</span><span class="n">X_explain</span><span class="o">=</span><span class="n">X_explain</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
 
         <span class="c1"># Step 2 - Generate predictions of synthetic instances using the global model</span>
         <span class="n">synthetic_instances</span> <span class="o">=</span> <span class="n">synthetic_object</span><span class="p">[</span><span class="s1">&#39;synthetic_data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]</span>
         <span class="n">synthetic_predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">synthetic_instances</span><span class="p">)</span>
+        <span class="k">if</span> <span class="mi">1</span> <span class="ow">in</span> <span class="n">synthetic_predictions</span> <span class="ow">and</span> <span class="mi">0</span> <span class="ow">in</span> <span class="n">synthetic_predictions</span><span class="p">:</span>
+            <span class="n">one_class_problem</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">one_class_problem</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">one_class_problem</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Random Perturbation only generated one class for the prediction column which means</span><span class="se">\</span>
+<span class="s2">                   Random Perturbation is not compatible with the current data.</span><span class="se">\</span>
+<span class="s2">                   The &#39;Crossover and Interpolation&#39; approach is used as the alternative.&quot;</span><span class="p">)</span>
+            <span class="n">synthetic_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">generate_instance_crossover_interpolation</span><span class="p">(</span><span class="n">X_explain</span><span class="p">,</span> <span class="n">y_explain</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="n">debug</span><span class="p">)</span>
+            <span class="n">synthetic_instances</span> <span class="o">=</span> <span class="n">synthetic_object</span><span class="p">[</span><span class="s1">&#39;synthetic_data&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]</span>
+            <span class="n">synthetic_predictions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">synthetic_instances</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
             <span class="n">n_defect_class</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">synthetic_predictions</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;nDefect=&#39;</span><span class="p">,</span> <span class="n">n_defect_class</span><span class="p">,</span>
@@ -435,22 +457,21 @@
                     <span class="s1">&#39;top_k_negative_rules&#39;</span><span class="p">:</span> <span class="n">top_k_negative_rules</span><span class="p">}</span>
         <span class="k">return</span> <span class="n">rule_obj</span></div>
 
-<div class="viewcode-block" id="PyExplainer.generate_bullet_data"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_bullet_data">[docs]</a>    <span class="k">def</span> <span class="nf">generate_bullet_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_rule_object</span><span class="p">,</span> <span class="n">X_explain</span><span class="p">):</span>
+<div class="viewcode-block" id="PyExplainer.generate_bullet_data"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_bullet_data">[docs]</a>    <span class="k">def</span> <span class="nf">generate_bullet_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsed_rule_object</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Generate bullet chart data (a list of dict) to be implemented with d3.js chart.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        parsed_rule_object : :obj:`dict`</span>
 <span class="sd">            Top rules parsed from Rule object.</span>
-<span class="sd">        X_explain : :obj:`pandas.core.frame.DataFrame`</span>
-<span class="sd">            Explained Dataframe generated from RuleFit model.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :obj:`list`</span>
 <span class="sd">            A list of dict that contains the data needed to generate a bullet chart.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">min_max_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_min_max_values</span><span class="p">()</span>
+        <span class="n">X_explain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_X_explain</span><span class="p">()</span>
+        <span class="n">min_max_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retrieve_X_explain_min_max_values</span><span class="p">()</span>
         <span class="c1"># Version 01 - only visualise for what to follow (Rules =&gt; Clean)</span>
         <span class="n">bullet_data</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -482,9 +503,13 @@
                 <span class="n">tmp_step</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 
             <span class="n">bullet_total_width</span> <span class="o">=</span> <span class="mi">450</span>
-            <span class="n">tmp_startpoints</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nb">round</span><span class="p">((</span><span class="n">tmp_threshold_value</span> <span class="o">-</span> <span class="n">plot_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">diff_plot_max_min</span> <span class="o">*</span> <span class="n">bullet_total_width</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
-            <span class="n">tmp_widths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">((</span><span class="n">tmp_threshold_value</span> <span class="o">-</span> <span class="n">plot_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">diff_plot_max_min</span> <span class="o">*</span> <span class="n">bullet_total_width</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-                          <span class="nb">round</span><span class="p">((</span><span class="n">plot_max</span> <span class="o">-</span> <span class="n">tmp_threshold_value</span><span class="p">)</span> <span class="o">/</span> <span class="n">diff_plot_max_min</span> <span class="o">*</span> <span class="n">bullet_total_width</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+            <span class="n">tmp_start_points</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="nb">round</span><span class="p">((</span><span class="n">tmp_threshold_value</span> <span class="o">-</span> <span class="n">plot_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">diff_plot_max_min</span> <span class="o">*</span> <span class="n">bullet_total_width</span>
+                                        <span class="k">if</span> <span class="n">diff_plot_max_min</span> <span class="o">*</span> <span class="n">bullet_total_width</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
+
+            <span class="n">tmp_widths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">round</span><span class="p">((</span><span class="n">tmp_threshold_value</span> <span class="o">-</span> <span class="n">plot_min</span><span class="p">)</span> <span class="o">/</span> <span class="n">diff_plot_max_min</span> <span class="o">*</span> <span class="n">bullet_total_width</span>
+                                <span class="k">if</span> <span class="n">diff_plot_max_min</span> <span class="o">*</span> <span class="n">bullet_total_width</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+                          <span class="nb">round</span><span class="p">((</span><span class="n">plot_max</span> <span class="o">-</span> <span class="n">tmp_threshold_value</span><span class="p">)</span> <span class="o">/</span> <span class="n">diff_plot_max_min</span> <span class="o">*</span> <span class="n">bullet_total_width</span>
+                                <span class="k">if</span> <span class="n">diff_plot_max_min</span> <span class="o">*</span> <span class="n">bullet_total_width</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)]</span>
 
             <span class="nb">id</span> <span class="o">=</span> <span class="s1">&#39;#&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
             <span class="n">var_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">tmp_rule</span><span class="p">[</span><span class="s1">&#39;variable&#39;</span><span class="p">])</span>
@@ -508,7 +533,7 @@
                 <span class="s2">&quot;subtitle&quot;</span><span class="p">:</span> <span class="n">tmp_subtitle_text</span><span class="p">,</span>
                 <span class="s2">&quot;ticks&quot;</span><span class="p">:</span> <span class="n">tmp_ticks</span><span class="p">,</span>
                 <span class="s2">&quot;step&quot;</span><span class="p">:</span> <span class="n">tmp_step</span><span class="p">,</span>
-                <span class="s2">&quot;startPoints&quot;</span><span class="p">:</span> <span class="n">tmp_startpoints</span><span class="p">,</span>
+                <span class="s2">&quot;startPoints&quot;</span><span class="p">:</span> <span class="n">tmp_start_points</span><span class="p">,</span>
                 <span class="s2">&quot;widths&quot;</span><span class="p">:</span> <span class="n">tmp_widths</span><span class="p">,</span>
                 <span class="s2">&quot;colors&quot;</span><span class="p">:</span> <span class="n">tmp_colors</span><span class="p">,</span>
                 <span class="s2">&quot;markers&quot;</span><span class="p">:</span> <span class="n">tmp_markers</span><span class="p">,</span>
@@ -524,18 +549,22 @@
 <span class="sd">        :obj:`str`</span>
 <span class="sd">            html String</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">this_dir</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">&#39;css/styles.css&#39;</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">style_css</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">&#39;js/d3.min.js&#39;</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">d3_js</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">&#39;js/bullet.js&#39;</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">bullet_js</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-        <span class="n">css_filepath</span> <span class="o">=</span> <span class="s2">&quot;css/styles.css&quot;</span>
         <span class="n">css_stylesheet</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">            &lt;link rel=&quot;stylesheet&quot; href=&quot;</span><span class="si">%s</span><span class="s2">&quot; /&gt;</span>
-<span class="s2">        &quot;&quot;&quot;</span> <span class="o">%</span> <span class="n">css_filepath</span>
+<span class="s2">        &lt;style&gt;</span><span class="si">%s</span><span class="s2">&lt;/style&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span> <span class="o">%</span> <span class="n">style_css</span>
 
-        <span class="n">d3_filepath</span> <span class="o">=</span> <span class="s2">&quot;js/d3.min.js&quot;</span>
-        <span class="n">bulletjs_filepath</span> <span class="o">=</span> <span class="s2">&quot;js/bullet.js&quot;</span>
         <span class="n">d3_script</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">        &lt;script src=&quot;</span><span class="si">%s</span><span class="s2">&quot;&gt;&lt;/script&gt;</span>
-<span class="s2">        &lt;script src=&quot;</span><span class="si">%s</span><span class="s2">&quot;&gt;&lt;/script&gt;</span>
-<span class="s2">        &quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">d3_filepath</span><span class="p">,</span> <span class="n">bulletjs_filepath</span><span class="p">)</span>
+<span class="s2">        &lt;script&gt;</span><span class="si">%s</span><span class="s2">&lt;/script&gt;</span>
+<span class="s2">        &lt;script&gt;</span><span class="si">%s</span><span class="s2">&lt;/script&gt;</span>
+<span class="s2">        &quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">d3_js</span><span class="p">,</span> <span class="n">bullet_js</span><span class="p">)</span>
 
         <span class="n">main_title</span> <span class="o">=</span> <span class="s2">&quot;What to do to decrease the risk of having defects?&quot;</span>
         <span class="n">title</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
@@ -638,38 +667,37 @@
 
         <span class="k">return</span> <span class="n">html</span></div>
 
-<div class="viewcode-block" id="PyExplainer.generate_instance_crossover_interpolation"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_instance_crossover_interpolation">[docs]</a>    <span class="k">def</span> <span class="nf">generate_instance_crossover_interpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_test</span><span class="p">,</span> <span class="n">y_test</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="PyExplainer.generate_instance_crossover_interpolation"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_instance_crossover_interpolation">[docs]</a>    <span class="k">def</span> <span class="nf">generate_instance_crossover_interpolation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_explain</span><span class="p">,</span> <span class="n">y_explain</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;An approach to generate instance using Crossover and Interpolation</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        X_test : :obj:`pandas.core.frame.DataFrame`</span>
-<span class="sd">            X_test (Testing Features)</span>
-<span class="sd">        y_test : :obj:`pandas.core.series.Series`</span>
-<span class="sd">            y_test (Testing Label)</span>
+<span class="sd">        X_explain : :obj:`pandas.core.frame.DataFrame`</span>
+<span class="sd">            X_explain (Testing Features)</span>
+<span class="sd">        y_explain : :obj:`pandas.core.series.Series`</span>
+<span class="sd">            y_explain (Testing Label)</span>
 <span class="sd">        debug : :obj:`bool`</span>
 <span class="sd">            True for debugging mode, False otherwise.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        :obj:`dict`</span>
-<span class="sd">            A dict with two keys &#39;synthetic_data&#39; and &#39;sampled_class_frequency&#39; generated via</span>
-<span class="sd">            Crossover and Interpolation.</span>
+<span class="sd">            A dict with two keys &#39;synthetic_data&#39; and &#39;sampled_class_frequency&#39; generated via Crossover and Interpolation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">categorical_vars</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="n">X_train_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">X_train</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">y_train_i</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">y_train</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">y_test</span> <span class="o">=</span> <span class="n">y_test</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="c1"># y_train_i = self.y_train.copy()</span>
+        <span class="n">X_explain</span> <span class="o">=</span> <span class="n">X_explain</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">y_explain</span> <span class="o">=</span> <span class="n">y_explain</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="n">X_train_i</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="n">X_test</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">X_explain</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">X_train_i</span> <span class="o">=</span> <span class="n">X_train_i</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]</span>
-        <span class="n">y_train_i</span> <span class="o">=</span> <span class="n">y_train_i</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[[</span><span class="bp">self</span><span class="o">.</span><span class="n">dep</span><span class="p">]]</span>
+        <span class="c1"># y_train_i = y_train_i.reset_index()[[self.dep]]</span>
 
-        <span class="n">X_test</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]</span>
-        <span class="n">y_test</span> <span class="o">=</span> <span class="n">y_test</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[[</span><span class="bp">self</span><span class="o">.</span><span class="n">dep</span><span class="p">]]</span>
+        <span class="n">X_explain</span> <span class="o">=</span> <span class="n">X_explain</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]</span>
+        <span class="n">y_explain</span> <span class="o">=</span> <span class="n">y_explain</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()[[</span><span class="bp">self</span><span class="o">.</span><span class="n">dep</span><span class="p">]]</span>
 
         <span class="c1"># get the global model predictions for the training set</span>
         <span class="n">target_train</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_train_i</span><span class="p">)</span>
@@ -682,7 +710,7 @@
         <span class="n">trainset_normalize</span> <span class="o">=</span> <span class="n">X_train_i</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">X_train_i</span><span class="p">),</span> <span class="s2">&quot;columns&quot;</span><span class="p">)</span>
-        <span class="n">cases_normalize</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">cases_normalize</span> <span class="o">=</span> <span class="n">X_explain</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="n">train_objs_num</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">trainset_normalize</span><span class="p">)</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">objs</span><span class="o">=</span><span class="p">[</span><span class="n">trainset_normalize</span><span class="p">,</span> <span class="n">cases_normalize</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -751,7 +779,7 @@
             <span class="n">train_set_neigh</span> <span class="o">=</span> <span class="n">X_train_i</span><span class="p">[</span><span class="n">X_train_i</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">final_neighbours_similarity_df</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span>
             <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">train_set_neigh</span><span class="p">,</span> <span class="s2">&quot;train set neigh&quot;</span><span class="p">)</span>
-            <span class="n">train_class_neigh</span> <span class="o">=</span> <span class="n">y_test</span><span class="p">[</span><span class="n">y_test</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">final_neighbours_similarity_df</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span>
+            <span class="n">train_class_neigh</span> <span class="o">=</span> <span class="n">y_explain</span><span class="p">[</span><span class="n">y_explain</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">final_neighbours_similarity_df</span><span class="o">.</span><span class="n">index</span><span class="p">)]</span>
             <span class="c1"># train_neigh_df = train_set_neigh.join(train_class_neigh)</span>
             <span class="c1"># class_neigh = train_class_neigh.groupby([self.dep]).size()</span>
 
@@ -822,15 +850,28 @@
 
             <span class="n">new_df_case</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">predict_dataset</span><span class="p">,</span> <span class="n">target_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">new_df_case</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">new_df_case</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-            <span class="n">new_df_case</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="n">y_test</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">new_df_case</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="n">y_explain</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">]},</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">sampled_class_frequency</span> <span class="o">=</span> <span class="n">new_df_case</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">dep</span><span class="p">])</span><span class="o">.</span><span class="n">size</span><span class="p">()</span>
 
             <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;synthetic_data&#39;</span><span class="p">:</span> <span class="n">new_df_case</span><span class="p">,</span>
                     <span class="s1">&#39;sampled_class_frequency&#39;</span><span class="p">:</span> <span class="n">sampled_class_frequency</span><span class="p">}</span></div>
 
-    <span class="c1"># todo - documentation</span>
 <div class="viewcode-block" id="PyExplainer.generate_instance_random_perturbation"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_instance_random_perturbation">[docs]</a>    <span class="k">def</span> <span class="nf">generate_instance_random_perturbation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X_explain</span><span class="p">,</span> <span class="n">debug</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;The random perturbation approach to generate synthetic instances which is also used by LIME.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;The random perturbation approach to generate synthetic instances which is also used by LIME.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        X_explain : :obj:`pandas.core.frame.DataFrame`</span>
+<span class="sd">            X_explain (Testing Features)</span>
+<span class="sd">        debug : :obj:`bool`</span>
+<span class="sd">            True for debugging mode, False otherwise.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :obj:`dict`</span>
+<span class="sd">            A dict with two keys &#39;synthetic_data&#39; and &#39;sampled_class_frequency&#39; generated via Random Perturbation.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">random_seed</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">data_row</span> <span class="o">=</span> <span class="n">X_explain</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="bp">self</span><span class="o">.</span><span class="n">indep</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
         <span class="n">num_samples</span> <span class="o">=</span> <span class="mi">1000</span>
@@ -861,7 +902,7 @@
                 <span class="n">num_cols</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">non_zero_indexes</span><span class="p">)</span>
                 <span class="n">instance_sample</span> <span class="o">=</span> <span class="n">data_row</span><span class="p">[:,</span> <span class="n">non_zero_indexes</span><span class="p">]</span>
                 <span class="n">scale</span> <span class="o">=</span> <span class="n">scale</span><span class="p">[</span><span class="n">non_zero_indexes</span><span class="p">]</span>
-                <span class="n">mean</span> <span class="o">=</span> <span class="n">mean</span><span class="p">[</span><span class="n">non_zero_indexes</span><span class="p">]</span>
+                <span class="c1"># mean = mean[non_zero_indexes]</span>
 
             <span class="k">if</span> <span class="n">sampling_method</span> <span class="o">==</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_samples</span> <span class="o">*</span> <span class="n">num_cols</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">num_samples</span><span class="p">,</span> <span class="n">num_cols</span><span class="p">)</span>
@@ -875,8 +916,8 @@
 
             <span class="k">if</span> <span class="n">sample_around_instance</span><span class="p">:</span>
                 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">instance_sample</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">data</span> <span class="o">*</span> <span class="n">scale</span> <span class="o">+</span> <span class="n">mean</span>
+            <span class="c1"># else:</span>
+            <span class="c1">#    data = data * scale + mean</span>
 
             <span class="k">if</span> <span class="n">is_sparse</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">num_cols</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -890,7 +931,7 @@
 
             <span class="c1"># first_row = data_row</span>
         <span class="c1"># else:</span>
-            <span class="c1"># first_row = discretizer.discretize(data_row)</span>
+        <span class="c1"># first_row = discretizer.discretize(data_row)</span>
 
         <span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_row</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">inverse</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -909,8 +950,8 @@
 <span class="sd">            inverse[:, column] = inverse_column</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">discretizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">inverse</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">=</span> <span class="n">discretizer</span><span class="o">.</span><span class="n">undiscretize</span><span class="p">(</span><span class="n">inverse</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="c1"># if discretizer is not None:</span>
+        <span class="c1">#    inverse[1:] = discretizer.undiscretize(inverse[1:])</span>
 
         <span class="n">inverse</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_row</span>
 
@@ -950,8 +991,9 @@
 <span class="sd">        :obj:`list`</span>
 <span class="sd">            A list of dict that contains the data of risk prediction and risk score.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">risk_pred</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_explain</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
         <span class="k">return</span> <span class="p">[{</span><span class="s2">&quot;riskScore&quot;</span><span class="p">:</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">X_explain</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">0</span><span class="p">)))</span> <span class="o">+</span> <span class="s1">&#39;%&#39;</span><span class="p">],</span>
-                 <span class="s2">&quot;riskPred&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">class_label</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X_explain</span><span class="p">)[</span><span class="mi">0</span><span class="p">]]],</span>
+                 <span class="s2">&quot;riskPred&quot;</span><span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">class_label</span><span class="p">[</span><span class="n">risk_pred</span><span class="p">]]</span>
                  <span class="p">}]</span></div>
 
 <div class="viewcode-block" id="PyExplainer.get_risk_pred"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.get_risk_pred">[docs]</a>    <span class="k">def</span> <span class="nf">get_risk_pred</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1009,7 +1051,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">slider_widgets</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_bullet_data</span><span class="p">()</span>
-        <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description_width&#39;</span><span class="p">:</span> <span class="s1">&#39;40%&#39;</span><span class="p">,</span> <span class="s1">&#39;widget_width&#39;</span><span class="p">:</span> <span class="s1">&#39;60%&#39;</span><span class="p">}</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;description_width&#39;</span><span class="p">:</span> <span class="s1">&#39;40%&#39;</span><span class="p">}</span>
         <span class="n">layout</span> <span class="o">=</span> <span class="n">widgets</span><span class="o">.</span><span class="n">Layout</span><span class="p">(</span><span class="n">width</span><span class="o">=</span><span class="s1">&#39;99%&#39;</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="s1">&#39;20px&#39;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
@@ -1112,6 +1154,13 @@
 <span class="sd">        :obj:`dict`</span>
 <span class="sd">            A dict containing two keys, &#39;top_tofollow_rules&#39; and &#39;top_toavoid_rules&#39;</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_k_positive_rules</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_k_negative_rules</span><span class="p">):</span>
+            <span class="n">smaller_top_rule</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_k_positive_rules</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">smaller_top_rule</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">top_k_negative_rules</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_top_k_rules</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">smaller_top_rule</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">set_top_k_rules</span><span class="p">(</span><span class="n">smaller_top_rule</span><span class="p">)</span>
+
         <span class="n">top_variables</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">top_k_toavoid_rules</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">top_k_tofollow_rules</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1159,7 +1208,7 @@
         <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;top_tofollow_rules&#39;</span><span class="p">:</span> <span class="n">top_k_tofollow_rules</span><span class="p">,</span>
                 <span class="s1">&#39;top_toavoid_rules&#39;</span><span class="p">:</span> <span class="n">top_k_toavoid_rules</span><span class="p">}</span></div>
 
-<div class="viewcode-block" id="PyExplainer.retrieve_min_max_values"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.retrieve_min_max_values">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_min_max_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="PyExplainer.retrieve_X_explain_min_max_values"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.retrieve_X_explain_min_max_values">[docs]</a>    <span class="k">def</span> <span class="nf">retrieve_X_explain_min_max_values</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Retrieve the minimum and maximum value from X_train</span>
 
 <span class="sd">        Returns</span>
@@ -1271,7 +1320,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">__get_hbox_items</span><span class="p">()[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">right_text</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The right_text to be set into hbox_items should be type &#39;ipywidgets.Label&#39;&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span></div>
+            <span class="k">raise</span> <span class="ne">TypeError</span></div>
 
 <div class="viewcode-block" id="PyExplainer.visualise"><a class="viewcode-back" href="../../source/pyexplainer.html#pyexplainer.pyexplainer_pyexplainer.PyExplainer.visualise">[docs]</a>    <span class="k">def</span> <span class="nf">visualise</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rule_obj</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Given the rule object, show all of the visualisation as follows .</span>
@@ -1304,7 +1353,7 @@
 <span class="sd">        &gt;&gt;&gt; sample_explain_index = 0</span>
 <span class="sd">        &gt;&gt;&gt; X_explain = X_test.iloc[[sample_explain_index]]</span>
 <span class="sd">        &gt;&gt;&gt; y_explain = y_test.iloc[[sample_explain_index]]</span>
-<span class="sd">        &gt;&gt;&gt; rule_obj = pyExp.explain(X_explain, y_explain, search_function = &#39;crossoverinterpolation&#39;, top_k = 3, max_rules=30, max_iter =5, cv=5, debug = False)</span>
+<span class="sd">        &gt;&gt;&gt; rule_obj = pyExp.explain(X_explain, y_explain, search_function = &#39;CrossoverInterpolation&#39;, top_k = 3, max_rules=30, max_iter =5, cv=5, debug = False)</span>
 <span class="sd">        &gt;&gt;&gt; pyExp.visualise(rule_obj)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">visualisation_data_setup</span><span class="p">(</span><span class="n">rule_obj</span><span class="p">)</span>
@@ -1322,7 +1371,7 @@
                                          <span class="n">top_k_negative_rules</span><span class="o">=</span><span class="n">rule_obj</span><span class="p">[</span><span class="s1">&#39;top_k_negative_rules&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__set_X_explain</span><span class="p">(</span><span class="n">rule_obj</span><span class="p">[</span><span class="s1">&#39;X_explain&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__set_y_explain</span><span class="p">(</span><span class="n">rule_obj</span><span class="p">[</span><span class="s1">&#39;y_explain&#39;</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__set_bullet_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generate_bullet_data</span><span class="p">(</span><span class="n">top_rules</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_X_explain</span><span class="p">()))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__set_bullet_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generate_bullet_data</span><span class="p">(</span><span class="n">top_rules</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__set_risk_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generate_risk_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__get_X_explain</span><span class="p">()))</span></div>
 
     <span class="k">def</span> <span class="nf">__get_bullet_data</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1411,7 +1460,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">bullet_output</span> <span class="o">=</span> <span class="n">bullet_output</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;bullet_output should be type &#39;ipywidgets.Output&#39;&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span>
 
     <span class="k">def</span> <span class="nf">__set_hbox_items</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">hbox_items</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Setter of hbox_items</span>
@@ -1428,11 +1477,11 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;hbox_items should be in the format of &#39;[widgets.Label, widgets.FloatProgress, widgets.Label, </span>
 <span class="s2">                                  widgets.Label]&#39;&quot;&quot;&quot;</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;hbox_items should be in the format of &#39;[widgets.Label, widgets.FloatProgress, widgets.Label, </span>
 <span class="s2">                  widgets.Label]&#39;&quot;&quot;&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span>
 
     <span class="k">def</span> <span class="nf">__set_risk_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">risk_data</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Setter of risk_data</span>
@@ -1460,7 +1509,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">X_explain</span> <span class="o">=</span> <span class="n">X_explain</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;X_explain should be type &#39;pandas.core.frame.DataFrame&#39;&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span>
 
     <span class="k">def</span> <span class="nf">__set_y_explain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y_explain</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Setter of y_explain</span>
@@ -1474,7 +1523,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">y_explain</span> <span class="o">=</span> <span class="n">y_explain</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;y_explain should be type &#39;pandas.core.series.Series&#39;&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span></div>
+            <span class="k">raise</span> <span class="ne">TypeError</span></div>
 </pre></div>
 
            </div>
