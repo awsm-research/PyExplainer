@@ -184,7 +184,7 @@ rq2.plot = function()
   
   # openstack.fig = grid.arrange(openstack.auc.plot, openstack.bal.acc.plot, openstack.f1.plot, openstack.bal.acc.plot, ncol=4)
   
-  print(auc.plot)
+  # print(auc.plot)
   # qt.fig = grid.arrange(qt.auc.plot, qt.bal.acc.plot, qt.f1.plot, qt.bal.acc.plot, ncol=4)
   
   
@@ -211,5 +211,71 @@ rq2.plot = function()
          height = plot.height)
 }
 
-rq2.plot()
+rq3.rq4.plot = function()
+{
+  plot.height <- 8
+  ## Generate boxplots
+  # X-axis = Each studied search technique
+  # Y-axis = Balanced accruacy (0 to 1)
+  # Facet = Each studied project
+  openstack.plot <- ggplot(data = openstack.rq3.result, aes(x=method, y=rule_ratio)) +
+    geom_boxplot(outlier.shape = NA) +
+    ylab('Percentage of train commits that follow defective rule guidance') + xlab('') + ggtitle('') +
+    facet_grid(~project) +
+    theme(text = element_text(size = 14),
+          strip.text.x = element_text(
+            size = 14, face = "bold.italic"
+          ))
+  
+  qt.plot <- ggplot(data = qt.rq3.result, aes(x=method, y=rule_ratio)) +
+    geom_boxplot(outlier.shape = NA) +
+    ylab('Percentage of train commits that follow defective rule guidance') + xlab('') + ggtitle('') +
+    facet_grid(~project) +
+    theme(text = element_text(size = 14),
+          strip.text.x = element_text(
+            size = 14, face = "bold.italic"
+          ))
+  
+  fig = grid.arrange(openstack.plot, qt.plot, ncol=2)
+  
+  # print(fig)
+  # export a plot as pdf
+  
+  
+  ggsave(paste0(plot.output.path,'RQ3.pdf'),
+         plot = fig,
+         width = plot.height * golden.ratio,
+         height = plot.height)
+  
+  openstack.plot <- ggplot(data = openstack.rq4.result, aes(x=method, y=rule_ratio)) +
+    geom_boxplot(outlier.shape = NA) +
+    ylab('Percentage of test commits that follow defective rule guidance') + xlab('') + ggtitle('') +
+    facet_grid(~project) +
+    theme(text = element_text(size = 14),
+          strip.text.x = element_text(
+            size = 14, face = "bold.italic"
+          )) + 
+    coord_cartesian(ylim = c(0, 1))
+  
+  qt.plot <- ggplot(data = qt.rq4.result, aes(x=method, y=rule_ratio)) +
+    geom_boxplot(outlier.shape = NA) +
+    ylab('Percentage of test commits that follow defective rule guidance') + xlab('') + ggtitle('') +
+    facet_grid(~project) +
+    theme(text = element_text(size = 14),
+          strip.text.x = element_text(
+            size = 14, face = "bold.italic"
+          )) + 
+    coord_cartesian(ylim = c(0, 1))
+  
+  fig = grid.arrange(openstack.plot, qt.plot, ncol=2)
+  
+  ggsave(paste0(plot.output.path,'RQ4.pdf'),
+         plot = fig,
+         width = plot.height * golden.ratio,
+         height = plot.height)
+}
+
+# rq1.plot()
+# rq2.plot()
+rq3.rq4.plot()
 
