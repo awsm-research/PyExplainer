@@ -58,10 +58,6 @@ If you'd like to clone from source, you can do it in two simple steps as follows
 > cd pyExplainer
 ```
 
-## Install the requirements and run the tests
-
-- TODO
-
 ## Tutorial
 
 For information on how to use pyexplainer, refer to the official documentation:
@@ -76,7 +72,7 @@ For information on how to use pyexplainer, refer to the official documentation:
 
 We welcome and recognize all contributions. You can see a list of current contributors in the [contributors tab](https://github.com/awsm-research/pyExplainer/graphs/contributors).
 
-- todo...... how to contribute?
+Please click [here](https://pyexplainer.readthedocs.io/en/latest/contributing.html) to gain more information about making a contribution to this project.
 
 ## Documentation
 
@@ -84,7 +80,7 @@ The official documentation is hosted on Read the Docs: https://pyexplainer.readt
 
 ## License
 
-- TODO
+MIT License, click [here](https://github.com/awsm-research/pyExplainer/blob/master/LICENSE) for more information.
 
 ### Credits
 
