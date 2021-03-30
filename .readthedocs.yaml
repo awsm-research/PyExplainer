@@ -1,0 +1,7 @@
+build:
+  image: latest
+python:
+  version: {{cookiecutter.python_version}}
+  pip_install: true
+  extra_requirements:
+    - docs

@@ -22,7 +22,6 @@ import os
 import sys
 
 os.system("pip install sphinx_rtd_theme")
-os.system("pip install pyexplainer")
 
 import sphinx_rtd_theme
 
