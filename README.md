@@ -5,7 +5,8 @@
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/awsm-research/pyExplainer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/awsm-research/pyExplainer/context:javascript)
 
 python ML explainer for SEA
-## pyexplainer
+
+## pyexplainer ![logo](img/logo_30x30.png)
 
 pyexplainer is a python package that generates explainable Machine Learning predictions from the so-called 'black-box model' such as random forest, moreover, pyexplainer provides interactive visualisation that simplifies the decision-making process for Software Engineering.
 
