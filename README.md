@@ -9,7 +9,7 @@ pyexplainer is a python package that generates explainable Machine Learning pred
 
 Here is a snapshot of how it works
 ![pipeline](img/pipeline.png)
-![alt text](https://github.com/MichaelFu1998-create/portfolio/blob/master/img/pyexplainer/pyexplainer_snap_demo.gif)
+![alt text](img/pyexplainer_snap_demo.gif)
 
 ## Table Of Contents
 
