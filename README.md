@@ -77,7 +77,7 @@ Please click [here](https://pyexplainer.readthedocs.io/en/latest/contributing.ht
 
 ## Documentation
 
-The official documentation is hosted on Read the Docs: https://pyexplainer.readthedocs.io/en/latest/
+The official documentation is hosted on [Read the Docs](https://pyexplainer.readthedocs.io/en/latest/)
 
 ## License
 
