@@ -8,7 +8,7 @@
 pyexplainer is a python package that generates explainable Machine Learning predictions from the so-called 'black-box model' such as random forest, moreover, pyexplainer provides interactive visualisation that simplifies the decision-making process for Software Engineering.
 
 Here is a snapshot of how it works
-
+![pipeline](img/pipeline.png)
 ![alt text](https://github.com/MichaelFu1998-create/portfolio/blob/master/img/pyexplainer/pyexplainer_snap_demo.gif)
 
 ## Table Of Contents
