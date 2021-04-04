@@ -13,6 +13,8 @@ import os
 import sys
 import pickle
 from bs4 import BeautifulSoup
+from pytest_notebook.execution import execute_notebook
+from pytest_notebook.notebook import create_notebook, create_cell, dump_notebook
 
 
 def get_base_prefix_compat():
@@ -596,3 +598,77 @@ def test_get_set_y_explain_positive(y_explain, result):
 
 def test_visualisation():
     os.system("jupyter nbconvert --to notebook --execute test_visualisation.ipynb --output test_visualisation.ipynb")
+
+
+def test_jupyter_notebook_code():
+    notebook = create_notebook()
+    cell = create_cell("""
+import pickle
+import os
+from sklearn.ensemble import RandomForestClassifier
+from pyexplainer.pyexplainer_pyexplainer import PyExplainer
+import pickle
+import os
+
+
+cwd = os.getcwd()
+parent_dir = os.path.dirname(cwd)
+path_train = parent_dir + "/tests/pyexplainer_test_data/activemq-5.0.0.zip"
+training_data = pd.read_csv(path_train, index_col = 'File')
+
+dep = training_data.columns[-4]
+selected_features = ["ADEV", "AvgCyclomaticModified", "AvgEssential", "AvgLineBlank", "AvgLineComment",
+                     "CountClassBase", "CountClassCoupled", "CountClassDerived", "CountDeclClass",
+                     "CountDeclClassMethod", "CountDeclClassVariable", "CountDeclInstanceVariable",
+                     "CountDeclMethodDefault", "CountDeclMethodPrivate", "CountDeclMethodProtected",
+                     "CountDeclMethodPublic", "CountInput_Mean", "CountInput_Min", "CountOutput_Min", "MAJOR_LINE",
+                     "MaxInheritanceTree", "MaxNesting_Min", "MINOR_COMMIT", "OWN_COMMIT", "OWN_LINE",
+                     "PercentLackOfCohesion", "RatioCommentToCode"]
+all_cols = training_data.columns
+for col in all_cols:
+    if col not in selected_features:
+        all_cols = all_cols.drop(col)
+indep = all_cols
+
+X_train = training_data.loc[:, indep]
+y_train = training_data.loc[:, dep]
+
+blackbox_model = RandomForestClassifier(max_depth=3, random_state=0)
+blackbox_model.fit(X_train, y_train)
+
+class_label = ['Clean', 'Defect']
+
+path_test = parent_dir + "/tests/pyexplainer_test_data/activemq-5.1.0.zip"
+testing_data = pd.read_csv(path_test, index_col = 'File')
+X_test = testing_data.loc[:, indep]
+y_test = testing_data.loc[:, dep]
+def load_object(filename):
+    with open(filename, 'rb') as file:
+        object_o = pickle.load(file)
+    return (object_o)
+# load rule obj
+if os.path.isfile('../tests/rule_objects/rule_object.pyobject'):
+    loaded_rule_obj = load_object('../tests/rule_objects/rule_object.pyobject')
+py_explainer = PyExplainer(X_train,
+                            y_train,
+                            indep,
+                            dep,
+                            blackbox_model,
+                            class_label=class_label)
+py_explainer.visualise(loaded_rule_obj)
+# test visualising manually created objects
+for explain_index in range(14, 15):
+   X_explain = X_test.iloc[[explain_index]]
+   y_explain = y_test.iloc[[explain_index]]
+   py_explainer = PyExplainer(X_train,
+                               y_train,
+                               indep,
+                               dep,
+                               blackbox_model,
+                               class_label=class_label)
+   rule_object = py_explainer.explain(X_explain, y_explain)
+   py_explainer.visualise(rule_object)
+                        """)
+    notebook.cells = [cell]
+    result = execute_notebook(notebook, with_coverage=True)
+    print(result.coverage_data())

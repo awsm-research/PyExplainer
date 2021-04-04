@@ -16,6 +16,7 @@ The module structure is the following:
 """
 import pandas as pd
 import numpy as np
+import sklearn
 from sklearn.base import BaseEstimator
 from sklearn.base import TransformerMixin
 from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier, RandomForestRegressor, \
@@ -115,7 +116,7 @@ class FriedScale:
 
     def train(self, X):
         # get multipliers
-        if self.winsorizer != None:
+        if self.winsorizer is not None:
             X_trimmed = self.winsorizer.trim(X)
         else:
             X_trimmed = X
@@ -128,7 +129,7 @@ class FriedScale:
         self.scale_multipliers = scale_multipliers
 
     def scale(self, X):
-        if self.winsorizer != None:
+        if self.winsorizer is not None:
             return self.winsorizer.trim(X) * self.scale_multipliers
         else:
             return X * self.scale_multipliers
@@ -369,6 +370,14 @@ class RuleFit(BaseEstimator, TransformerMixin):
         self.sample_fract = sample_fract
         self.max_rules = max_rules
         self.memory_par = memory_par
+        if tree_generator is None \
+                or isinstance(tree_generator, sklearn.ensemble.GradientBoostingClassifier)\
+                or isinstance(tree_generator, sklearn.ensemble.GradientBoostingRegressor):
+            self.tree_generator = tree_generator
+        else:
+            print("tree_generator must be the type either 'sklearn.ensemble.GradientBoostingClassifier' or \
+                  'sklearn.ensemble.GradientBoostingRegressor'")
+            raise TypeError
         self.tree_size = tree_size
         self.random_state = random_state
         self.model_type = model_type
