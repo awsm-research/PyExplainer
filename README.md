@@ -62,11 +62,11 @@ If you'd like to clone from source, you can do it in two simple steps as follows
 ## Tutorial
 
 For information on how to use pyexplainer, refer to the official documentation:
-- Video for testing >>> to be modified
+- [Tutorial Video](https://www.youtube.com/watch?v=p6uff4iYtHo)
 
-[![Tutorial](http://img.youtube.com/vi/kBlGMHiPf1U/0.jpg)](http://www.youtube.com/watch?v=kBlGMHiPf1U "Tutorial")
-- notebook file link here
-- [official documentation](https://pyexplainer.readthedocs.io/en/latest/)
+[![Tutorial](https://img.youtube.com/vi/p6uff4iYtHo/hqdefault.jpg)](https://www.youtube.com/watch?v=p6uff4iYtHo "Tutorial")
+- [Quickstart Notebook](https://github.com/awsm-research/pyExplainer/blob/master/quickstart_guide/formal_quickstart.ipynb)
+- [Official Documentation](https://pyexplainer.readthedocs.io/en/latest/)
 
 
 ## Contributors
