@@ -13,8 +13,6 @@ import os
 import sys
 import pickle
 from bs4 import BeautifulSoup
-from pytest_notebook.execution import execute_notebook
-from pytest_notebook.notebook import create_notebook, create_cell, dump_notebook
 
 
 def get_base_prefix_compat():
@@ -178,13 +176,15 @@ def test_to_js_data(data, result):
                          [
                              (X_train, y_train, indep, dep, blackbox_model, class_label, 0, 'ValueError'),
                              (X_train, y_train, indep, dep, blackbox_model, class_label, 16, 'ValueError'),
+                             (X_train, y_train, indep, dep, blackbox_model, class_label, '3', 'TypeError'),
                              (X_train, y_train, indep, dep, blackbox_model, ['clean'], 3, 'ValueError'),
+                             (X_train, y_train, indep, dep, blackbox_model, 'clean', 3, 'TypeError'),
                              (X_train, y_train, indep, dep, "wrong model", class_label, 3, 'TypeError'),
                              (X_train, y_train, indep, 123, blackbox_model, class_label, 3, 'TypeError'),
                              (X_train, y_train, {}, dep, blackbox_model, class_label, 3, 'TypeError'),
                              (X_train, y_train, [], dep, blackbox_model, class_label, 3, 'TypeError'),
                              (X_train, [], indep, dep, blackbox_model, class_label, 3, 'TypeError'),
-                             ([], y_train, indep, dep, blackbox_model, class_label, 3, 'TypeError'),
+                             ([], y_train, indep, dep, blackbox_model, class_label, 3, 'TypeError')
                          ])
 def test_pyexplainer_init_negative(X_train, y_train, indep, dep, blackbox_model, class_label, top_k_rules, result):
     with pytest.raises(Exception) as e_info:
@@ -203,6 +203,25 @@ def test_pyexplainer_init_positive(X_train, y_train, indep, dep, blackbox_model,
 
 rule_obj_keys = ['synthetic_data', 'synthetic_predictions', 'X_explain', 'y_explain', 'indep',
                  'dep', 'top_k_positive_rules', 'top_k_negative_rules', 'local_rulefit_model']
+
+
+@pytest.mark.parametrize('exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, '
+                         'X_train, result',
+                         [
+                             ([], testing_y_explain, 3, 10, 10000, 5,
+                              'CrossoverInterpolation', False, X_train, 'TypeError'),
+                             (testing_X_explain, testing_y_explain, 3, 10, 10000, 5,
+                              'RandomPerturbation', True, X_train[:1], 'ValueError'),
+                             (testing_X_explain, testing_X_explain, 3, 10, 10000, 5,
+                              'CrossoverInterpolation', False, X_train, 'TypeError')
+                         ])
+def test_explain_negative(exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, X_train,
+                          result):
+    py_explainer.X_train = X_train
+    py_explainer.y_train = y_train
+    with pytest.raises(Exception) as e_info:
+        py_explainer.explain(exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug)
+    assert e_info.typename == result
 
 
 @pytest.mark.parametrize('exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, result',
@@ -593,82 +612,40 @@ def test_get_set_y_explain_positive(y_explain, result):
 
 
 """Test the visualisation using Jupyter Notebook Kernel"""
-# todo - how to test on_value_change
 
 
-def test_visualisation():
-    os.system("jupyter nbconvert --to notebook --execute test_visualisation.ipynb --output test_visualisation.ipynb")
+def test_visualise():
+    py_explainer.visualise(test_rule_object)
 
 
-def test_jupyter_notebook_code():
-    notebook = create_notebook()
-    cell = create_cell("""
-import pickle
-import os
-from sklearn.ensemble import RandomForestClassifier
-from pyexplainer.pyexplainer_pyexplainer import PyExplainer
-import pickle
-import os
+def test_visualisation_data_setup():
+    py_explainer.visualisation_data_setup(test_rule_object)
 
 
-cwd = os.getcwd()
-parent_dir = os.path.dirname(cwd)
-path_train = parent_dir + "/tests/pyexplainer_test_data/activemq-5.0.0.zip"
-training_data = pd.read_csv(path_train, index_col = 'File')
+def test_show_visualisation():
+    py_explainer.visualisation_data_setup(test_rule_object)
+    py_explainer.show_visualisation()
 
-dep = training_data.columns[-4]
-selected_features = ["ADEV", "AvgCyclomaticModified", "AvgEssential", "AvgLineBlank", "AvgLineComment",
-                     "CountClassBase", "CountClassCoupled", "CountClassDerived", "CountDeclClass",
-                     "CountDeclClassMethod", "CountDeclClassVariable", "CountDeclInstanceVariable",
-                     "CountDeclMethodDefault", "CountDeclMethodPrivate", "CountDeclMethodProtected",
-                     "CountDeclMethodPublic", "CountInput_Mean", "CountInput_Min", "CountOutput_Min", "MAJOR_LINE",
-                     "MaxInheritanceTree", "MaxNesting_Min", "MINOR_COMMIT", "OWN_COMMIT", "OWN_LINE",
-                     "PercentLackOfCohesion", "RatioCommentToCode"]
-all_cols = training_data.columns
-for col in all_cols:
-    if col not in selected_features:
-        all_cols = all_cols.drop(col)
-indep = all_cols
 
-X_train = training_data.loc[:, indep]
-y_train = training_data.loc[:, dep]
+def test_run_bar_animation():
+    py_explainer.visualisation_data_setup(test_rule_object)
+    py_explainer.run_bar_animation()
 
-blackbox_model = RandomForestClassifier(max_depth=3, random_state=0)
-blackbox_model.fit(X_train, y_train)
 
-class_label = ['Clean', 'Defect']
+def test_generate_sliders():
+    py_explainer.generate_sliders()
 
-path_test = parent_dir + "/tests/pyexplainer_test_data/activemq-5.1.0.zip"
-testing_data = pd.read_csv(path_test, index_col = 'File')
-X_test = testing_data.loc[:, indep]
-y_test = testing_data.loc[:, dep]
-def load_object(filename):
-    with open(filename, 'rb') as file:
-        object_o = pickle.load(file)
-    return (object_o)
-# load rule obj
-if os.path.isfile('../tests/rule_objects/rule_object.pyobject'):
-    loaded_rule_obj = load_object('../tests/rule_objects/rule_object.pyobject')
-py_explainer = PyExplainer(X_train,
-                            y_train,
-                            indep,
-                            dep,
-                            blackbox_model,
-                            class_label=class_label)
-py_explainer.visualise(loaded_rule_obj)
-# test visualising manually created objects
-for explain_index in range(14, 15):
-   X_explain = X_test.iloc[[explain_index]]
-   y_explain = y_test.iloc[[explain_index]]
-   py_explainer = PyExplainer(X_train,
-                               y_train,
-                               indep,
-                               dep,
-                               blackbox_model,
-                               class_label=class_label)
-   rule_object = py_explainer.explain(X_explain, y_explain)
-   py_explainer.visualise(rule_object)
-                        """)
-    notebook.cells = [cell]
-    result = execute_notebook(notebook, with_coverage=True)
-    print(result.coverage_data())
+
+def test_on_value_change():
+    py_explainer.visualise(test_rule_object)
+    change = \
+        {'name': 'value',
+         'old': 0.0,
+         'new': 46.0,
+         'owner': widgets.FloatSlider(value=46.0, continuous_update=False,
+                                      description='#1 Decrease the values of PercentLackOfCohesion to less than 0',
+                                      layout=widgets.Layout(height='20px', width='99%'), max=87.0,
+                                      readout_format='.1f', step=1.0,
+                                      style=widgets.SliderStyle(description_width='40%')),
+         'type': 'change'}
+    py_explainer.on_value_change(change=change, debug=True)

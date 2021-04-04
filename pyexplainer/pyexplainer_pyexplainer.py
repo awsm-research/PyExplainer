@@ -285,16 +285,16 @@ class PyExplainer:
         """
         # check if X_explain is a DF
         if not isinstance(X_explain, pd.core.frame.DataFrame):
-            print("X_explain (X_test) should be type 'pandas.core.frame.DataFrame'")
-            raise ValueError
+            print("X_explain should be type 'pandas.core.frame.DataFrame'")
+            raise TypeError
         # check if X_explain has the same num of cols as X_train
-        if len(X_explain.columns) != len(X_explain.columns):
+        if len(X_explain.columns) != len(self.X_train.columns):
             print("X_explain should have the same number of columns as X_train")
             raise ValueError
         # check if y_explain is a Series
         if not isinstance(y_explain, pd.core.series.Series):
-            print("y_explain (y_test) should be type 'pandas.core.series.Series'")
-            raise ValueError
+            print("y_explain should be type 'pandas.core.series.Series'")
+            raise TypeError
         self.set_top_k_rules(top_k)
         # Step 1 - Generate synthetic instances
         if search_function.lower() == 'crossoverinterpolation':
@@ -707,6 +707,7 @@ class PyExplainer:
                 new_ins = x + (y - x) * alpha_n
                 new_ins = new_ins.to_frame().T
 
+                """
                 # For Categorical Variables
                 for cat in categorical_vars:
                     x_df = x.to_frame().T
@@ -719,6 +720,7 @@ class PyExplainer:
                         new_ins[cat] = y_df.iloc[0][cat]
                     else:
                         new_ins[cat] = random.choice([x_df.iloc[0][cat], y_df.iloc[0][cat]])
+                """
                 new_ins.name = num
                 new_con_df = new_con_df.append(new_ins, ignore_index=True)
 
@@ -735,12 +737,14 @@ class PyExplainer:
                 z = rand_rows.iloc[2]
                 new_ins = x + (y - z) * mu_f
                 new_ins = new_ins.to_frame().T
+                """
                 # For Categorical Variables get the value of the closest instance to the explained instance
                 for cat in categorical_vars:
                     x_df = x.to_frame().T
                     y_df = y.to_frame().T
                     z_df = z.to_frame().T
                     new_ins[cat] = random.choice([x_df.iloc[0][cat], y_df.iloc[0][cat], z_df.iloc[0][cat]])
+                """
                 new_ins.name = num
                 new_con_df = new_con_df.append(new_ins, ignore_index=True)
 
@@ -995,7 +999,7 @@ class PyExplainer:
                 slider_widgets.append(slider)
         return slider_widgets
 
-    def on_value_change(self, change):
+    def on_value_change(self, change, debug=False):
         """The callback function for the interactive slider
 
         Whenever the user interacts with the slider,
@@ -1022,7 +1026,10 @@ class PyExplainer:
         bullet_data = self.__get_bullet_data()
         id = int(change['owner'].description.split(" ")[0].strip("#"))
         var_changed = bullet_data[id - 1]['varRef']
-        new_value = change.new
+        if debug:
+            new_value = change['new']
+        else:
+            new_value = change.new
         # modify changed var in X_explain
         X_explain = self.__get_X_explain()
         row_name = self.__get_X_explain().index[0]
