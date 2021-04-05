@@ -3,8 +3,6 @@ from pyexplainer.rulefit import FriedScale, RuleCondition, Rule, RuleEnsemble, R
 import numpy as np
 import sys
 from sklearn import tree
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.datasets import make_classification
 
 
 def get_base_prefix_compat():
@@ -24,6 +22,11 @@ rule_condition_greater = RuleCondition(0, 1, ">", 0.1)
 X = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
 
 """Testing RuleCondition"""
+
+
+def test_rule_condition_repr():
+    rule_condition = RuleCondition(1, 5, "<=", 0.4)
+    rule_condition.__repr__()
 
 
 def test_rule_condition_hashing_equal1():
@@ -56,7 +59,7 @@ def test_rule_condition_greater():
                                   np.array([0, 1, 1]))
 
 
-"""Testing rule"""
+"""Testing Rule"""
 
 rule = Rule([rule_condition_smaller, rule_condition_greater], 0)
 
@@ -69,6 +72,13 @@ def test_rule_transform():
 def test_rule_equality():
     rule2 = Rule([rule_condition_greater, rule_condition_smaller], 0)
     assert rule == rule2
+
+
+def test_rule_repr():
+    rule.__repr__()
+
+
+"""Testing FriedScale"""
 
 
 def test_fried_scale():
@@ -88,6 +98,7 @@ def test_fried_scale():
     FriedScale(winsorizer=winsorizer)
 
 
+"""Testing RuleEnsemble"""
 X_short = [[0, 0], [1, 1]]
 y_short = [0, 1]
 clf = tree.DecisionTreeClassifier()
@@ -109,13 +120,20 @@ def test_rule_ensemble_transform():
     rule_ensemble.transform(X_short)
 
 
-def test_rule_fit_tree_generator():
-    X_rf, y_rf = make_classification(n_samples=1000, n_features=4, n_informative=2,
-                                     n_redundant=0, random_state=0, shuffle=False)
-    rf_model = RandomForestClassifier(max_depth=2, random_state=0)
-    rf_model = rf_model.fit(X_rf, y_rf)
+def test_rule_ensemble_str():
+    rule.__str__()
+
+
+"""Testing RuleFit"""
+
+
+def test_rule_fit_init():
+    RuleFit()
+
+
+def test_rule_fit_init_tree_generator():
     with pytest.raises(Exception) as e_info:
-        RuleFit(tree_generator=rf_model)
+        RuleFit(tree_generator=tree1)
     assert e_info.typename == 'TypeError'
 
 
