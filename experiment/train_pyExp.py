@@ -41,10 +41,10 @@ def train_global_model(x_train,y_train):
     pickle.dump(global_model, open(proj_name+'_global_model.pkl','wb'))
     print('train global model finished')
     
-def create_pyExplainer_obj(search_function, feature_df, test_label, explainer='LRR'):
+def create_pyExplainer_obj(search_function, feature_df, test_label, explainer='rulefit'):
     
-    if search_function.lower() not in ['lime','crossoverinterpolation']:
-        print('the search function must be "lime" or "crossoverinterpolation"')
+    if search_function not in ['lime','CrossoverInterpolation']:
+        print('the search function must be "lime" or "CrossoverInterpolation"')
         return
     
     problem_index = []
@@ -64,9 +64,9 @@ def create_pyExplainer_obj(search_function, feature_df, test_label, explainer='L
                                            y_explain,
                                            search_function = search_function, 
                                            top_k = 15,
-                                           max_rules=2000, 
+                                           max_rules=20, 
                                            max_iter = None, 
-                                           cv=5,
+                                           cv=10,
                                            debug = False)
     #             synt_pred = pyExp_obj['synthetic_predictions']
                 pyExp_obj['commit_id'] = row_index
@@ -76,11 +76,13 @@ def create_pyExplainer_obj(search_function, feature_df, test_label, explainer='L
                 del pyExp_obj['local_rulefit_model']
     #             print('{}: found {} defect from total {}'.format(row_index, str(np.sum(synt_pred)), 
     #                                                          str(len(synt_pred))))
-                pickle.dump(pyExp_obj, open(pyExp_dir+proj_name+'_'+explainer+'_'+search_function.lower()+'_'+row_index+'_2000_instances.pkl','wb'))
+                pickle.dump(pyExp_obj, open(pyExp_dir+proj_name+'_'+explainer+'_'+search_function.lower()+'_'+row_index+'_20_rules.pkl','wb'))
         
             else:
                 X_explain = feature_df.iloc[i] # to prevent error in LIME
-                exp, synt_inst, synt_inst_for_local_model, selected_feature_indices, local_model = lime_explainer.explain_instance(X_explain, global_model.predict_proba)
+                exp, synt_inst, synt_inst_for_local_model, selected_feature_indices, local_model = lime_explainer.explain_instance(X_explain, 
+                                                                                                                                   global_model.predict_proba, 
+                                                                                                                                   num_samples=2000,)
 
                 lime_obj = {}
                 lime_obj['rule'] = exp
@@ -89,7 +91,7 @@ def create_pyExplainer_obj(search_function, feature_df, test_label, explainer='L
                 lime_obj['local_model'] = local_model
                 lime_obj['selected_feature_indeces'] = selected_feature_indices
                 lime_obj['commit_id'] = row_index
-                pickle.dump(lime_obj, open(pyExp_dir+proj_name+'_lime_'+row_index+'.pkl','wb'))
+                pickle.dump(lime_obj, open(pyExp_dir+proj_name+'_lime_'+row_index+'_2000_instances.pkl','wb'))
                 
             print('finished',row_index)
 #             print(row_index)
