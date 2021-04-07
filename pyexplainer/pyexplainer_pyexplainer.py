@@ -587,7 +587,7 @@ class PyExplainer:
         :obj:`dict`
             A dict with two keys 'synthetic_data' and 'sampled_class_frequency' generated via Crossover and Interpolation.
         """
-        categorical_vars = []
+        # categorical_vars = []
 
         X_train_i = self.X_train.copy()
         # y_train_i = self.y_train.copy()
@@ -694,7 +694,7 @@ class PyExplainer:
             for num in range(0, 1000):
                 rand_rows = train_set_neigh.sample(2)
                 sample_indexes_list = sample_indexes_list + rand_rows.index.values.tolist()
-                similarity_both = dist_df[dist_df.index.isin(rand_rows.index)]
+                # similarity_both = dist_df[dist_df.index.isin(rand_rows.index)]
                 sample_classes = train_class_neigh[train_class_neigh.index.isin(
                     rand_rows.index)]
                 sample_classes = np.array(
@@ -802,7 +802,7 @@ class PyExplainer:
         if discretizer is None:
             instance_sample = data_row
             scale = scaler.scale_
-            mean = scaler.mean_
+            # mean = scaler.mean_
             if is_sparse:
                 # Perturb only the non-zero values
                 non_zero_indexes = data_row.nonzero()[1]

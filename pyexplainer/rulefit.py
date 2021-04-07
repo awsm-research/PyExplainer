@@ -16,7 +16,6 @@ The module structure is the following:
 """
 import pandas as pd
 import numpy as np
-import sklearn
 from sklearn.base import BaseEstimator
 from sklearn.base import TransformerMixin
 from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier, RandomForestRegressor, \
