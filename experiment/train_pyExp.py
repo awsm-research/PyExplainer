@@ -12,7 +12,7 @@ from pyexplainer_pyexplainer import *
 
 import matplotlib.pyplot as plt
 
-
+from lime.lime.lime_tabular import LimeTabularExplainer
 from datetime import datetime
 
 from my_util import *
@@ -116,6 +116,60 @@ def create_pyExplainer_obj(search_function, feature_df, test_label, explainer='r
     print('from total {} commits, there are {} problematic commits'.format(len(feature_df),len(problem_index)))
     return time_spent, problem_index
 
+def create_every_explainer(feature_df, test_label):
+
+    
+#     problem_index = []
+#     time_spent = []
+    
+    for i in range(0,len(feature_df)):
+        X_explain = feature_df.iloc[[i]]
+        y_explain = test_label.iloc[[i]]
+
+        row_index = str(X_explain.index[0])
+
+#         start = time.time()
+        pyExp_obj = pyExp.explain(X_explain,
+                                   y_explain,
+                                   search_function = 'CrossoverInterpolation', 
+                                   top_k = 15,
+                                   max_rules=2000, 
+                                   max_iter = None, 
+                                   cv=5,
+                                   debug = False)
+#             synt_pred = pyExp_obj['synthetic_predictions']
+        pyExp_obj['commit_id'] = row_index
+
+        # because I don't want to change key name in another evaluation file
+        pyExp_obj['local_model'] = pyExp_obj['local_rulefit_model']
+        del pyExp_obj['local_rulefit_model']
+#             print('{}: found {} defect from total {}'.format(row_index, str(np.sum(synt_pred)), 
+#                                                          str(len(synt_pred))))
+#         pickle.dump(pyExp_obj, open(pyExp_dir+proj_name+'_'+explainer+'_'+search_function.lower()+'_'+row_index+'_20_rules.pkl','wb'))
+        
+        X_explain = feature_df.iloc[i] # to prevent error in LIME
+        exp, synt_inst, synt_inst_for_local_model, selected_feature_indices, local_model = lime_explainer.explain_instance(X_explain, 
+                                                                                                                           global_model.predict_proba, 
+                                                                                                                           num_samples=5000)
+
+        lime_obj = {}
+        lime_obj['rule'] = exp
+        lime_obj['synthetic_instance_for_global_model'] = synt_inst
+        lime_obj['synthetic_instance_for_lobal_model'] = synt_inst_for_local_model
+        lime_obj['local_model'] = local_model
+        lime_obj['selected_feature_indeces'] = selected_feature_indices
+        lime_obj['commit_id'] = row_index
+#         pickle.dump(lime_obj, open(pyExp_dir+proj_name+'_lime_'+row_index+'.pkl','wb'))
+
+        all_explainer = {'pyExplainer':pyExp_obj, 'LIME': lime_obj}
+        pickle.dump(lime_obj, open(pyExp_dir+proj_name+'_all_explainer_'+row_index+'.pkl','wb'))
+        
+        print('finished',row_index)
+
+
+        end = time.time()
+
+        
 x_train, x_test, y_train, y_test = prepare_data(proj_name, mode = 'all')
 col = list(x_test.columns)
 
@@ -151,18 +205,19 @@ dep = 'defect'
 indep = correctly_predict_df.columns[:-3]
 
 pyExp = PyExplainer(x_train, y_train, indep, dep, global_model, class_label)
+lime_explainer = LimeTabularExplainer(x_train.values, categorical_features=[6],
+                                      feature_names=indep, class_names=class_label, 
+                                      random_state=0)
 
-feature_df = correctly_predict_df.loc[:, indep]
-test_label = correctly_predict_df.loc[:, dep]
+# feature_df = correctly_predict_df.loc[:, indep]
+# test_label = correctly_predict_df.loc[:, dep]
 
 # time_spent_rand, problem_index_rand = create_pyExplainer_obj('randompertubation', feature_df, test_label,local_model_type)
 # pickle.dump(time_spent_rand, open(other_object_dir+proj_name+'_train_time_'+local_model_type+'_randompertubation.pkl','wb'))
 # pickle.dump(problem_index_rand, open(other_object_dir+proj_name+'_problem_index_'+local_model_type+'_randompertubation.pkl','wb'))
 
-time_spent_ci, problem_index_ci = create_pyExplainer_obj('CrossoverInterpolation', feature_df, test_label,local_model_type)
-pickle.dump(time_spent_ci, open(other_object_dir+proj_name+'_train_time_'+local_model_type+'_crossoverinterpolation.pkl','wb'))
-pickle.dump(problem_index_ci, open(other_object_dir+proj_name+'_problem_index_'+local_model_type+'_crossoverinterpolation.pkl','wb'))
+# time_spent_ci, problem_index_ci = create_pyExplainer_obj('CrossoverInterpolation', feature_df, test_label,local_model_type)
+# pickle.dump(time_spent_ci, open(other_object_dir+proj_name+'_train_time_'+local_model_type+'_crossoverinterpolation.pkl','wb'))
+# pickle.dump(problem_index_ci, open(other_object_dir+proj_name+'_problem_index_'+local_model_type+'_crossoverinterpolation.pkl','wb'))
 
-
-
-
+create_every_explainer(x_test, y_test)
