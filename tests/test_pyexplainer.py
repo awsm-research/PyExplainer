@@ -120,7 +120,7 @@ testing_risk_data = py_explainer.generate_risk_data(py_explainer.X_explain)
 
 
 def test_version():
-    assert __version__ == '0.1.5'
+    assert __version__ == '0.1.6'
 
 
 @pytest.mark.parametrize('data, result',
@@ -176,13 +176,15 @@ def test_to_js_data(data, result):
                          [
                              (X_train, y_train, indep, dep, blackbox_model, class_label, 0, 'ValueError'),
                              (X_train, y_train, indep, dep, blackbox_model, class_label, 16, 'ValueError'),
+                             (X_train, y_train, indep, dep, blackbox_model, class_label, '3', 'TypeError'),
                              (X_train, y_train, indep, dep, blackbox_model, ['clean'], 3, 'ValueError'),
+                             (X_train, y_train, indep, dep, blackbox_model, 'clean', 3, 'TypeError'),
                              (X_train, y_train, indep, dep, "wrong model", class_label, 3, 'TypeError'),
                              (X_train, y_train, indep, 123, blackbox_model, class_label, 3, 'TypeError'),
                              (X_train, y_train, {}, dep, blackbox_model, class_label, 3, 'TypeError'),
                              (X_train, y_train, [], dep, blackbox_model, class_label, 3, 'TypeError'),
                              (X_train, [], indep, dep, blackbox_model, class_label, 3, 'TypeError'),
-                             ([], y_train, indep, dep, blackbox_model, class_label, 3, 'TypeError'),
+                             ([], y_train, indep, dep, blackbox_model, class_label, 3, 'TypeError')
                          ])
 def test_pyexplainer_init_negative(X_train, y_train, indep, dep, blackbox_model, class_label, top_k_rules, result):
     with pytest.raises(Exception) as e_info:
@@ -201,6 +203,25 @@ def test_pyexplainer_init_positive(X_train, y_train, indep, dep, blackbox_model,
 
 rule_obj_keys = ['synthetic_data', 'synthetic_predictions', 'X_explain', 'y_explain', 'indep',
                  'dep', 'top_k_positive_rules', 'top_k_negative_rules', 'local_rulefit_model']
+
+
+@pytest.mark.parametrize('exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, '
+                         'X_train, result',
+                         [
+                             ([], testing_y_explain, 3, 10, 10000, 5,
+                              'CrossoverInterpolation', False, X_train, 'TypeError'),
+                             (testing_X_explain, testing_y_explain, 3, 10, 10000, 5,
+                              'RandomPerturbation', True, X_train[:1], 'ValueError'),
+                             (testing_X_explain, testing_X_explain, 3, 10, 10000, 5,
+                              'CrossoverInterpolation', False, X_train, 'TypeError')
+                         ])
+def test_explain_negative(exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, X_train,
+                          result):
+    py_explainer.X_train = X_train
+    py_explainer.y_train = y_train
+    with pytest.raises(Exception) as e_info:
+        py_explainer.explain(exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug)
+    assert e_info.typename == result
 
 
 @pytest.mark.parametrize('exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, result',
@@ -591,8 +612,40 @@ def test_get_set_y_explain_positive(y_explain, result):
 
 
 """Test the visualisation using Jupyter Notebook Kernel"""
-# todo - how to test on_value_change
 
 
-def test_visualisation():
-    os.system("jupyter nbconvert --to notebook --execute test_visualisation.ipynb --output test_visualisation.ipynb")
+def test_visualise():
+    py_explainer.visualise(test_rule_object)
+
+
+def test_visualisation_data_setup():
+    py_explainer.visualisation_data_setup(test_rule_object)
+
+
+def test_show_visualisation():
+    py_explainer.visualisation_data_setup(test_rule_object)
+    py_explainer.show_visualisation()
+
+
+def test_run_bar_animation():
+    py_explainer.visualisation_data_setup(test_rule_object)
+    py_explainer.run_bar_animation()
+
+
+def test_generate_sliders():
+    py_explainer.generate_sliders()
+
+
+def test_on_value_change():
+    py_explainer.visualise(test_rule_object)
+    change = \
+        {'name': 'value',
+         'old': 0.0,
+         'new': 46.0,
+         'owner': widgets.FloatSlider(value=46.0, continuous_update=False,
+                                      description='#1 Decrease the values of PercentLackOfCohesion to less than 0',
+                                      layout=widgets.Layout(height='20px', width='99%'), max=87.0,
+                                      readout_format='.1f', step=1.0,
+                                      style=widgets.SliderStyle(description_width='40%')),
+         'type': 'change'}
+    py_explainer.on_value_change(change=change, debug=True)

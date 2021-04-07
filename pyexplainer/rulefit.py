@@ -16,6 +16,7 @@ The module structure is the following:
 """
 import pandas as pd
 import numpy as np
+import sklearn
 from sklearn.base import BaseEstimator
 from sklearn.base import TransformerMixin
 from sklearn.ensemble import GradientBoostingRegressor, GradientBoostingClassifier, RandomForestRegressor, \
@@ -115,7 +116,7 @@ class FriedScale:
 
     def train(self, X):
         # get multipliers
-        if self.winsorizer != None:
+        if self.winsorizer is not None:
             X_trimmed = self.winsorizer.trim(X)
         else:
             X_trimmed = X
@@ -128,7 +129,7 @@ class FriedScale:
         self.scale_multipliers = scale_multipliers
 
     def scale(self, X):
-        if self.winsorizer != None:
+        if self.winsorizer is not None:
             return self.winsorizer.trim(X) * self.scale_multipliers
         else:
             return X * self.scale_multipliers
@@ -247,7 +248,7 @@ class RuleEnsemble:
         self.tree_list = tree_list
         self.feature_names = feature_names
         self.rules = set()
-        ## TODO: Move this out of __init__
+        # TODO: Move this out of __init__
         self._extract_rules()
         self.rules = list(self.rules)
 
@@ -356,7 +357,6 @@ class RuleFit(BaseEstimator, TransformerMixin):
             max_iter=None,
             n_jobs=None,
             random_state=None):
-        self.tree_generator = tree_generator
         self.rfmode = rfmode
         self.lin_trim_quantile = lin_trim_quantile
         self.lin_standardise = lin_standardise
@@ -369,6 +369,14 @@ class RuleFit(BaseEstimator, TransformerMixin):
         self.sample_fract = sample_fract
         self.max_rules = max_rules
         self.memory_par = memory_par
+        if tree_generator is None \
+                or type(tree_generator) in [GradientBoostingRegressor, RandomForestRegressor]\
+                or type(tree_generator) in [GradientBoostingClassifier, RandomForestClassifier]:
+            self.tree_generator = tree_generator
+        else:
+            print("RuleFit only work with 4 types of tree generator as follows, GradientBoostingRegressor,\
+             RandomForestRegressor, GradientBoostingClassifier, RandomForestClassifier")
+            raise TypeError
         self.tree_size = tree_size
         self.random_state = random_state
         self.model_type = model_type
@@ -414,13 +422,6 @@ class RuleFit(BaseEstimator, TransformerMixin):
                                                                      subsample=self.sample_fract_,
                                                                      random_state=self.random_state, max_depth=100)
 
-            if self.rfmode == 'regress':
-                if type(self.tree_generator) not in [GradientBoostingRegressor, RandomForestRegressor]:
-                    raise ValueError("RuleFit only works with RandomForest and BoostingRegressor")
-            else:
-                if type(self.tree_generator) not in [GradientBoostingClassifier, RandomForestClassifier]:
-                    raise ValueError("RuleFit only works with RandomForest and BoostingClassifier")
-
             # fit tree generator
             if not self.exp_rand_tree_size:  # simply fit with constant tree size
                 self.tree_generator.fit(X, y)
@@ -440,8 +441,10 @@ class RuleFit(BaseEstimator, TransformerMixin):
                     self.tree_generator.set_params(n_estimators=curr_est_ + 1)
                     self.tree_generator.set_params(max_leaf_nodes=size)
                     random_state_add = self.random_state if self.random_state else 0
+                    # warm_state=True seems to reset random_state, such that the trees are highly correlated,
+                    # unless we manually change the random_sate here.
                     self.tree_generator.set_params(
-                        random_state=i_size + random_state_add)  # warm_state=True seems to reset random_state, such that the trees are highly correlated, unless we manually change the random_sate here.
+                        random_state=i_size + random_state_add)
                     self.tree_generator.get_params()['n_estimators']
                     self.tree_generator.fit(np.copy(X, order='C'), np.copy(y, order='C'))
                     curr_est_ = curr_est_ + 1
@@ -621,7 +624,7 @@ class RuleFit(BaseEstimator, TransformerMixin):
             output_rules += [(rule.__str__(), 'rule', coef, rule.support, importance)]
         rules = pd.DataFrame(output_rules, columns=["rule", "type", "coef", "support", "importance"])
         if exclude_zero_coef:
-            rules = rules.ix[rules.coef != 0]
+            rules = rules.loc[rules.coef != 0]
         return rules
 
     def get_feature_importance(self, exclude_zero_coef=False, subregion=None, scaled=False):

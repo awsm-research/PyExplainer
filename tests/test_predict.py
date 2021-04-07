@@ -3,7 +3,8 @@ import numpy as np
 from pyexplainer.rulefit import RuleFit
 import os
 import sys
-from pathlib import Path
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.datasets import make_regression
 
 
 def get_base_prefix_compat():
@@ -37,21 +38,38 @@ y_class[y_class < 21] = 0
 y_class[y_class >= 21] = +1
 N = X.shape[0]
 
-# fit
-rf = RuleFit(tree_size=4, sample_fract='default', max_rules=2000,
-             memory_par=0.01,
-             tree_generator=None,
-             rfmode='classify', lin_trim_quantile=0.025,
-             lin_standardise=True, exp_rand_tree_size=True, random_state=1)
-rf.fit(X, y_class, feature_names=features)
+# fit - classify
+rf_classify = RuleFit(tree_size=4, sample_fract='default', max_rules=2000,
+                      memory_par=0.01,
+                      tree_generator=None,
+                      rfmode='classify', lin_trim_quantile=0.025,
+                      lin_standardise=True, exp_rand_tree_size=True, random_state=1)
+rf_classify.fit(X, y_class, feature_names=features)
 
 # predict
-y_pred = rf.predict(X)
-y_proba = rf.predict_proba(X)
+y_pred = rf_classify.predict(X)
+y_proba = rf_classify.predict_proba(X)
 
 # basic checks for probabilities
 assert np.min(y_proba) >= 0
 assert np.max(y_proba) <= 1
+
+# fit - regress
+X_regr, y_regr = make_regression(n_features=4, n_informative=2, random_state=0, shuffle=False)
+regr = RandomForestRegressor(max_depth=2, random_state=0, n_estimators=1)
+regr = regr.fit(X_regr, y_regr)
+rf_regress = RuleFit(tree_size=4, sample_fract='default', max_rules=2000,
+                     memory_par=0.01,
+                     tree_generator=regr,
+                     rfmode='regress', lin_trim_quantile=0.025,
+                     lin_standardise=False, exp_rand_tree_size=True, random_state=1)
+rf_regress.fit(X_regr, y_regr, feature_names=None)
+rf_regress.predict(X_regr)
+rf_regress.transform(X_regr)
+# todo - test > rf_regress.get_rules(subregion=...)
+rf_regress.get_rules(exclude_zero_coef=True)
+rf_regress.get_feature_importance()
+rf_regress.get_feature_importance(scaled=True)
 
 
 def test_probabilities_match_predictions():
