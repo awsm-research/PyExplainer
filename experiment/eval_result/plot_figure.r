@@ -41,66 +41,63 @@ rq1.plot = function()
   # X-axis = Each studied search technique
   # Y-axis = Balanced accruacy (0 to 1)
   # Facet = Each studied project
-  openstack.plot <- ggplot(data = openstack.rq1.result, aes(x=reorder(method, euc_dist_med, FUN = median), y=euc_dist_med)) +
+  openstack.euc_dist.plot <- ggplot(data = openstack.rq1.result, aes(x=reorder(method, euc_dist_med, FUN = median), y=euc_dist_med)) +
     geom_boxplot(outlier.shape = NA) +
     ylab('Euclidean Distance') + xlab('') + ggtitle('') +
-    facet_grid(~project) +
     theme(text = element_text(size = 14),
           strip.text.x = element_text(
             size = 14, face = "bold.italic"
           ))
   
-  qt.plot <- ggplot(data = qt.rq1.result, aes(x=reorder(method, euc_dist_med, FUN = median), y=euc_dist_med)) +
+  qt.euc_dist.plot <- ggplot(data = qt.rq1.result, aes(x=reorder(method, euc_dist_med, FUN = median), y=euc_dist_med)) +
     geom_boxplot(outlier.shape = NA) +
     ylab('Euclidean Distance') + xlab('') + ggtitle('') +
-    facet_grid(~project) +
     theme(text = element_text(size = 14),
           strip.text.x = element_text(
             size = 14, face = "bold.italic"
           ))
 
-  fig = grid.arrange(openstack.plot, qt.plot, ncol=2)
-  
-  # print(fig)
-  # export a plot as pdf
-
-  
-  ggsave(paste0(plot.output.path,'RQ1_euclidean_distance.pdf'),
-         plot = fig,
-         width = plot.height * golden.ratio,
-         height = plot.height)
-  
-  openstack.plot <- ggplot(data = openstack.rq1.result, 
+  openstack.def.ratio.plot <- ggplot(data = openstack.rq1.result, 
                            aes(x=reorder(method, -defective_generated_instance_ratio, 
                                          FUN = median), 
                                y=defective_generated_instance_ratio)) +
     geom_boxplot(outlier.shape = NA) +
     ylab('Defective Generated Instance Ratio') + xlab('') + ggtitle('') +
-    facet_grid(~project) +
     theme(text = element_text(size = 14),
           strip.text.x = element_text(
             size = 14, face = "bold.italic"
           )) + 
     coord_cartesian(ylim = c(0, 1))
   
-  qt.plot <- ggplot(data = qt.rq1.result, 
+  qt.def.ratio.plot <- ggplot(data = qt.rq1.result, 
                            aes(x=reorder(method, -defective_generated_instance_ratio, 
                                          FUN = median), 
                                y=defective_generated_instance_ratio)) +geom_boxplot(outlier.shape = NA) +
     ylab('Defective Generated Instance Ratio') + xlab('') + ggtitle('') +
-    facet_grid(~project) +
     theme(text = element_text(size = 14),
           strip.text.x = element_text(
             size = 14, face = "bold.italic"
           )) + 
     coord_cartesian(ylim = c(0, 1))
   
-  fig = grid.arrange(openstack.plot, qt.plot, ncol=2)
   
-  ggsave(paste0(plot.output.path,'RQ1_defective_generated_instance_ratio.pdf'),
-         plot = fig,
+  openstack.plot = grid.arrange(openstack.euc_dist.plot, openstack.def.ratio.plot, 
+                                ncol=2, bottom='openstack')
+  qt.plot = grid.arrange(qt.euc_dist.plot, qt.def.ratio.plot, 
+                         ncol=2, bottom = 'qt')
+  
+  
+  ggsave(paste0(plot.output.path,'RQ1_openstack.pdf'),
+         plot = openstack.plot,
          width = plot.height * golden.ratio,
          height = plot.height)
+  
+  ggsave(paste0(plot.output.path,'RQ1_qt.pdf'),
+         plot = qt.plot,
+         width = plot.height * golden.ratio,
+         height = plot.height)
+  
+  
 }
 
 rq2.plot = function()
@@ -214,7 +211,7 @@ rq2.plot = function()
          width = 10,
          height = plot.height)
 
-  ggsave(paste0(plot.output.path,'RQ2_2_qt.pdf'),
+  ggsave(paste0(plot.output.path,'RQ2_1_qt.pdf'),
          plot = qt.plot,
          width = 10,
          height = plot.height)
@@ -237,25 +234,25 @@ rq3.plot = function()
   # X-axis = Each studied search technique
   # Y-axis = Balanced accruacy (0 to 1)
   # Facet = Each studied project
-  openstack.match.clean.commit.plot <- ggplot(data = openstack.rq3.result, 
-                                              aes(x=reorder(method, -number_of_clean_commits_match_guidance, 
-                                                            FUN = median), y=number_of_clean_commits_match_guidance)) +
-    geom_boxplot(outlier.shape = NA) +
-    ylab('#Clean commits that match guidance') + xlab('') + ggtitle('') +
-    theme(text = element_text(size = 14),
-          strip.text.x = element_text(
-            size = 14, face = "bold.italic"
-          ))
-  
-  qt.match.clean.commit.plot <- ggplot(data = qt.rq3.result, 
-                                       aes(x=reorder(method, -number_of_clean_commits_match_guidance, 
-                                                     FUN = median), y=number_of_clean_commits_match_guidance)) +
-    geom_boxplot(outlier.shape = NA) +
-    ylab('#Clean commits that match guidance') + xlab('') + ggtitle('') +
-    theme(text = element_text(size = 14),
-          strip.text.x = element_text(
-            size = 14, face = "bold.italic"
-          ))
+  # openstack.match.clean.commit.plot <- ggplot(data = openstack.rq3.result, 
+  #                                             aes(x=reorder(method, -number_of_clean_commits_match_guidance, 
+  #                                                           FUN = median), y=number_of_clean_commits_match_guidance)) +
+  #   geom_boxplot(outlier.shape = NA) +
+  #   ylab('#Clean commits that match guidance') + xlab('') + ggtitle('') +
+  #   theme(text = element_text(size = 14),
+  #         strip.text.x = element_text(
+  #           size = 14, face = "bold.italic"
+  #         ))
+  # 
+  # qt.match.clean.commit.plot <- ggplot(data = qt.rq3.result, 
+  #                                      aes(x=reorder(method, -number_of_clean_commits_match_guidance, 
+  #                                                    FUN = median), y=number_of_clean_commits_match_guidance)) +
+  #   geom_boxplot(outlier.shape = NA) +
+  #   ylab('#Clean commits that match guidance') + xlab('') + ggtitle('') +
+  #   theme(text = element_text(size = 14),
+  #         strip.text.x = element_text(
+  #           size = 14, face = "bold.italic"
+  #         ))
   
   openstack.true.positive.rate.plot <- ggplot(data = openstack.rq3.result, 
                                               aes(x=reorder(method, -true_positive_rate, 
@@ -293,14 +290,10 @@ rq3.plot = function()
             size = 14, face = "bold.italic"
           ))
   
-  openstack.plot = grid.arrange(openstack.match.clean.commit.plot, 
-                     openstack.true.positive.rate.plot, 
-                     openstack.true.negative.rate.plot, 
-                     ncol=3, bottom='Openstack')
-  qt.plot = grid.arrange(qt.match.clean.commit.plot, 
-                                qt.true.positive.rate.plot, 
-                                qt.true.negative.rate.plot, 
-                                ncol=3, bottom='Qt')
+  openstack.plot = grid.arrange(openstack.true.positive.rate.plot, openstack.true.negative.rate.plot, 
+                     ncol=2, bottom='Openstack')
+  qt.plot = grid.arrange(qt.true.positive.rate.plot, qt.true.negative.rate.plot, 
+                         ncol=2, bottom='Qt')
   
   # print(fig)
   # export a plot as pdf
@@ -308,17 +301,17 @@ rq3.plot = function()
   
   ggsave(paste0(plot.output.path,'RQ3_openstack.pdf'),
          plot = openstack.plot,
-         width = 10,
-         height = plot.height*1.1)
+         width = plot.height * golden.ratio,
+         height = plot.height)
   
   ggsave(paste0(plot.output.path,'RQ3_qt.pdf'),
          plot = qt.plot,
-         width = 10,
-         height = plot.height*1.1)
+         width = plot.height * golden.ratio,
+         height = plot.height)
 
 }
 
-# rq1.plot()
+rq1.plot()
 # rq2.plot()
-rq3.plot()
+# rq3.plot()
 
