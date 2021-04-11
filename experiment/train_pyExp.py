@@ -17,6 +17,11 @@ from datetime import datetime
 
 from my_util import *
 
+from multiprocessing import Pool
+
+import warnings
+warnings.filterwarnings("ignore")
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-proj_name', type=str, default='openstack', help='project name (openstack or qt)')
 parser.add_argument('-local_model_type',type=str, default='LRR', help='local model type (rulefit or LRR)')
@@ -41,133 +46,106 @@ def train_global_model(x_train,y_train):
     pickle.dump(global_model, open(proj_name+'_global_model.pkl','wb'))
     print('train global model finished')
     
-def create_pyExplainer_obj(search_function, feature_df, test_label, explainer='rulefit'):
+def create_exp(X_explain, y_explain, row_index):
+    pyExp_obj = pyExp.explain(X_explain, y_explain, search_function = 'CrossoverInterpolation', 
+                              top_k = 15, max_rules=2000, max_iter = None, cv=5,debug = False)
+
+    pyExp_obj['commit_id'] = row_index
+
+    # because I don't want to change key name in another evaluation file
+    pyExp_obj['local_model'] = pyExp_obj['local_rulefit_model']
+    del pyExp_obj['local_rulefit_model']
     
-    if search_function not in ['lime','CrossoverInterpolation']:
-        print('the search function must be "lime" or "CrossoverInterpolation"')
-        return
+    X_explain = X_explain.iloc[0] # to prevent error in LIME
+    exp, synt_inst, synt_inst_for_local_model, selected_feature_indices, local_model = lime_explainer.explain_instance(X_explain, 
+                                                                                                                       global_model.predict_proba, 
+                                                                                                                       num_samples=5000)
+
+    lime_obj = {}
+    lime_obj['rule'] = exp
+    lime_obj['synthetic_instance_for_global_model'] = synt_inst
+    lime_obj['synthetic_instance_for_lobal_model'] = synt_inst_for_local_model
+    lime_obj['local_model'] = local_model
+    lime_obj['selected_feature_indeces'] = selected_feature_indices
+    lime_obj['commit_id'] = row_index
+#         pickle.dump(lime_obj, open(pyExp_dir+proj_name+'_lime_'+row_index+'.pkl','wb'))
+
+    all_explainer = {'pyExplainer':pyExp_obj, 'LIME': lime_obj}
+    pickle.dump(all_explainer, open(pyExp_dir+proj_name+'_all_explainer_'+row_index+'.pkl','wb'))
+
+    print('finished',row_index)
     
-    problem_index = []
-    time_spent = []
-    
-    for i in range(0,len(feature_df)):
-        X_explain = feature_df.iloc[[i]]
-        y_explain = test_label.iloc[[i]]
-
-        row_index = str(X_explain.index[0])
-
-        start = time.time()
-        try:
-            if search_function=='CrossoverInterpolation':
-                # the returned object is dictionary
-                pyExp_obj = pyExp.explain(X_explain,
-                                           y_explain,
-                                           search_function = search_function, 
-                                           top_k = 15,
-                                           max_rules=20, 
-                                           max_iter = None, 
-                                           cv=10,
-                                           debug = False)
-    #             synt_pred = pyExp_obj['synthetic_predictions']
-                pyExp_obj['commit_id'] = row_index
-        
-                # because I don't want to change key name in another evaluation file
-                pyExp_obj['local_model'] = pyExp_obj['local_rulefit_model']
-                del pyExp_obj['local_rulefit_model']
-    #             print('{}: found {} defect from total {}'.format(row_index, str(np.sum(synt_pred)), 
-    #                                                          str(len(synt_pred))))
-                pickle.dump(pyExp_obj, open(pyExp_dir+proj_name+'_'+explainer+'_'+search_function.lower()+'_'+row_index+'_20_rules.pkl','wb'))
-        
-            else:
-                X_explain = feature_df.iloc[i] # to prevent error in LIME
-                exp, synt_inst, synt_inst_for_local_model, selected_feature_indices, local_model = lime_explainer.explain_instance(X_explain, 
-                                                                                                                                   global_model.predict_proba, 
-                                                                                                                                   num_samples=2000,)
-
-                lime_obj = {}
-                lime_obj['rule'] = exp
-                lime_obj['synthetic_instance_for_global_model'] = synt_inst
-                lime_obj['synthetic_instance_for_lobal_model'] = synt_inst_for_local_model
-                lime_obj['local_model'] = local_model
-                lime_obj['selected_feature_indeces'] = selected_feature_indices
-                lime_obj['commit_id'] = row_index
-                pickle.dump(lime_obj, open(pyExp_dir+proj_name+'_lime_'+row_index+'_2000_instances.pkl','wb'))
-                
-            print('finished',row_index)
-#             print(row_index)
-#             print('just one rulefit is enough')
-#             break
-            
-        except Exception as e:
-            problem_index.append(row_index)
-            print('-'*100)
-            print(e)
-#             print('found total {} problematic commit'.format(str(len(problem_index))))
-            print('-'*100)
-            
-#         break
-
-        end = time.time()
-
-        time_spent.append(str(end-start))
-#     print(row_index)
-#     break
-    
-    print('from total {} commits, there are {} problematic commits'.format(len(feature_df),len(problem_index)))
-    return time_spent, problem_index
-
 def create_every_explainer(feature_df, test_label):
 
     
 #     problem_index = []
 #     time_spent = []
     
+    input_data = []
+    
     for i in range(0,len(feature_df)):
         X_explain = feature_df.iloc[[i]]
         y_explain = test_label.iloc[[i]]
 
         row_index = str(X_explain.index[0])
 
+        input_data.append((X_explain, y_explain, row_index))
+        
+#         break
+        
+#     print(input_data)
+    print('prepare data done...')
+    pool = Pool(processes=24)
+    result_list = pool.starmap(create_exp, input_data)
+
+    
 #         start = time.time()
-        pyExp_obj = pyExp.explain(X_explain,
-                                   y_explain,
-                                   search_function = 'CrossoverInterpolation', 
-                                   top_k = 15,
-                                   max_rules=2000, 
-                                   max_iter = None, 
-                                   cv=5,
-                                   debug = False)
-#             synt_pred = pyExp_obj['synthetic_predictions']
-        pyExp_obj['commit_id'] = row_index
+#         pyExp_obj = pyExp.explain(X_explain,
+#                                    y_explain,
+#                                    search_function = 'CrossoverInterpolation', 
+#                                    top_k = 15,
+#                                    max_rules=2000, 
+#                                    max_iter = None, 
+#                                    cv=5,
+#                                    debug = False)
+# #             synt_pred = pyExp_obj['synthetic_predictions']
+#         pyExp_obj['commit_id'] = row_index
 
-        # because I don't want to change key name in another evaluation file
-        pyExp_obj['local_model'] = pyExp_obj['local_rulefit_model']
-        del pyExp_obj['local_rulefit_model']
-#             print('{}: found {} defect from total {}'.format(row_index, str(np.sum(synt_pred)), 
-#                                                          str(len(synt_pred))))
-#         pickle.dump(pyExp_obj, open(pyExp_dir+proj_name+'_'+explainer+'_'+search_function.lower()+'_'+row_index+'_20_rules.pkl','wb'))
+#         # because I don't want to change key name in another evaluation file
+#         pyExp_obj['local_model'] = pyExp_obj['local_rulefit_model']
+#         del pyExp_obj['local_rulefit_model']
+# #             print('{}: found {} defect from total {}'.format(row_index, str(np.sum(synt_pred)), 
+# #                                                          str(len(synt_pred))))
+# #         pickle.dump(pyExp_obj, open(pyExp_dir+proj_name+'_'+explainer+'_'+search_function.lower()+'_'+row_index+'_20_rules.pkl','wb'))
         
-        X_explain = feature_df.iloc[i] # to prevent error in LIME
-        exp, synt_inst, synt_inst_for_local_model, selected_feature_indices, local_model = lime_explainer.explain_instance(X_explain, 
-                                                                                                                           global_model.predict_proba, 
-                                                                                                                           num_samples=5000)
+#         X_explain = feature_df.iloc[i] # to prevent error in LIME
+#         exp, synt_inst, synt_inst_for_local_model, selected_feature_indices, local_model = lime_explainer.explain_instance(X_explain, 
+#                                                                                                                            global_model.predict_proba, 
+#                                                                                                                            num_samples=5000)
 
-        lime_obj = {}
-        lime_obj['rule'] = exp
-        lime_obj['synthetic_instance_for_global_model'] = synt_inst
-        lime_obj['synthetic_instance_for_lobal_model'] = synt_inst_for_local_model
-        lime_obj['local_model'] = local_model
-        lime_obj['selected_feature_indeces'] = selected_feature_indices
-        lime_obj['commit_id'] = row_index
-#         pickle.dump(lime_obj, open(pyExp_dir+proj_name+'_lime_'+row_index+'.pkl','wb'))
+#         lime_obj = {}
+#         lime_obj['rule'] = exp
+#         lime_obj['synthetic_instance_for_global_model'] = synt_inst
+#         lime_obj['synthetic_instance_for_lobal_model'] = synt_inst_for_local_model
+#         lime_obj['local_model'] = local_model
+#         lime_obj['selected_feature_indeces'] = selected_feature_indices
+#         lime_obj['commit_id'] = row_index
+# #         pickle.dump(lime_obj, open(pyExp_dir+proj_name+'_lime_'+row_index+'.pkl','wb'))
 
-        all_explainer = {'pyExplainer':pyExp_obj, 'LIME': lime_obj}
-        pickle.dump(lime_obj, open(pyExp_dir+proj_name+'_all_explainer_'+row_index+'.pkl','wb'))
+#         all_explainer = {'pyExplainer':pyExp_obj, 'LIME': lime_obj}
+#         pickle.dump(all_explainer, open(pyExp_dir+proj_name+'_all_explainer_'+row_index+'.pkl','wb'))
         
-        print('finished',row_index)
+#         print('finished',row_index)
 
 
-        end = time.time()
+#         end = time.time()
+
+#         time_spent.append(str(end-start))
+#     print(row_index)
+#     break
+    
+#     print('from total {} commits, there are {} problematic commits'.format(len(feature_df),len(problem_index)))
+#     return time_spent, problem_index
 
         
 x_train, x_test, y_train, y_test = prepare_data(proj_name, mode = 'all')
