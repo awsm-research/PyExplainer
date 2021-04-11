@@ -2,7 +2,6 @@ import copy
 import math
 import os
 import sys
-import random
 import string
 import warnings
 import ipywidgets as widgets
@@ -12,7 +11,7 @@ import scipy as sp
 import sklearn
 from IPython.core.display import display, HTML
 from sklearn.preprocessing import StandardScaler
-from sklearn.utils import check_random_state
+from sklearn.utils import check_random_state, all_estimators
 from sklearn.ensemble import RandomForestClassifier
 from pyexplainer.rulefit import RuleFit
 
@@ -194,11 +193,12 @@ class PyExplainer:
         else:
             print("dep (label column name) should be type 'str'")
             raise TypeError
-        if isinstance(blackbox_model, sklearn.ensemble.RandomForestClassifier):
+        all_clf = all_estimators(type_filter="classifier")
+        supported_algo = [clf[1] for clf in all_clf]
+        if type(blackbox_model) in supported_algo:
             self.blackbox_model = blackbox_model
         else:
-            print("The blackbox_model should be a Random Forest model trained from sklearn ("
-                  "sklearn.ensemble.RandomForestClassifier)")
+            print("The blackbox_model should be a classifier provided by sklearn)")
             raise TypeError
         if isinstance(class_label, list):
             if len(class_label) == 2:
