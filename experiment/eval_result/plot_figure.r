@@ -1,3 +1,4 @@
+
 library(ggplot2)
 library(caret)
 library(ggthemr)
@@ -42,7 +43,8 @@ rq1.plot = function()
   # Y-axis = Balanced accruacy (0 to 1)
   # Facet = Each studied project
   openstack.euc_dist.plot <- ggplot(data = openstack.rq1.result, aes(x=reorder(method, euc_dist_med, FUN = median), y=euc_dist_med)) +
-    geom_boxplot(outlier.shape = NA) +
+    geom_boxplot() +
+    facet_grid(~project) +
     ylab('Euclidean Distance') + xlab('') + ggtitle('') +
     theme(text = element_text(size = 14),
           strip.text.x = element_text(
@@ -50,18 +52,20 @@ rq1.plot = function()
           ))
   
   qt.euc_dist.plot <- ggplot(data = qt.rq1.result, aes(x=reorder(method, euc_dist_med, FUN = median), y=euc_dist_med)) +
-    geom_boxplot(outlier.shape = NA) +
+    geom_boxplot() +
+    facet_grid(~project) +
     ylab('Euclidean Distance') + xlab('') + ggtitle('') +
     theme(text = element_text(size = 14),
           strip.text.x = element_text(
             size = 14, face = "bold.italic"
           ))
-
+  
   openstack.def.ratio.plot <- ggplot(data = openstack.rq1.result, 
-                           aes(x=reorder(method, -defective_generated_instance_ratio, 
-                                         FUN = median), 
-                               y=defective_generated_instance_ratio)) +
-    geom_boxplot(outlier.shape = NA) +
+                                     aes(x=reorder(method, -defective_generated_instance_ratio, 
+                                                   FUN = median), 
+                                         y=defective_generated_instance_ratio)) +
+    geom_boxplot() +
+    facet_grid(~project) +
     ylab('Defective Generated Instance Ratio') + xlab('') + ggtitle('') +
     theme(text = element_text(size = 14),
           strip.text.x = element_text(
@@ -70,33 +74,49 @@ rq1.plot = function()
     coord_cartesian(ylim = c(0, 1))
   
   qt.def.ratio.plot <- ggplot(data = qt.rq1.result, 
-                           aes(x=reorder(method, -defective_generated_instance_ratio, 
-                                         FUN = median), 
-                               y=defective_generated_instance_ratio)) +geom_boxplot(outlier.shape = NA) +
+                              aes(x=reorder(method, -defective_generated_instance_ratio, 
+                                            FUN = median), 
+                                  y=defective_generated_instance_ratio)) +geom_boxplot() +
     ylab('Defective Generated Instance Ratio') + xlab('') + ggtitle('') +
+    facet_grid(~project) +
     theme(text = element_text(size = 14),
           strip.text.x = element_text(
             size = 14, face = "bold.italic"
           )) + 
     coord_cartesian(ylim = c(0, 1))
   
+  euc_dist_plot = grid.arrange(qt.euc_dist.plot, openstack.euc_dist.plot, 
+                               ncol=2)
   
-  openstack.plot = grid.arrange(openstack.euc_dist.plot, openstack.def.ratio.plot, 
-                                ncol=2, bottom='openstack')
-  qt.plot = grid.arrange(qt.euc_dist.plot, qt.def.ratio.plot, 
-                         ncol=2, bottom = 'qt')
+  def.ratio.plot = grid.arrange(qt.def.ratio.plot, openstack.def.ratio.plot, 
+                         ncol=2)
   
-  
-  ggsave(paste0(plot.output.path,'RQ1_openstack.pdf'),
-         plot = openstack.plot,
+  ggsave(paste0(plot.output.path,'RQ1_euc_dist.pdf'),
+         plot = euc_dist_plot,
          width = plot.height * golden.ratio,
          height = plot.height)
   
-  ggsave(paste0(plot.output.path,'RQ1_qt.pdf'),
-         plot = qt.plot,
+  ggsave(paste0(plot.output.path,'RQ1_def_ratio.pdf'),
+         plot = def.ratio.plot,
          width = plot.height * golden.ratio,
          height = plot.height)
   
+  # openstack.plot = grid.arrange(openstack.euc_dist.plot, openstack.def.ratio.plot, 
+  #                               ncol=2, bottom='openstack')
+  # qt.plot = grid.arrange(qt.euc_dist.plot, qt.def.ratio.plot, 
+  #                        ncol=2, bottom = 'qt')
+
+  
+  # ggsave(paste0(plot.output.path,'RQ1_openstack.pdf'),
+  #        plot = openstack.plot,
+  #        width = plot.height * golden.ratio,
+  #        height = plot.height)
+  # 
+  # ggsave(paste0(plot.output.path,'RQ1_qt.pdf'),
+  #        plot = qt.plot,
+  #        width = plot.height * golden.ratio,
+  #        height = plot.height)
+
   
 }
 
@@ -104,7 +124,7 @@ rq2.plot = function()
 {
   openstack.bal.acc.plot <- ggplot(data = openstack.rq2.result, aes(x=reorder(method, -balanced_accuracy, 
                                                                               FUN = median), y=balanced_accuracy)) +
-    geom_boxplot(outlier.shape = NA) +
+    geom_boxplot() +
     ylab('Balance Accuracy') + xlab('') + ggtitle('') +
     # facet_grid(~project) +
     theme(text = element_text(size = 14),
@@ -115,7 +135,7 @@ rq2.plot = function()
   
   qt.bal.acc.plot <- ggplot(data = qt.rq2.result, aes(x=reorder(method, -balanced_accuracy, 
                                                                 FUN = median), y=balanced_accuracy)) +
-    geom_boxplot(outlier.shape = NA) +
+    geom_boxplot() +
     ylab('Balance Accuracy') + xlab('') + ggtitle('') +
     # facet_grid(~project) +
     theme(text = element_text(size = 14),
@@ -125,8 +145,8 @@ rq2.plot = function()
     coord_cartesian(ylim = c(0, 1))
   
   openstack.auc.plot <- ggplot(data = openstack.rq2.result, aes(x=reorder(method, -AUC, 
-                                                                            FUN = median), y=AUC)) +
-    geom_boxplot(outlier.shape = NA) +
+                                                                          FUN = median), y=AUC)) +
+    geom_boxplot() +
     ylab('AUC') + xlab('') + ggtitle('') +
     # facet_grid(~project) +
     theme(text = element_text(size = 14),
@@ -137,7 +157,7 @@ rq2.plot = function()
   
   qt.auc.plot <- ggplot(data = qt.rq2.result, aes(x=reorder(method, -AUC, 
                                                             FUN = median), y=AUC)) +
-    geom_boxplot(outlier.shape = NA) +
+    geom_boxplot() +
     ylab('AUC') + xlab('') + ggtitle('') +
     # facet_grid(~project) +
     theme(text = element_text(size = 14),
@@ -148,7 +168,7 @@ rq2.plot = function()
   
   openstack.f1.plot <- ggplot(data = openstack.rq2.result, aes(x=reorder(method, -F1, 
                                                                          FUN = median), y=F1)) +
-    geom_boxplot(outlier.shape = NA) +
+    geom_boxplot() +
     ylab('F-measure') + xlab('') + ggtitle('') +
     # facet_grid(~project) +
     theme(text = element_text(size = 14),
@@ -159,7 +179,7 @@ rq2.plot = function()
   
   qt.f1.plot <- ggplot(data = qt.rq2.result, aes(x=reorder(method, -F1, 
                                                            FUN = median), y=F1)) +
-    geom_boxplot(outlier.shape = NA) +
+    geom_boxplot() +
     ylab('F-measure') + xlab('') + ggtitle('') +
     # facet_grid(~project) +
     theme(text = element_text(size = 14),
@@ -170,7 +190,7 @@ rq2.plot = function()
   
   openstack.mcc.plot <- ggplot(data = openstack.rq2.result, aes(x=reorder(method, -MCC, 
                                                                           FUN = median), y=MCC)) +
-    geom_boxplot(outlier.shape = NA) +
+    geom_boxplot() +
     ylab('MCC') + xlab('') + ggtitle('') +
     # facet_grid(~project) +
     theme(text = element_text(size = 14),
@@ -181,7 +201,7 @@ rq2.plot = function()
   
   qt.mcc.plot <- ggplot(data = qt.rq2.result, aes(x=reorder(method, -MCC, 
                                                             FUN = median), y=MCC)) +
-    geom_boxplot(outlier.shape = NA) +
+    geom_boxplot() +
     ylab('MCC') + xlab('') + ggtitle('') +
     # facet_grid(~project) +
     theme(text = element_text(size = 14),
@@ -190,12 +210,10 @@ rq2.plot = function()
           )) + 
     coord_cartesian(ylim = c(-1, 1))
   
-  openstack.plot = grid.arrange(openstack.auc.plot, openstack.bal.acc.plot, 
-                                openstack.f1.plot, openstack.mcc.plot, ncol=4, 
-                                bottom = 'Openstack')
-  qt.plot = grid.arrange(qt.auc.plot, qt.bal.acc.plot, 
-                         qt.f1.plot, qt.mcc.plot, ncol=4,
-                         bottom = 'Qt')
+  openstack.plot = grid.arrange(openstack.auc.plot, 
+                                openstack.f1.plot, openstack.mcc.plot, ncol=3)
+  qt.plot = grid.arrange(qt.auc.plot, 
+                         qt.f1.plot, qt.mcc.plot, ncol=3)
   
   # print(openstack.plot)
   # openstack.fig = grid.arrange(openstack.auc.plot, openstack.bal.acc.plot, openstack.f1.plot, openstack.bal.acc.plot, ncol=4)
@@ -210,7 +228,7 @@ rq2.plot = function()
          plot = openstack.plot,
          width = 10,
          height = plot.height)
-
+  
   ggsave(paste0(plot.output.path,'RQ2_1_qt.pdf'),
          plot = qt.plot,
          width = 10,
@@ -237,7 +255,7 @@ rq3.plot = function()
   # openstack.match.clean.commit.plot <- ggplot(data = openstack.rq3.result, 
   #                                             aes(x=reorder(method, -number_of_clean_commits_match_guidance, 
   #                                                           FUN = median), y=number_of_clean_commits_match_guidance)) +
-  #   geom_boxplot(outlier.shape = NA) +
+  #   geom_boxplot() +
   #   ylab('#Clean commits that match guidance') + xlab('') + ggtitle('') +
   #   theme(text = element_text(size = 14),
   #         strip.text.x = element_text(
@@ -247,7 +265,7 @@ rq3.plot = function()
   # qt.match.clean.commit.plot <- ggplot(data = qt.rq3.result, 
   #                                      aes(x=reorder(method, -number_of_clean_commits_match_guidance, 
   #                                                    FUN = median), y=number_of_clean_commits_match_guidance)) +
-  #   geom_boxplot(outlier.shape = NA) +
+  #   geom_boxplot() +
   #   ylab('#Clean commits that match guidance') + xlab('') + ggtitle('') +
   #   theme(text = element_text(size = 14),
   #         strip.text.x = element_text(
@@ -257,7 +275,7 @@ rq3.plot = function()
   openstack.true.positive.rate.plot <- ggplot(data = openstack.rq3.result, 
                                               aes(x=reorder(method, -true_positive_rate, 
                                                             FUN = median), y=true_positive_rate)) +
-    geom_boxplot(outlier.shape = NA) +
+    geom_boxplot() +
     ylab('True positive rate') + xlab('') + ggtitle('') +
     theme(text = element_text(size = 14),
           strip.text.x = element_text(
@@ -267,7 +285,7 @@ rq3.plot = function()
   qt.true.positive.rate.plot <- ggplot(data = qt.rq3.result, 
                                        aes(x=reorder(method, -true_positive_rate, 
                                                      FUN = median), y=true_positive_rate)) +
-    geom_boxplot(outlier.shape = NA) +
+    geom_boxplot() +
     ylab('True positive rate') + xlab('') + ggtitle('') +
     theme(text = element_text(size = 14),
           strip.text.x = element_text(
@@ -275,7 +293,7 @@ rq3.plot = function()
           ))
   
   openstack.true.negative.rate.plot <- ggplot(data = openstack.rq3.result, aes(x=method, y=true_negative_rate)) +
-    geom_boxplot(outlier.shape = NA) +
+    geom_boxplot() +
     ylab('True negative rate') + xlab('') + ggtitle('') +
     theme(text = element_text(size = 14),
           strip.text.x = element_text(
@@ -283,7 +301,7 @@ rq3.plot = function()
           ))
   
   qt.true.negative.rate.plot <- ggplot(data = qt.rq3.result, aes(x=method, y=true_negative_rate)) +
-    geom_boxplot(outlier.shape = NA) +
+    geom_boxplot() +
     ylab('True negative rate') + xlab('') + ggtitle('') +
     theme(text = element_text(size = 14),
           strip.text.x = element_text(
@@ -291,9 +309,9 @@ rq3.plot = function()
           ))
   
   openstack.plot = grid.arrange(openstack.true.positive.rate.plot, openstack.true.negative.rate.plot, 
-                     ncol=2, bottom='Openstack')
+                                ncol=2)
   qt.plot = grid.arrange(qt.true.positive.rate.plot, qt.true.negative.rate.plot, 
-                         ncol=2, bottom='Qt')
+                         ncol=2)
   
   # print(fig)
   # export a plot as pdf
@@ -308,7 +326,7 @@ rq3.plot = function()
          plot = qt.plot,
          width = plot.height * golden.ratio,
          height = plot.height)
-
+  
 }
 
 rq1.plot()
