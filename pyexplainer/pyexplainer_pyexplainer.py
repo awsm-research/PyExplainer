@@ -635,7 +635,7 @@ class PyExplainer:
             dist = np.linalg.norm(
                 trainset_normalize.sub(np.array(case)), axis=1)
             # Convert distance to a similarity score
-            similarity = np.sqrt(np.exp(-(dist ** 2) / (width ** 2)))
+            similarity = np.exp( -(dist ** 2) / (2 * (width ** 2)) )
             dist_df['dist'] = similarity
             dist_df['t_target'] = target_train
             # get the unique classes of the training set
