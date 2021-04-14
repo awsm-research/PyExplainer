@@ -13,3 +13,9 @@ test_AIX360_model.ipynb
 /dataset/qt_metrics_train.csv
 /generated_instance_not_normalized_time/
 /pyExplainer_obj_not_normalized_time/
+eval_result/RQ2_LR_prediction.csv
+eval_result/RQ2_LR_prediction_prob.csv
+eval_result/RQ2_RF_prediction.csv
+eval_result/RQ2_RF_prediction_prob.csv
+eval_result/RQ2_prediction.csv
+eval_result/RQ2_prediction_prob.csv
