@@ -228,23 +228,20 @@ class PyExplainer:
         self.X_explain = None
         self.y_explain = None
 
-    def auto_spearman(self, correlation_threshold=0.7, correlation_method='spearman', VIF_threshold=5):
+    def auto_spearman(self, apply_to_X_train=True, correlation_threshold=0.7, correlation_method='spearman', VIF_threshold=5):
         """An automated feature selection approach that address collinearity and multicollinearity.
         For more information, please kindly refer to the `paper <https://ieeexplore.ieee.org/document/8530020>`_.
 
         Parameters
         ----------
+        apply_to_X_train : :obj:`bool`
+            Whether to apply the selected columns to the X_train data inside PyExplainer Obj., default is True
         correlation_threshold : :obj:`float`
             Threshold value of correalation.
         correlation_method : :obj:`str`
             Method for solving the correlation between the features.
         VIF_threshold : :obj:`int`
             Threshold value of VIF score.
-
-        Returns
-        -------
-        :obj:`pandas.core.frame.DataFrame`
-            A Dataframe that contains selected features
         """
         X_AS_train = self.X_train.copy()
         AS_metrics = X_AS_train.columns
@@ -336,7 +333,9 @@ class PyExplainer:
             X_AS_train = X_AS_train.loc[:, selected_features]
 
         print('Finally, according to Part 2 of AutoSpearman,', AS_metrics, 'are selected.')
-        return AS_metrics
+        if apply_to_X_train:
+            self.set_X_train(X_AS_train)
+            print('X_train data inside PyExplainer was updated based on the selected features above')
 
     def explain(self,
                 X_explain,
@@ -1291,6 +1290,13 @@ class PyExplainer:
             self.top_k_rules = top_k_rules
 
     def set_X_train(self, X_train):
+        """Setter of X_train
+
+        Parameters
+        ----------
+        X_train : :obj:`pandas.core.frame.DataFrame`
+            X_train data
+        """
         if isinstance(X_train, pd.core.frame.DataFrame):
             self.X_train = X_train
         else:

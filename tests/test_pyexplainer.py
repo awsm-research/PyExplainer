@@ -120,7 +120,7 @@ testing_risk_data = py_explainer.generate_risk_data(py_explainer.X_explain)
 
 
 def test_version():
-    assert __version__ == '0.1.8'
+    assert __version__ == '0.1.9'
 
 
 @pytest.mark.parametrize('data, result',
@@ -203,6 +203,11 @@ def test_pyexplainer_init_positive(X_train, y_train, indep, dep, blackbox_model,
 
 rule_obj_keys = ['synthetic_data', 'synthetic_predictions', 'X_explain', 'y_explain', 'indep',
                  'dep', 'top_k_positive_rules', 'top_k_negative_rules', 'local_rulefit_model']
+
+
+def test_auto_spearman():
+    py_explainer.auto_spearman()
+    py_explainer.auto_spearman(apply_to_X_train=False)
 
 
 @pytest.mark.parametrize('exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, '
