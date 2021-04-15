@@ -16,3 +16,7 @@ test_AIX360_model.ipynb
 eval_result/RQ2_LR_prediction_prob.csv
 eval_result/RQ2_RF_prediction_prob.csv
 eval_result/RQ2_prediction_prob.csv
+eval_result/RQ2_openstack_LR_probability_distribution.csv 
+eval_result/RQ2_openstack_RF_probability_distribution.csv
+eval_result/RQ2_qt_LR_probability_distribution.csv
+eval_result/RQ2_qt_RF_probability_distribution.csv
