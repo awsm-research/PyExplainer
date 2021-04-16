@@ -59,6 +59,7 @@ dependencies:
     - pandas==1.2.3
     - pandocfilters==1.4.3
     - parso==0.8.2
+    - patsy==0.5.1
     - pexpect==4.8.0
     - pickleshare==0.7.5
     - pillow==8.2.0
@@ -79,6 +80,7 @@ dependencies:
     - seaborn==0.11.1
     - send2trash==1.5.0
     - six==1.15.0
+    - statsmodels==0.12.2
     - terminado==0.9.4
     - testpath==0.4.4
     - threadpoolctl==2.1.0

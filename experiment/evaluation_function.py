@@ -16,7 +16,8 @@ from datetime import datetime
 from collections import Counter
 
 
-sys.path.append(os.path.abspath('../pyexplainer'))
+# sys.path.append(os.path.abspath('../pyexplainer'))
+# from pyexplainer_pyexplainer import *
 from pyexplainer.pyexplainer_pyexplainer import *
 
 from IPython.display import display
