@@ -26,15 +26,15 @@ rq1.stat.eval = function()
   {
     print(paste0('Global model: ',global.model))
     
-    for(proj in c('qt','openstack'))
+    for(proj in c('openstack','qt'))
     {
       print(paste0('Project: ',proj))
       pyexp.result = select.data(rq1.df, global.model,proj,'pyExplainer','euc_dist_med')
       lime.result = select.data(rq1.df, global.model,proj,'LIME','euc_dist_med')
 
-      wilcox = wilcox.test(c(pyexp.result$euc_dist_med),c(lime.result$euc_dist_med))
+      # wilcox = wilcox.test(c(pyexp.result$euc_dist_med),c(lime.result$euc_dist_med))
       cliff.d = cliff.delta(c(pyexp.result$euc_dist_med),c(lime.result$euc_dist_med))
-      print(wilcox)
+      # print(wilcox)
       print(cliff.d)
 
       # break
@@ -51,7 +51,7 @@ rq2.stat.eval = function()
   {
     print(paste0('Global model: ',global.model))
     
-    for(proj in c('qt','openstack'))
+    for(proj in c('openstack','qt'))
     {
       print(paste0('Project: ',proj))
       print('')
@@ -59,9 +59,9 @@ rq2.stat.eval = function()
       pyexp.result = select.data(rq2.df, global.model,proj,'pyExplainer','AUC')
       lime.result = select.data(rq2.df, global.model,proj,'LIME','AUC')
       
-      wilcox = wilcox.test(c(pyexp.result$AUC),c(lime.result$AUC))
+      # wilcox = wilcox.test(c(pyexp.result$AUC),c(lime.result$AUC))
       cliff.d = cliff.delta(c(pyexp.result$AUC),c(lime.result$AUC))
-      print(wilcox)
+      # print(wilcox)
       print(cliff.d)
       
       print('')
@@ -69,9 +69,9 @@ rq2.stat.eval = function()
       pyexp.result = select.data(rq2.df, global.model,proj,'pyExplainer','F1')
       lime.result = select.data(rq2.df, global.model,proj,'LIME','F1')
       
-      wilcox = wilcox.test(c(pyexp.result$F1),c(lime.result$F1))
+      # wilcox = wilcox.test(c(pyexp.result$F1),c(lime.result$F1))
       cliff.d = cliff.delta(c(pyexp.result$F1),c(lime.result$F1))
-      print(wilcox)
+      # print(wilcox)
       print(cliff.d)
       
       # break
@@ -88,7 +88,7 @@ rq3.stat.eval = function()
   {
     print(paste0('Global model: ',global.model))
 
-    for(proj in c('qt','openstack'))
+    for(proj in c('openstack','qt'))
     {
       print(paste0('Project: ',proj))
       print('')
@@ -97,9 +97,9 @@ rq3.stat.eval = function()
       lime.result = select.data(rq3.df, global.model,proj,'LIME','true_positive_rate')
 
       # print(head(pyexp.result))
-      wilcox = wilcox.test(c(pyexp.result$true_positive_rate),c(lime.result$true_positive_rate))
+      # wilcox = wilcox.test(c(pyexp.result$true_positive_rate),c(lime.result$true_positive_rate))
       cliff.d = cliff.delta(c(pyexp.result$true_positive_rate),c(lime.result$true_positive_rate))
-      print(wilcox)
+      # print(wilcox)
       print(cliff.d)
 
       print('')
@@ -107,9 +107,9 @@ rq3.stat.eval = function()
       pyexp.result = select.data(rq3.df, global.model,proj,'pyExplainer','true_negative_rate')
       lime.result = select.data(rq3.df, global.model,proj,'LIME','true_negative_rate')
 
-      wilcox = wilcox.test(c(pyexp.result$true_negative_rate),c(lime.result$true_negative_rate))
+      # wilcox = wilcox.test(c(pyexp.result$true_negative_rate),c(lime.result$true_negative_rate))
       cliff.d = cliff.delta(c(pyexp.result$true_negative_rate),c(lime.result$true_negative_rate))
-      print(wilcox)
+      # print(wilcox)
       print(cliff.d)
 
       # break
