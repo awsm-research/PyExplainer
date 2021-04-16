@@ -13,7 +13,7 @@ from IPython.core.display import display, HTML
 from sklearn.preprocessing import StandardScaler
 from sklearn.utils import check_random_state, all_estimators
 from sklearn.ensemble import RandomForestClassifier
-from pyexplainer.rulefit import RuleFit
+from .rulefit import RuleFit
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from statsmodels.tools.tools import add_constant
 
