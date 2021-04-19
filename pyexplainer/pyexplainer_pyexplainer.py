@@ -607,7 +607,7 @@ class PyExplainer:
         // define the color of the box
         var boxColor = "box green";
         var riskPred = riskData[0].riskPred[0];
-        if (riskPred.localeCompare("Yes")==0) {
+        if (riskPred.localeCompare("Defect")==0) {
             boxColor = "box orange";
         }
 
