@@ -1,7 +1,7 @@
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
-from sklearn.metrics import auc, classification_report, roc_auc_score, f1_score, matthews_corrcoef, balanced_accuracy_score, r2_score , confusion_matrix, precision_score, recall_score
-
+from sklearn.metrics import auc, roc_auc_score, f1_score, confusion_matrix
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -15,13 +15,8 @@ import os, pickle, time, re, sys, operator
 from datetime import datetime
 from collections import Counter
 
-
-# sys.path.append(os.path.abspath('../pyexplainer'))
-# from pyexplainer_pyexplainer import *
+sys.path.append(os.path.abspath('../'))
 from pyexplainer.pyexplainer_pyexplainer import *
-
-from IPython.display import display
-
 
 flip_sign_dict = {
     '<': '>=',
