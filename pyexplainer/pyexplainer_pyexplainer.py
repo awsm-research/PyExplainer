@@ -1,6 +1,7 @@
 import copy
 import math
 import os
+import re
 import sys
 import string
 import warnings
@@ -16,6 +17,113 @@ from sklearn.ensemble import RandomForestClassifier
 from .rulefit import RuleFit
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 from statsmodels.tools.tools import add_constant
+
+
+def AutoSpearman(X_train, correlation_threshold=0.7, correlation_method='spearman', VIF_threshold=5):
+    """An automated feature selection approach that address collinearity and multicollinearity.
+    For more information, please kindly refer to the `paper <https://ieeexplore.ieee.org/document/8530020>`_.
+
+    Parameters
+    ----------
+    X_train : :obj:``
+        Threshold value of correalation.
+    correlation_threshold : :obj:`float`
+        Threshold value of correalation.
+    correlation_method : :obj:`str`
+        Method for solving the correlation between the features.
+    VIF_threshold : :obj:`int`
+        Threshold value of VIF score.
+    """
+    X_AS_train = X_train.copy()
+    AS_metrics = X_AS_train.columns
+    count = 1
+
+    # (Part 1) Automatically select non-correlated metrics based on a Spearman rank correlation test.
+    print('(Part 1) Automatically select non-correlated metrics based on a Spearman rank correlation test')
+    while True:
+        corrmat = X_AS_train.corr(method=correlation_method)
+        top_corr_features = corrmat.index
+        abs_corrmat = abs(corrmat)
+
+        # identify correlated metrics with the correlation threshold of the threshold
+        highly_correlated_metrics = ((corrmat > correlation_threshold) | (corrmat < -correlation_threshold)) & (
+                corrmat != 1)
+        n_correlated_metrics = np.sum(np.sum(highly_correlated_metrics))
+        if n_correlated_metrics > 0:
+            # find the strongest pair-wise correlation
+            find_top_corr = pd.melt(abs_corrmat, ignore_index=False)
+            find_top_corr.reset_index(inplace=True)
+            find_top_corr = find_top_corr[find_top_corr['value'] != 1]
+            top_corr_index = find_top_corr['value'].idxmax()
+            top_corr_i = find_top_corr.loc[top_corr_index, :]
+
+            # get the 2 correlated metrics with the strongest correlation
+            correlated_metric_1 = top_corr_i[0]
+            correlated_metric_2 = top_corr_i[1]
+            print('> Step', count, 'comparing between', correlated_metric_1, 'and', correlated_metric_2)
+
+            # compute their correlation with other metrics outside of the pair
+            correlation_with_other_metrics_1 = np.mean(abs_corrmat[correlated_metric_1][
+                                                           [i for i in top_corr_features if
+                                                            i not in [correlated_metric_1, correlated_metric_2]]])
+            correlation_with_other_metrics_2 = np.mean(abs_corrmat[correlated_metric_2][
+                                                           [i for i in top_corr_features if
+                                                            i not in [correlated_metric_1, correlated_metric_2]]])
+            print('>>', correlated_metric_1, 'has the average correlation of',
+                  np.round(correlation_with_other_metrics_1, 3), 'with other metrics')
+            print('>>', correlated_metric_2, 'has the average correlation of',
+                  np.round(correlation_with_other_metrics_2, 3), 'with other metrics')
+            # select the metric that shares the least correlation outside of the pair and exclude the other
+            if correlation_with_other_metrics_1 < correlation_with_other_metrics_2:
+                exclude_metric = correlated_metric_2
+            else:
+                exclude_metric = correlated_metric_1
+            print('>>', 'Exclude', exclude_metric)
+            count = count + 1
+            AS_metrics = list(set(AS_metrics) - set([exclude_metric]))
+            X_AS_train = X_AS_train[AS_metrics]
+        else:
+            break
+
+    print('According to Part 1 of AutoSpearman,', AS_metrics, 'are selected.')
+
+    # (Part 2) Automatically select non-correlated metrics based on a Variance Inflation Factor analysis.
+    print('(Part 2) Automatically select non-correlated metrics based on a Variance Inflation Factor analysis')
+
+    # Prepare a dataframe for VIF
+    X_AS_train = add_constant(X_AS_train)
+
+    selected_features = X_AS_train.columns
+    count = 1
+    while True:
+        # Calculate VIF scores
+        vif_scores = pd.DataFrame([variance_inflation_factor(X_AS_train.values, i)
+                                   for i in range(X_AS_train.shape[1])],
+                                  index=X_AS_train.columns)
+        # Prepare a final dataframe of VIF scores
+        vif_scores.reset_index(inplace=True)
+        vif_scores.columns = ['Feature', 'VIFscore']
+        vif_scores = vif_scores.loc[vif_scores['Feature'] != 'const', :]
+        vif_scores.sort_values(by=['VIFscore'], ascending=False, inplace=True)
+
+        # Find features that have their VIF scores of above the threshold
+        filtered_vif_scores = vif_scores[vif_scores['VIFscore'] >= VIF_threshold]
+
+        # Terminate when there is no features with the VIF scores of above the threshold
+        if len(filtered_vif_scores) == 0:
+            break
+
+        # exclude the metric with the highest VIF score
+        metric_to_exclude = list(filtered_vif_scores['Feature'].head(1))[0]
+
+        print('> Step', count, '- exclude', str(metric_to_exclude))
+        count = count + 1
+
+        selected_features = list(set(selected_features) - set([metric_to_exclude]))
+
+        X_AS_train = X_AS_train.loc[:, selected_features]
+    print('Finally, according to Part 2 of AutoSpearman,', AS_metrics, 'are selected.')
+    return X_AS_train
 
 
 def get_base_prefix_compat():
@@ -55,6 +163,49 @@ def data_validation(data):
         valid = False
     return valid
 
+"""
+def eval_rule(rule, x_df):
+    var_in_rule = list(set(re.findall('[a-zA-Z]+', rule)))
+    rule = re.sub(r'\b=\b', '==', rule)
+    if 'or' in var_in_rule:
+        var_in_rule.remove('or')
+    rule = rule.replace('&', 'and')
+    eval_result_list = []
+    for i in range(0, len(x_df)):
+        x = x_df.iloc[[i]]
+        var_dict = {}
+        for var in var_in_rule:
+            var_dict[var] = float(x[var])
+        eval_result = eval(rule, var_dict)  # thanks to eval() function in Python :)
+        eval_result_list.append(eval_result)
+    return eval_result_list
+
+
+def filter_rules(rules, X_explain):
+    # Get rules that are actually applied to the commit
+    
+    # select rules that (1) have positive coefficient values and (2) have positive importance scores
+    rules = rules[(rules['type'] == 'rule') & (rules['coef'] > 0) & (rules['importance'] > 0)]
+    rules_list = list(rules['rule'])
+    rule_eval_result = []
+    # for each rule, check whether such rules apply to the actual instance to be explained
+    # Note.
+    # you may pass rules variable to eval_rule() to get the result of all rules
+    # never try, but if it works please tell me.
+    for r in rules_list:
+        # X_explain must be a dataframe of 1 row
+        py_exp_pred = eval_rule(r, X_explain)[0]
+        rule_eval_result.append(py_exp_pred)
+    new_col = {'is_satisfy_instance': rule_eval_result}
+    df = pd.DataFrame(data=new_col)
+    rules = pd.concat([rules, df], axis=1)
+    # select rules that apply to the actual instance to be explained
+    rules = rules.loc[rules['is_satisfy_instance'] == True]
+    # sort rules according to their importance scores
+    sorted_rules = rules.sort_values(by='importance', ascending=False)
+    # top_rule = sorted_rules.iloc[0]['rule']  # change 0 to 1,2,3,... to get other rules
+    return sorted_rules
+"""
 
 def get_default_data_and_model():
     this_dir, _ = os.path.split(__file__)
@@ -240,124 +391,6 @@ class PyExplainer:
         self.X_explain = None
         self.y_explain = None
 
-    def auto_spearman(self, apply_to_X_train=True, correlation_threshold=0.7, correlation_method='spearman', VIF_threshold=5):
-        """An automated feature selection approach that address collinearity and multicollinearity.
-        For more information, please kindly refer to the `paper <https://ieeexplore.ieee.org/document/8530020>`_.
-
-        Parameters
-        ----------
-        apply_to_X_train : :obj:`bool`
-            Whether to apply the selected columns to the X_train data inside PyExplainer Obj., default is True
-        correlation_threshold : :obj:`float`
-            Threshold value of correalation.
-        correlation_method : :obj:`str`
-            Method for solving the correlation between the features.
-        VIF_threshold : :obj:`int`
-            Threshold value of VIF score.
-        """
-        X_AS_train = self.X_train.copy()
-        AS_metrics = X_AS_train.columns
-        count = 1
-
-        # (Part 1) Automatically select non-correlated metrics based on a Spearman rank correlation test.
-        print('(Part 1) Automatically select non-correlated metrics based on a Spearman rank correlation test')
-        while True:
-            corrmat = X_AS_train.corr(method=correlation_method)
-            top_corr_features = corrmat.index
-            abs_corrmat = abs(corrmat)
-
-            # identify correlated metrics with the correlation threshold of the threshold
-            highly_correlated_metrics = ((corrmat > correlation_threshold) | (corrmat < -correlation_threshold)) & (
-                        corrmat != 1)
-            n_correlated_metrics = np.sum(np.sum(highly_correlated_metrics))
-            if n_correlated_metrics > 0:
-                # find the strongest pair-wise correlation
-                find_top_corr = pd.melt(abs_corrmat, ignore_index=False)
-                find_top_corr.reset_index(inplace=True)
-                find_top_corr = find_top_corr[find_top_corr['value'] != 1]
-                top_corr_index = find_top_corr['value'].idxmax()
-                top_corr_i = find_top_corr.loc[top_corr_index, :]
-
-                # get the 2 correlated metrics with the strongest correlation
-                correlated_metric_1 = top_corr_i[0]
-                correlated_metric_2 = top_corr_i[1]
-                print('> Step', count, 'comparing between', correlated_metric_1, 'and', correlated_metric_2)
-
-                # compute their correlation with other metrics outside of the pair
-                correlation_with_other_metrics_1 = np.mean(abs_corrmat[correlated_metric_1][
-                                                               [i for i in top_corr_features if
-                                                                i not in [correlated_metric_1, correlated_metric_2]]])
-                correlation_with_other_metrics_2 = np.mean(abs_corrmat[correlated_metric_2][
-                                                               [i for i in top_corr_features if
-                                                                i not in [correlated_metric_1, correlated_metric_2]]])
-                print('>>', correlated_metric_1, 'has the average correlation of',
-                      np.round(correlation_with_other_metrics_1, 3), 'with other metrics')
-                print('>>', correlated_metric_2, 'has the average correlation of',
-                      np.round(correlation_with_other_metrics_2, 3), 'with other metrics')
-                # select the metric that shares the least correlation outside of the pair and exclude the other
-                if correlation_with_other_metrics_1 < correlation_with_other_metrics_2:
-                    exclude_metric = correlated_metric_2
-                else:
-                    exclude_metric = correlated_metric_1
-                print('>>', 'Exclude', exclude_metric)
-                count = count + 1
-                AS_metrics = list(set(AS_metrics) - set([exclude_metric]))
-                X_AS_train = X_AS_train[AS_metrics]
-            else:
-                break
-
-        print('According to Part 1 of AutoSpearman,', AS_metrics, 'are selected.')
-
-        # (Part 2) Automatically select non-correlated metrics based on a Variance Inflation Factor analysis.
-        print('(Part 2) Automatically select non-correlated metrics based on a Variance Inflation Factor analysis')
-
-        # Prepare a dataframe for VIF
-        X_AS_train = add_constant(X_AS_train)
-
-        selected_features = X_AS_train.columns
-        count = 1
-        while True:
-            # Calculate VIF scores
-            vif_scores = pd.DataFrame([variance_inflation_factor(X_AS_train.values, i)
-                                       for i in range(X_AS_train.shape[1])],
-                                      index=X_AS_train.columns)
-            # Prepare a final dataframe of VIF scores
-            vif_scores.reset_index(inplace=True)
-            vif_scores.columns = ['Feature', 'VIFscore']
-            vif_scores = vif_scores.loc[vif_scores['Feature'] != 'const', :]
-            vif_scores.sort_values(by=['VIFscore'], ascending=False, inplace=True)
-
-            # Find features that have their VIF scores of above the threshold
-            filtered_vif_scores = vif_scores[vif_scores['VIFscore'] >= VIF_threshold]
-
-            # Terminate when there is no features with the VIF scores of above the threshold
-            if len(filtered_vif_scores) == 0:
-                break
-
-            # exclude the metric with the highest VIF score
-            metric_to_exclude = list(filtered_vif_scores['Feature'].head(1))[0]
-
-            print('> Step', count, '- exclude', str(metric_to_exclude))
-            count = count + 1
-
-            selected_features = list(set(selected_features) - set([metric_to_exclude]))
-
-            X_AS_train = X_AS_train.loc[:, selected_features]
-
-        print('Finally, according to Part 2 of AutoSpearman,', AS_metrics, 'are selected.')
-        if apply_to_X_train:
-            self.set_X_train(X_AS_train)
-            # todo - use get
-            if self.full_ft_names:
-                # todo - use get
-                full_ft_names = self.full_ft_names
-                new_full_ft_names = {}
-                for key in X_AS_train.columns.to_list():
-                    new_full_ft_names[key] = full_ft_names[key]
-                # todo - use set
-                self.full_ft_names = new_full_ft_names
-            print('X_train data inside PyExplainer was updated based on the selected features above')
-
     def explain(self,
                 X_explain,
                 y_explain,
@@ -474,10 +507,15 @@ class PyExplainer:
         rules = local_rulefit_model.get_rules()
         rules = rules[rules.coef != 0].sort_values("importance", ascending=False)
         rules = rules[rules.type == 'rule'].sort_values("importance", ascending=False)
+        positive_filtered_rules = rules #todo - filter_rules(rules, X_explain)
 
-        top_k_positive_rules = rules[rules.coef > 0].sort_values("importance", ascending=False).head(top_k)
+        # positive rules
+        top_k_positive_rules = positive_filtered_rules.loc[positive_filtered_rules['coef'] > 0].sort_values("importance", ascending=False).head(top_k)
         top_k_positive_rules['Class'] = self.class_label[1]
-        top_k_negative_rules = rules[rules.coef < 0].sort_values("importance", ascending=False).head(top_k)
+        top_k_positive_rules = positive_filtered_rules.reset_index()
+
+        # negative rules
+        top_k_negative_rules = rules.loc[rules['coef'] < 0].sort_values("importance", ascending=False).head(top_k)
         top_k_negative_rules['Class'] = self.class_label[0]
 
         rule_obj = {'synthetic_data': synthetic_instances,
@@ -548,6 +586,7 @@ class PyExplainer:
 
             id = '#' + str(i + 1)
             var_name = str(tmp_rule['variable'])
+            var_ref = var_name
             # todo - use get
             # check if there is mapping for full feature names
             if self.full_ft_names:
@@ -578,7 +617,7 @@ class PyExplainer:
                 "widths": tmp_widths,
                 "colors": tmp_colors,
                 "markers": tmp_markers,
-                "varRef": var_name,
+                "varRef": var_ref,
             })
         return bullet_data
 
