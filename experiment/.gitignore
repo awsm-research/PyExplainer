@@ -20,3 +20,7 @@ eval_result/RQ2_openstack_LR_probability_distribution.csv
 eval_result/RQ2_openstack_RF_probability_distribution.csv
 eval_result/RQ2_qt_LR_probability_distribution.csv
 eval_result/RQ2_qt_RF_probability_distribution.csv
+explainer_obj_20_4_2021/
+explainer_object/
+new_eval_result/
+prediction_result/
