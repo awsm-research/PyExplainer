@@ -527,6 +527,22 @@ def rq3_eval(proj_name, global_model_name):
     rq3_explanation_result.to_csv(result_dir+'RQ3_'+proj_name+'_'+global_model_name+'_explanation_eval_split_rulefit_condition.csv',
                                   index=False)
     
+def get_percent_unique_explanation(proj_name, global_model_name, explanation_list):
+    
+    print('project: {}, JIT model: {}'.format(proj_name, global_model_name))
+    total_exp = len(explanation_list)
+    total_unique_exp = len(set(explanation_list))
+    percent_unique = (total_unique_exp/total_exp)*100
+    
+    count_exp = Counter(explanation_list)
+    max_exp_count = max(list(count_exp.values()))
+    percent_dup_explanation = (max_exp_count/total_exp)*100
+    
+    print('% unique explanation is',round(percent_unique,2))
+    print('% duplicate explanation is', round(percent_dup_explanation))
+    
+    print('-'*100)
+    
 def show_rq3_eval_result():
 
     openstack_rf = pd.read_csv(result_dir+'RQ3_openstack_RF_explanation_eval_split_rulefit_condition.csv')
@@ -544,8 +560,6 @@ def show_rq3_eval_result():
     openstack_result = all_result[all_result['project']=='openstack']
     qt_result = all_result[all_result['project']=='qt']
     
-    display(all_result.head(10))
-    
     fig, axs = plt.subplots(1,2, figsize=(8,8))
 
     axs[0].set_title('Openstack')
@@ -559,6 +573,14 @@ def show_rq3_eval_result():
     
     plt.show()
 
+    openstack_rf = openstack_rf[openstack_rf['method']=='LIME']
+    openstack_lr = openstack_lr[openstack_lr['method']=='LIME']
+    qt_rf = qt_rf[qt_rf['method']=='LIME']
+    qt_lr = qt_lr[qt_lr['method']=='LIME']
+    
+    get_percent_unique_explanation('openstack','RF', list(openstack_rf['explanation']))
+    get_percent_unique_explanation('openstack','LR',list(openstack_lr['explanation']))
+    get_percent_unique_explanation('qt','RF',list(qt_rf['explanation']))
+    get_percent_unique_explanation('qt','LR',list(qt_lr['explanation']))
+    
     fig.savefig(fig_dir+'RQ3.png')
-    
-    
