@@ -1,7 +1,7 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
-from sklearn.metrics import auc, roc_auc_score, f1_score, confusion_matrix, classification_report
+from sklearn.metrics import auc, roc_auc_score, f1_score, confusion_matrix, classification_report, recall_score
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -18,19 +18,39 @@ from collections import Counter
 sys.path.append(os.path.abspath('../'))
 from pyexplainer.pyexplainer_pyexplainer import *
 
+
 data_path = './dataset/'
 result_dir = './eval_result/'
 dump_dataframe_dir = './prediction_result/'
 exp_dir = './explainer_obj_20_4_2021/'
 
-def get_rule_str_of_rulefit(local_rulefit_model):
-    rule_df = local_rulefit_model.get_rules()
-    top_k = 5
-    top_k_positive_rules = rule_df[(rule_df.coef > 0) & (rule_df.type=='rule')].sort_values("importance", ascending=False).head(top_k)
+fig_dir = result_dir+'figures/'
 
-    the_best_defective_rule_str = list(top_k_positive_rules['rule'])[0]
+if not os.path.exists(fig_dir):
+    os.makedirs(fig_dir)
+
+def get_rule_str_of_rulefit(local_model, X_explain):
+    rules = local_model.get_rules()
+    rules = rules[(rules['type']=='rule') & (rules['coef'] > 0) & (rules['importance'] > 0)]
+    rules_list = list(rules['rule'])
     
-    return the_best_defective_rule_str
+    rule_eval_result = []
+    
+    dup_feature_in_rule = [] # true or false...
+    
+    for r in rules_list:
+        py_exp_pred = eval_rule(r, X_explain)[0]
+        rule_eval_result.append(py_exp_pred)
+          
+    rules['is_satisfy_instance'] = rule_eval_result
+
+    rules = rules[rules['is_satisfy_instance']==True]
+
+    rules = rules.sort_values(by='importance', ascending=False)
+    
+    rule_str = rules.iloc[0]['rule']
+    
+    return rule_str
 
 def aggregate_list(l):
     return np.mean(l), np.median(l)
@@ -190,13 +210,13 @@ def rq1_eval(proj_name, global_model_name):
     print('finished RQ1 of',proj_name,', globla model is',global_model_name)
     
 def show_rq1_eval_result():
-    openstack_rf = pd.read_csv('./eval_result/RQ1_openstack_RF.csv')
-    qt_rf = pd.read_csv('./eval_result/RQ1_qt_RF.csv')
+    openstack_rf = pd.read_csv(result_dir+'RQ1_openstack_RF.csv')
+    qt_rf = pd.read_csv(result_dir+'RQ1_qt_RF.csv')
     result_rf = pd.concat([openstack_rf, qt_rf])
     result_rf['global_model'] = 'RF'
     
-    openstack_lr = pd.read_csv('./eval_result/RQ1_openstack_LR.csv')
-    qt_lr = pd.read_csv('./eval_result/RQ1_qt_LR.csv')
+    openstack_lr = pd.read_csv(result_dir+'RQ1_openstack_LR.csv')
+    qt_lr = pd.read_csv(result_dir+'RQ1_qt_LR.csv')
     result_lr = pd.concat([openstack_lr, qt_lr])
     result_lr['global_model'] = 'LR'
     
@@ -214,14 +234,10 @@ def show_rq1_eval_result():
     sns.boxplot(data=result_lr, x='project', y='euc_dist_med', hue='method', ax=axs[1])
     
     plt.show()
-
-    display(all_result.groupby(['global_model', 'project', 'method']).describe())
     
-    result_rf.to_csv('./eval_result/RQ1_RF.csv',index=False)
-    result_lr.to_csv('./eval_result/RQ1_LR.csv',index=False)
-    all_result.to_csv('./eval_result/RQ1.csv',index=False)
+    all_result.to_csv(result_dir+'/RQ1.csv',index=False)
     
-    fig.savefig('./eval_result/figures/RQ1.png')
+    fig.savefig(fig_dir+'RQ1.png')
     
 def rq2_eval(proj_name, global_model_name):
     global_model_name = global_model_name.upper()
@@ -296,13 +312,13 @@ def rq2_eval(proj_name, global_model_name):
     print('finished RQ2 of',proj_name)
     
 def show_rq2_eval_result():
-    openstack_rf = pd.read_csv('./eval_result/RQ2_openstack_RF_global_vs_local_synt_pred.csv')
-    qt_rf = pd.read_csv('./eval_result/RQ2_qt_RF_global_vs_local_synt_pred.csv')
+    openstack_rf = pd.read_csv(result_dir+'RQ2_openstack_RF_global_vs_local_synt_pred.csv')
+    qt_rf = pd.read_csv(result_dir+'RQ2_qt_RF_global_vs_local_synt_pred.csv')
     result_rf = pd.concat([openstack_rf, qt_rf])
     result_rf['global_model'] = 'RF'
     
-    openstack_lr = pd.read_csv('./eval_result/RQ2_openstack_LR_global_vs_local_synt_pred.csv')
-    qt_lr = pd.read_csv('./eval_result/RQ2_qt_LR_global_vs_local_synt_pred.csv')
+    openstack_lr = pd.read_csv(result_dir+'/RQ2_openstack_LR_global_vs_local_synt_pred.csv')
+    qt_lr = pd.read_csv(result_dir+'/RQ2_qt_LR_global_vs_local_synt_pred.csv')
     result_lr = pd.concat([openstack_lr, qt_lr])
     result_lr['global_model'] = 'LR'
     
@@ -344,22 +360,17 @@ def show_rq2_eval_result():
     sns.boxplot(data=qt_result, x='global_model', y='F1', hue='method', ax=axs[1,1])
 
     plt.show()
-
-    pd.set_option("max_columns", 40)
-    display(all_result.groupby(['global_model', 'project','method']).describe())
     
-    result_rf.to_csv('./eval_result/RQ2_RF_prediction.csv',index=False)
-    result_lr.to_csv('./eval_result/RQ2_LR_prediction.csv',index=False)
-    all_result.to_csv('./eval_result/RQ2_prediction.csv',index=False)
+    all_result.to_csv(result_dir+'RQ2_prediction.csv',index=False)
     
-    fig.savefig('./eval_result/figures/RQ2_prediction.png')
+    fig.savefig(fig_dir+'RQ2_prediction.png')
 
 def show_rq2_prob_distribution():
     
     d = {True: 'DEFECT', False: 'CLEAN'}
 
-    openstack_rf = pd.read_csv('./eval_result/RQ2_openstack_RF_probability_distribution.csv')
-    qt_rf = pd.read_csv('./eval_result/RQ2_qt_RF_probability_distribution.csv')
+    openstack_rf = pd.read_csv(result_dir+'RQ2_openstack_RF_probability_distribution.csv')
+    qt_rf = pd.read_csv(result_dir+'RQ2_qt_RF_probability_distribution.csv')
     
     mask = openstack_rf.applymap(type) != bool
     openstack_rf = openstack_rf.where(mask, openstack_rf.replace(d))
@@ -368,8 +379,8 @@ def show_rq2_prob_distribution():
     result_rf = pd.concat([openstack_rf, qt_rf])
     result_rf['global_model'] = 'RF'
     
-    openstack_lr = pd.read_csv('./eval_result/RQ2_openstack_LR_probability_distribution.csv')
-    qt_lr = pd.read_csv('./eval_result/RQ2_qt_LR_probability_distribution.csv')
+    openstack_lr = pd.read_csv(result_dir+'RQ2_openstack_LR_probability_distribution.csv')
+    qt_lr = pd.read_csv(result_dir+'RQ2_qt_LR_probability_distribution.csv')
     
     openstack_lr = openstack_lr.where(mask, openstack_lr.replace(d))
     qt_lr = qt_lr.where(mask, qt_lr.replace(d))
@@ -422,11 +433,9 @@ def show_rq2_prob_distribution():
     
     plt.show()
     
-    result_rf.to_csv('./eval_result/RQ2_RF_prediction_prob.csv',index=False)
-    result_lr.to_csv('./eval_result/RQ2_LR_prediction_prob.csv',index=False)
-    all_result.to_csv('./eval_result/RQ2_prediction_prob.csv',index=False)
+    all_result.to_csv(result_dir+'RQ2_prediction_prob.csv',index=False)
     
-    fig.savefig('./eval_result/figures/RQ2_prediction_prob.png')
+    fig.savefig(fig_dir+'RQ2_prediction_prob.png')
     
 def eval_rule(rule, x_df):
     var_in_rule = list(set(re.findall('[a-zA-Z]+', rule)))
@@ -462,93 +471,94 @@ def summarize_rule_eval_result(rule_str, x_df):
 def rq3_eval(proj_name, global_model_name):
     global_model, correctly_predict_df, indep, dep, feature_df = prepare_data_for_testing(proj_name, global_model_name)
     x_test, y_test = prepare_data(proj_name, mode = 'test')
-    
-    rq3_eval_result = pd.DataFrame() # for train data
 
+    rq3_explanation_result = pd.DataFrame()
+    
+    pyexp_guidance_result_list = []
+    lime_guidance_result_df = pd.DataFrame()
+    
     for i in range(0,len(feature_df)):
         X_explain = feature_df.iloc[[i]]
 
         row_index = str(X_explain.index[0])
 
-        exp_obj = pickle.load(open(exp_dir+proj_name+'_'+global_model_name+'_all_explainer_'+row_index+'.pkl','rb'))
+        exp_obj = pickle.load(open(os.path.join(exp_dir,proj_name,global_model_name,'all_explainer_'+row_index+'.pkl'),'rb'))
         py_exp = exp_obj['pyExplainer']
         lime_exp = exp_obj['LIME']
 
+        # load local models
         py_exp_local_model = py_exp['local_model']
         lime_exp_local_model = lime_exp['local_model']
         
-        py_exp_the_best_defective_rule_str = get_rule_str_of_rulefit(py_exp_local_model)
-        
+        # generate explanations                
+        py_exp_the_best_defective_rule_str = get_rule_str_of_rulefit(py_exp_local_model, X_explain)
         lime_the_best_defective_rule_str = lime_exp['rule'].as_list()[0][0]
 
+        # check whether explanations apply to the instance to be explained
         py_exp_pred = eval_rule(py_exp_the_best_defective_rule_str, X_explain)[0]
         lime_pred = eval_rule(lime_the_best_defective_rule_str, X_explain)[0]
 
-        if py_exp_pred:
-            py_exp_the_best_defective_rule_str = flip_rule(py_exp_the_best_defective_rule_str)
-            py_exp_rule_eval = summarize_rule_eval_result(py_exp_the_best_defective_rule_str, x_test)
-            tn, fp, fn, tp = confusion_matrix(y_test, py_exp_rule_eval, labels=[1,0]).ravel()
-            tp_rate = tp/(tp+fn)
-            tn_rate = tn/(tn+fp)
+        condition_list = py_exp_the_best_defective_rule_str.split('&')
+
+        # for explanations
+        for condition in condition_list:
+            condition = condition.strip()
+
+            py_exp_rule_eval = summarize_rule_eval_result(condition, x_test)
+
+            rule_rec = recall_score(y_test, py_exp_rule_eval)
+
+            py_exp_serie_test = pd.Series(data=[proj_name, row_index, 'pyExplainer',global_model_name, condition, rule_rec])
+            rq3_explanation_result = rq3_explanation_result.append(py_exp_serie_test,ignore_index=True)
+
+        # PyExp END
+        
+        # LIME START
+        lime_rule_eval = summarize_rule_eval_result(lime_the_best_defective_rule_str, x_test)
+
+        rule_rec = recall_score(y_test, lime_rule_eval)
+
+        lime_serie_test = pd.Series(data=[proj_name, row_index, 'LIME',global_model_name, lime_the_best_defective_rule_str, rule_rec])
+        rq3_explanation_result = rq3_explanation_result.append(lime_serie_test,ignore_index=True)
             
-            py_exp_serie_test = pd.Series(data=[proj_name, row_index, 'pyExplainer',tp_rate,tn_rate])
-        
-            rq3_eval_result = rq3_eval_result.append(py_exp_serie_test,ignore_index=True)
-        
-        if lime_pred:
-            lime_the_best_defective_rule_str = flip_rule(lime_the_best_defective_rule_str)
-            lime_rule_eval = summarize_rule_eval_result(lime_the_best_defective_rule_str, x_test)
-            tn, fp, fn, tp = confusion_matrix(y_test, lime_rule_eval, labels=[1,0]).ravel()
-            tp_rate = tp/(tp+fn)
-            tn_rate = tn/(tn+fp)
-
-            lime_serie_test = pd.Series(data=[proj_name, row_index, 'LIME',tp_rate,tn_rate])
-        
-            rq3_eval_result = rq3_eval_result.append(lime_serie_test, ignore_index=True)
-
         print('finished {} from {} commits'.format(str(i+1),len(feature_df)))
-        
-        
-    rq3_eval_result.columns = ['project', 'commit id', 'method', 'true_positive_rate','true_negative_rate']
-    
-    rq3_eval_result.to_csv(result_dir+'RQ3_'+proj_name+'_'+global_model_name+'.csv',index=False)
-    print('finished RQ3 of',proj_name)
+
+    rq3_explanation_result.columns = ['project','commit_id','method','global_model','explanation','recall']
+    rq3_explanation_result.to_csv(result_dir+'RQ3_'+proj_name+'_'+global_model_name+'_explanation_eval_split_rulefit_condition.csv',
+                                  index=False)
     
 def show_rq3_eval_result():
 
-    openstack_rf = pd.read_csv('./eval_result/RQ3_openstack_RF.csv')
-    qt_rf = pd.read_csv('./eval_result/RQ3_qt_RF.csv')
+    openstack_rf = pd.read_csv(result_dir+'RQ3_openstack_RF_explanation_eval_split_rulefit_condition.csv')
+    qt_rf = pd.read_csv(result_dir+'RQ3_qt_RF_explanation_eval_split_rulefit_condition.csv')
     result_rf = pd.concat([openstack_rf, qt_rf])
     result_rf['global_model'] = 'RF'
     
-    openstack_lr = pd.read_csv('./eval_result/RQ3_openstack_LR.csv')
-    qt_lr = pd.read_csv('./eval_result/RQ3_qt_LR.csv')
+    openstack_lr = pd.read_csv(result_dir+'RQ3_openstack_LR_explanation_eval_split_rulefit_condition.csv')
+    qt_lr = pd.read_csv(result_dir+'RQ3_qt_LR_explanation_eval_split_rulefit_condition.csv')
     result_lr = pd.concat([openstack_lr, qt_lr])
     result_lr['global_model'] = 'LR'
     
     all_result = pd.concat([result_rf, result_lr])
+    all_result['recall'] = all_result['recall']*100
+    openstack_result = all_result[all_result['project']=='openstack']
+    qt_result = all_result[all_result['project']=='qt']
+    
+    display(all_result.head(10))
+    
+    fig, axs = plt.subplots(1,2, figsize=(8,8))
 
-    my_pal = ['darkorange','blue']
+    axs[0].set_title('Openstack')
+    axs[1].set_title('Qt')
 
-    fig, axs = plt.subplots(2,2, figsize=(8,8))
+    sns.boxplot(data=openstack_result, x='global_model', y='recall', 
+                hue='method', ax=axs[0], palette=['darkorange','royalblue']).set(xlabel='', ylabel='Consistency Percentage (%)')
+    sns.boxplot(data=qt_result, x='global_model', y='recall', 
+                hue='method', ax=axs[1], palette=['darkorange','royalblue']).set(xlabel='', ylabel='')
 
-    axs[0,0].set_title('RF')
-    axs[0,1].set_title('LR')
-
-    # plt.ylim(0,100)
-    sns.boxplot(data=result_rf, x='project', y='true_positive_rate', hue='method', ax=axs[0,0], palette=['darkorange','royalblue'])
-    sns.boxplot(data=result_rf, x='project', y='true_negative_rate', hue='method', ax=axs[1,0], palette=['darkorange','royalblue'])
-    sns.boxplot(data=result_lr, x='project', y='true_positive_rate', hue='method', ax=axs[0,1], palette=['royalblue','darkorange'])
-    sns.boxplot(data=result_lr, x='project', y='true_negative_rate', hue='method', ax=axs[1,1], palette=['royalblue','darkorange'])
-
+    
     plt.show()
-    
-    display(all_result[['global_model', 'project','method', 'true_positive_rate','true_negative_rate']].groupby(['global_model','project','method']).describe())
-    
-    result_rf.to_csv('./eval_result/RQ3_RF.csv',index=False)
-    result_lr.to_csv('./eval_result/RQ3_LR.csv',index=False)
-    all_result.to_csv('./eval_result/RQ3.csv',index=False)
-    
-    fig.savefig('./eval_result/figures/RQ3.png')
+
+    fig.savefig(fig_dir+'RQ3.png')
     
     
