@@ -55,14 +55,14 @@ def prepare_data(proj_name, mode = 'all'):
     
     change_metrics, bug_label = load_change_metrics_df(proj_name) 
     
-    with open(data_path+proj_name+'_non_correlated_metrics.txt','r') as f:
-        metrics = f.read()
+#     with open(data_path+proj_name+'_non_correlated_metrics.txt','r') as f:
+#         metrics = f.read()
     
-    metrics_list = metrics.split('\n')
+#     metrics_list = metrics.split('\n')
     
-    non_correlated_change_metrics = change_metrics[metrics_list]
+#     non_correlated_change_metrics = change_metrics[metrics_list]
 
-    x_train, x_test, y_train, y_test = split_train_test_data(non_correlated_change_metrics, bug_label, percent_split = 70)
+    x_train, x_test, y_train, y_test = split_train_test_data(change_metrics, bug_label, percent_split = 70)
     
     if mode == 'train':
         return x_train,y_train

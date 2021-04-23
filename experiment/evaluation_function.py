@@ -1,7 +1,7 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics.pairwise import cosine_similarity, euclidean_distances
-from sklearn.metrics import auc, roc_auc_score, f1_score, confusion_matrix
+from sklearn.metrics import auc, roc_auc_score, f1_score, confusion_matrix, classification_report
 import pandas as pd
 import numpy as np
 import seaborn as sns
@@ -18,42 +18,10 @@ from collections import Counter
 sys.path.append(os.path.abspath('../'))
 from pyexplainer.pyexplainer_pyexplainer import *
 
-flip_sign_dict = {
-    '<': '>=',
-    '>': '<=',
-    '=': '!=',
-    '>=': '<',
-    '<=': '>',
-    '!=': '=='
-}
-
-'''
-    input: rule (str)
-'''
-def flip_rule(rule):
-    rule = re.sub(r'\b=\b',' = ',rule) # for LIME
-    found_rule = re.findall('.* <=? [a-zA-Z]+ <=? .*', rule) # for LIME
-    ret = ''
-    
-    if len(found_rule) > 0:
-        found_rule = found_rule[0]
-    
-        var_in_rule = re.findall('[a-zA-Z]+',found_rule)
-        var_in_rule = var_in_rule[0]
-        
-        splitted_rule = found_rule.split(var_in_rule)
-        splitted_rule[0] = splitted_rule[0] + var_in_rule # for left side
-        splitted_rule[1] = var_in_rule + splitted_rule[1] # for right side
-        combined_rule = splitted_rule[0] + ' or ' + splitted_rule[1]
-        ret = flip_rule(combined_rule)
-        
-    else:
-        for tok in rule.split():
-            if tok in flip_sign_dict:
-                ret = ret + flip_sign_dict[tok] + ' '
-            else:
-                ret = ret + tok + ' '
-    return ret
+data_path = './dataset/'
+result_dir = './eval_result/'
+dump_dataframe_dir = './prediction_result/'
+exp_dir = './explainer_obj_20_4_2021/'
 
 def get_rule_str_of_rulefit(local_rulefit_model):
     rule_df = local_rulefit_model.get_rules()
@@ -186,7 +154,7 @@ def rq1_eval(proj_name, global_model_name):
 
         row_index = str(X_explain.index[0])
 
-        exp_obj = pickle.load(open(exp_dir+proj_name+'_'+global_model_name+'_all_explainer_'+row_index+'.pkl','rb'))
+        exp_obj = pickle.load(open(os.path.join(exp_dir,proj_name,global_model_name,'all_explainer_'+row_index+'.pkl'),'rb'))
         py_exp = exp_obj['pyExplainer']
         lime_exp = exp_obj['LIME']
 
@@ -269,7 +237,7 @@ def rq2_eval(proj_name, global_model_name):
 
         row_index = str(X_explain.index[0])
 
-        exp_obj = pickle.load(open(pyExp_dir+proj_name+'_'+global_model_name+'_all_explainer_'+row_index+'.pkl','rb'))
+        exp_obj = pickle.load(open(os.path.join(exp_dir,proj_name,global_model_name,'all_explainer_'+row_index+'.pkl'),'rb'))
         py_exp = exp_obj['pyExplainer']
         lime_exp = exp_obj['LIME']
 
@@ -339,21 +307,41 @@ def show_rq2_eval_result():
     result_lr['global_model'] = 'LR'
     
     all_result = pd.concat([result_rf, result_lr])
+    
+    openstack_result = all_result[all_result['project']=='openstack']
+    qt_result = all_result[all_result['project']=='qt']
 
     fig, axs = plt.subplots(2,2, figsize=(10,10))
 
-    axs[0,0].set_title('RF')
-    axs[0,1].set_title('LR')
+    axs[0,0].set_title('Openstack')
+    axs[0,1].set_title('Qt')
     
     axs[0,0].set_ylim([0, 1])
     axs[0,1].set_ylim([0, 1]) 
     axs[1,0].set_ylim([0, 1])
     axs[1,1].set_ylim([0, 1])
 
-    sns.boxplot(data=result_rf, x='project', y='AUC', hue='method', ax=axs[0,0])
-    sns.boxplot(data=result_rf, x='project', y='F1', hue='method', ax=axs[1,0])
-    sns.boxplot(data=result_lr, x='project', y='AUC', hue='method', ax=axs[0,1])
-    sns.boxplot(data=result_lr, x='project', y='F1', hue='method', ax=axs[1,1])
+#     rows = ['AUC', 'F1']
+    cols = ['Openstack','Qt']
+
+#     plt.setp(axs.flat, xlabel='Technique', ylabel='Probability')
+
+    pad = 5 # in points
+
+    for ax, col in zip(axs[0], cols):
+        ax.annotate(col, xy=(0.5, 1), xytext=(0, pad),
+                    xycoords='axes fraction', textcoords='offset points',
+                    size='large', ha='center', va='baseline')
+
+#     for ax, row in zip(axs[:,0], rows):
+#         ax.annotate(row, xy=(0, 0.5), xytext=(-ax.yaxis.labelpad - pad, 0),
+#                     xycoords=ax.yaxis.label, textcoords='offset points',
+#                     size='large', ha='right', va='center')
+        
+    sns.boxplot(data=openstack_result, x='global_model', y='AUC', hue='method', ax=axs[0,0])
+    sns.boxplot(data=openstack_result, x='global_model', y='F1', hue='method', ax=axs[1,0])
+    sns.boxplot(data=qt_result, x='global_model', y='AUC', hue='method', ax=axs[0,1])
+    sns.boxplot(data=qt_result, x='global_model', y='F1', hue='method', ax=axs[1,1])
 
     plt.show()
 
@@ -391,26 +379,32 @@ def show_rq2_prob_distribution():
     
     all_result = pd.concat([result_rf, result_lr])
 
+    pyexp_openstack_result = all_result[(all_result['project']=='openstack') & (all_result['technique']=='pyExplainer')]
+    pyexp_qt_result = all_result[(all_result['project']=='qt') & (all_result['technique']=='pyExplainer')]
+    lime_openstack_result = all_result[(all_result['project']=='openstack') & (all_result['technique']=='LIME')]
+    lime_qt_result = all_result[(all_result['project']=='qt') & (all_result['technique']=='LIME')]
+    
+#     qt_result = all_result[all_result['project']=='qt']
+    
     fig, axs = plt.subplots(2,2, figsize=(10,10))
 
-    
     axs[0,0].set_ylim([0, 1])
     axs[0,1].set_ylim([0, 1]) 
     axs[1,0].set_ylim([0, 1])
     axs[1,1].set_ylim([0, 1])
     
-    sns.boxplot(data=openstack_rf, x='technique', y='prob', hue='label' , ax=axs[0,0])
-    sns.boxplot(data=qt_rf,  x='technique', y='prob', hue='label' , ax=axs[1,0])
-    sns.boxplot(data=openstack_lr,  x='technique', y='prob', hue='label' , ax=axs[0,1])
-    sns.boxplot(data=qt_lr,  x='technique', y='prob', hue='label' , ax=axs[1,1], palette=['darkorange','royalblue'])
+    sns.boxplot(data=pyexp_openstack_result, x='global_model', y='prob', hue='label' , ax=axs[0,0])
+    sns.boxplot(data=lime_openstack_result,  x='global_model', y='prob', hue='label' , ax=axs[1,0])
+    sns.boxplot(data=pyexp_qt_result,  x='global_model', y='prob', hue='label' , ax=axs[0,1])
+    sns.boxplot(data=lime_qt_result,  x='global_model', y='prob', hue='label' , ax=axs[1,1], palette=['darkorange','royalblue'])
     
     axs[0,0].axhline(0.5, ls='--')
     axs[0,1].axhline(0.5, ls='--')
     axs[1,0].axhline(0.5, ls='--')
     axs[1,1].axhline(0.5, ls='--')
     
-    cols = ['Global model: RF', 'Global model: LR']
-    rows = ['Openstack','Qt']
+    rows = ['PyExplainer', 'LIME']
+    cols = ['Openstack','Qt']
 
     plt.setp(axs.flat, xlabel='Technique', ylabel='Probability')
 
