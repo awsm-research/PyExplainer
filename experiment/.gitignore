@@ -25,3 +25,5 @@ new_eval_result/RQ2_openstack_LR_probability_distribution.csv
 new_eval_result/RQ2_openstack_RF_probability_distribution.csv
 new_eval_result/RQ2_qt_LR_probability_distribution.csv
 new_eval_result/RQ2_qt_RF_probability_distribution.csv
+/vis
+vis.zip
