@@ -165,6 +165,8 @@ class PyExplainer:
         Classification labels, default = ['Clean', 'Defect']
     top_k_rules : :obj:`int`
         Number of top positive and negative rules to be retrieved
+    full_ft_names : :obj:`list`
+        A list containing full feature names inside X_train
     """
 
     def __init__(self,
@@ -174,7 +176,8 @@ class PyExplainer:
                  dep,
                  blackbox_model,
                  class_label=['Clean', 'Defect'],
-                 top_k_rules=3):
+                 top_k_rules=3,
+                 full_ft_names=[]):
         if isinstance(X_train, pd.core.frame.DataFrame):
             self.X_train = X_train
         else:
@@ -220,6 +223,15 @@ class PyExplainer:
         else:
             print("top_k_rules should be type 'int'")
             raise TypeError
+        if full_ft_names:
+            short_ft_names = X_train.columns.to_list()
+            # length of short ft names and full ft names should be the same
+            if len(short_ft_names) != len(full_ft_names):
+                print("list of short feature names and list of full feature names should have the same length!")
+                raise ValueError
+            self.full_ft_names = dict(zip(short_ft_names, full_ft_names))
+        else:
+            self.full_ft_names = {}
 
         self.bullet_data = [{}]
         self.risk_data = [{}]
@@ -335,6 +347,15 @@ class PyExplainer:
         print('Finally, according to Part 2 of AutoSpearman,', AS_metrics, 'are selected.')
         if apply_to_X_train:
             self.set_X_train(X_AS_train)
+            # todo - use get
+            if self.full_ft_names:
+                # todo - use get
+                full_ft_names = self.full_ft_names
+                new_full_ft_names = {}
+                for key in X_AS_train.columns.to_list():
+                    new_full_ft_names[key] = full_ft_names[key]
+                # todo - use set
+                self.full_ft_names = new_full_ft_names
             print('X_train data inside PyExplainer was updated based on the selected features above')
 
     def explain(self,
@@ -527,18 +548,24 @@ class PyExplainer:
 
             id = '#' + str(i + 1)
             var_name = str(tmp_rule['variable'])
+            # todo - use get
+            # check if there is mapping for full feature names
+            if self.full_ft_names:
+                # todo - use get
+                full_ft_names = self.full_ft_names
+                var_name = full_ft_names[var_name]
             if tmp_rule['lessthan']:
                 # lessthan == TRUE:
                 # The rule suggest to decrease the values to less than a certain threshold
-                tmp_title_text = id + ' Decrease the values of ' + \
-                                 var_name + ' to less than ' + \
+                tmp_title_text = id + ' The value of ' + \
+                                 var_name + ' is more than ' + \
                                  str(tmp_actual_value)
                 tmp_colors = ["#a6d96a", "#d7191c"]
             else:
                 # lessthan == FALSE:
                 # The rule suggest to increase the values to more than a certain threshold
-                tmp_title_text = id + ' Increase the values of ' + \
-                                 var_name + ' to more than ' + \
+                tmp_title_text = id + ' The value of ' + \
+                                 var_name + ' is less than ' + \
                                  str(tmp_actual_value)
                 tmp_colors = ["#d7191c", "#a6d96a"]
 
@@ -580,7 +607,7 @@ class PyExplainer:
         <script>%s</script>
         """ % (d3_js, bullet_js)
 
-        main_title = "What to do to decrease the risk of having defects?"
+        main_title = "Why this commit is predicted as defect-introducing?"
         title = """
         <div style="position: relative; top: 0; width: 100vw; left: 20vw;">
             <b>%s</b>
@@ -603,28 +630,6 @@ class PyExplainer:
         var bulletData = %s
 
         var riskData = %s
-
-        // define the color of the box
-        var boxColor = "box green";
-        var riskPred = riskData[0].riskPred[0];
-        if (riskPred.localeCompare("Yes")==0) {
-            boxColor = "box orange";
-        }
-
-        // append risk prediction and risk score
-        d3.select("#d3-target-bullet-%s")
-          .append("div")
-          .attr("class", "riskPred")
-          .data(riskData)
-          .text((d) => d.riskPred)
-          .append("div")
-          .attr("class", boxColor);
-
-        d3.select("#d3-target-bullet-%s")
-          .append("div")
-          .attr("class", "riskScore")
-          .data(riskData)
-          .text((d) => "Risk Score: " + d.riskScore);
 
         var svg = d3
           .select("#d3-target-bullet-%s")
@@ -659,7 +664,7 @@ class PyExplainer:
           .text((d) => d.subtitle);
 
         </script>
-        """ % (bullet_data, risk_data, unique_id, unique_id, unique_id)
+        """ % (bullet_data, risk_data, unique_id)
 
         html = """
         <!DOCTYPE html>
@@ -1314,12 +1319,6 @@ class PyExplainer:
         display(widgets.HBox(items))
         self.run_bar_animation()
 
-        # display sliders
-        sliders = self.generate_sliders()
-        for slider in sliders:
-            slider.observe(self.on_value_change, names='value')
-            display(slider)
-
         bullet_out = self.bullet_output
         bullet_out.clear_output()
         display(bullet_out)
@@ -1327,6 +1326,12 @@ class PyExplainer:
             # display d3 bullet chart
             html = self.generate_html()
             display(HTML(html))
+
+        # display sliders
+        sliders = self.generate_sliders()
+        for slider in sliders:
+            slider.observe(self.on_value_change, names='value')
+            display(slider)
 
     def update_risk_score(self, risk_score):
         """Update the risk score value inside the risk_data
