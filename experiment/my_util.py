@@ -49,6 +49,8 @@ def split_train_test_data(feature_df, label, percent_split = 70):
     return x_train, x_test, y_train, y_test
 
 def prepare_data(proj_name, mode = 'all'):
+    mode = mode.lower()
+    
     if mode not in ['train','test','all']:
         print('this function accepts "train","test","all" mode only')
         return
