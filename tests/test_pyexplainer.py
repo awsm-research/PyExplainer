@@ -120,7 +120,7 @@ testing_risk_data = py_explainer.generate_risk_data(py_explainer.X_explain)
 
 
 def test_version():
-    assert __version__ == '0.1.11'
+    assert __version__ == '0.2.0'
 
 
 @pytest.mark.parametrize('data, result',
@@ -135,13 +135,16 @@ def test_data_validation(data, result):
     assert pyexplainer_pyexplainer.data_validation(data) is result
 
 
-def test_get_default_data_and_model():
-    default = pyexplainer_pyexplainer.get_default_data_and_model()
+def test_get_dflt():
+    default = pyexplainer_pyexplainer.get_dflt()
     assert isinstance(default['X_train'], pd.core.frame.DataFrame)
     assert isinstance(default['y_train'], pd.core.series.Series)
     assert isinstance(default['indep'], pd.core.indexes.base.Index)
     assert isinstance(default['dep'], str)
     assert isinstance(default['blackbox_model'], sklearn.ensemble.RandomForestClassifier)
+    assert isinstance(default['X_explain'], pd.core.frame.DataFrame)
+    assert isinstance(default['y_explain'], pd.core.series.Series)
+    assert isinstance(default['full_ft_names'], list)
 
 
 @pytest.mark.parametrize('size, random_state, result',
