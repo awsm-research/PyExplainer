@@ -25,8 +25,8 @@ def AutoSpearman(X_train, correlation_threshold=0.7, correlation_method='spearma
 
     Parameters
     ----------
-    X_train : :obj:``
-        Threshold value of correalation.
+    X_train : :obj:`pd.core.frame.DataFrame`
+        The X_train data to be processed
     correlation_threshold : :obj:`float`
         Threshold value of correalation.
     correlation_method : :obj:`str`
@@ -106,24 +106,31 @@ def AutoSpearman(X_train, correlation_threshold=0.7, correlation_method='spearma
         vif_scores = vif_scores.loc[vif_scores['Feature'] != 'const', :]
         vif_scores.sort_values(by=['VIFscore'], ascending=False, inplace=True)
 
-        # Find features that have their VIF scores of above the threshold
-        filtered_vif_scores = vif_scores[vif_scores['VIFscore'] >= VIF_threshold]
+        # Find features that have their VIF scores of above 5.0
+        filtered_vif_scores = vif_scores[vif_scores['VIFscore'] >= 5.0]
 
-        # Terminate when there is no features with the VIF scores of above the threshold
+        # Terminate when there is no features with the VIF scores of above 5.0
         if len(filtered_vif_scores) == 0:
             break
 
         # exclude the metric with the highest VIF score
         metric_to_exclude = list(filtered_vif_scores['Feature'].head(1))[0]
 
-        print('> Step', count, '- exclude', str(metric_to_exclude))
+        print('Step', count, '- exclude', str(metric_to_exclude))
         count = count + 1
 
         selected_features = list(set(selected_features) - set([metric_to_exclude]))
 
         X_AS_train = X_AS_train.loc[:, selected_features]
+
     print('Finally, according to Part 2 of AutoSpearman,', AS_metrics, 'are selected.')
-    return X_AS_train
+    all_cols = X_train.columns
+    for col in all_cols:
+        if col not in list(AS_metrics):
+            all_cols = all_cols.drop(col)
+    selected = all_cols
+    X_train = X_train.loc[:, selected]
+    return X_train
 
 
 def get_base_prefix_compat():
