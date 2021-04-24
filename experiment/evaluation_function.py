@@ -26,6 +26,15 @@ exp_dir = './explainer_obj_20_4_2021/'
 
 fig_dir = result_dir+'figures/'
 
+flip_sign_dict = {
+    '<': '>=',
+    '>': '<=',
+    '=': '!=',
+    '>=': '<',
+    '<=': '>',
+    '!=': '=='
+}
+
 if not os.path.exists(fig_dir):
     os.makedirs(fig_dir)
 
@@ -582,3 +591,245 @@ def show_rq3_eval_result():
     get_percent_unique_explanation('qt','LR',list(qt_lr['explanation']))
     
     fig.savefig(fig_dir+'RQ3.png')
+
+    
+def flip_rule(rule):
+    rule = re.sub(r'\b=\b',' = ',rule) # for LIME
+    found_rule = re.findall('.* <=? [a-zA-Z]+ <=? .*', rule) # for LIME
+    ret = ''
+    
+    # for LIME that has condition like this: 0.53 < nref <= 0.83
+    if len(found_rule) > 0:
+        found_rule = found_rule[0]
+    
+        var_in_rule = re.findall('[a-zA-Z]+',found_rule)
+
+        var_in_rule = var_in_rule[0]
+        
+        splitted_rule = found_rule.split(var_in_rule)
+        splitted_rule[0] = splitted_rule[0] + var_in_rule # for left side
+        splitted_rule[1] = var_in_rule + splitted_rule[1] # for right side
+        combined_rule = splitted_rule[0] + ' or ' + splitted_rule[1]
+        ret = flip_rule(combined_rule)
+        
+    else:
+        for tok in rule.split():
+            if tok in flip_sign_dict:
+                ret = ret + flip_sign_dict[tok] + ' '
+            else:
+                ret = ret + tok + ' '
+    return ret
+
+def get_combined_probs(X_input, global_model, input_guidance, input_SD):
+
+    k_percent = 10
+    prob_og = global_model.predict_proba(X_input)[0][1]
+
+
+    output_df = pd.DataFrame()
+    # 1) Revised values must not be negative -> if val < 0 then val = 0
+    # 2) Revised values must not be lesser/greater than the actual values for < / > operations
+    # E.g., {LOC < 50} => Clean and the actual LOC is 30: 
+    # For a 10-percent decrease approach, the revised value according to the threshold is 45
+    # In this case (Actual < Revised), we apply the 10-percent decrease approach to the actual value instead of the threshold.
+    # Thus, the final revised value is 27 (10-percent decrease from 30)
+    # There are 2 approaches:
+    # (1) n-percent increase/decrease, e.g., 10-percent
+    # (2) an SD_train increase/decrease, e.g., 1SD
+
+    X_revised_sd = X_input.copy()
+    for guidance_i in input_guidance.split('&'):
+        tmp_g = guidance_i.strip().split(' ')
+        if len(tmp_g) != 3:
+            continue
+
+        revised_var = tmp_g[0]    
+        revised_opr = tmp_g[1] 
+        actual_val = X_input[revised_var][0]
+
+        if '<' in revised_opr:
+            # < or <=
+            revised_from_threshold = float(tmp_g[2]) - input_SD[revised_var]
+            revised_from_actual = X_input[revised_var][0] - input_SD[revised_var]
+            # the revised value from threshold must not greater than the actual values
+            if revised_from_threshold > actual_val:
+                actual_revised_value = revised_from_actual
+            else:
+                actual_revised_value = revised_from_threshold
+        else:
+            # > or >=
+            revised_from_threshold = float(tmp_g[2]) + input_SD[revised_var]
+            revised_from_actual = X_input[revised_var][0] + input_SD[revised_var]
+            # the revised value from threshold must not less than the actual values
+            if revised_from_threshold < actual_val:
+                actual_revised_value = revised_from_actual
+            else:
+                actual_revised_value = revised_from_threshold
+
+        # the revised value must not be negative
+        if actual_revised_value < 0:
+            actual_revised_value = 0
+
+        X_revised_sd[revised_var] = actual_revised_value
+
+#     prob_revised_percent = global_model.predict_proba(X_revised_percent)[0][1]
+    prob_revised_sd = global_model.predict_proba(X_revised_sd)[0][1]
+    
+    tmp_out = pd.Series(data=[input_guidance, prob_og, prob_revised_sd])
+    output_df = output_df.append(tmp_out,ignore_index=True)
+    if len(output_df) == 0:
+        return []
+    output_df.columns = ['guidance', 'probOg', 'probRevisedSD']
+    return output_df
+
+
+def what_if_analysis(proj_name, global_model_name):
+    global_model, correctly_predict_df, indep, dep, feature_df = prepare_data_for_testing(proj_name, global_model_name)
+
+    x_train, x_test, y_train, y_test = prepare_data(proj_name, mode = 'all')
+
+    rq3_explanation_result = pd.DataFrame()
+
+    pyexp_guidance_result_list = []
+
+    x_train_sd = x_train.std()
+    
+    all_df = pd.DataFrame()
+
+    for i in range(0,len(feature_df)):
+
+        tmp_df = pd.DataFrame()
+
+        X_explain = feature_df.iloc[[i]]
+
+        row_index = str(X_explain.index[0])
+
+        exp_obj = pickle.load(open(os.path.join(exp_dir,proj_name,global_model_name,'all_explainer_'+row_index+'.pkl'),'rb'))
+        py_exp = exp_obj['pyExplainer']
+        lime_exp = exp_obj['LIME']
+
+        # load local models
+        py_exp_local_model = py_exp['local_model']
+        lime_exp_local_model = lime_exp['local_model']
+
+        # generate explanations                
+        py_exp_the_best_defective_rule_str = get_rule_str_of_rulefit(py_exp_local_model, X_explain)
+        lime_the_best_defective_rule_str = lime_exp['rule'].as_list()[0][0]
+
+        # generate guidance
+        pyFlip = flip_rule(py_exp_the_best_defective_rule_str)
+
+        tmp_df_i = get_combined_probs(X_explain, global_model, pyFlip, x_train_sd)
+        if len(tmp_df_i) > 0:
+            tmp_df_i['gtype'] = 'pyFlip'
+            tmp_df = tmp_df.append(tmp_df_i)
+
+        tmp_df['commit_id'] = row_index
+        tmp_df['model'] = global_model_name
+        tmp_df['project'] = proj_name
+        all_df = all_df.append(tmp_df)
+        
+        print('finished {}/{} commits'.format(str(i+1), str(len(feature_df))))
+
+    print('finished what-if of',proj_name)
+    all_df.to_csv(result_dir+proj_name+'_'+global_model_name+'_combined_prob_from_guidance.csv',index=False)
+
+def show_what_if_eval_result():
+    openstack_rf = pd.read_csv(result_dir+'openstack_RF_combined_prob_from_guidance.csv')
+    qt_rf = pd.read_csv(result_dir+'qt_RF_combined_prob_from_guidance.csv')
+    result_rf = pd.concat([openstack_rf, qt_rf])
+    result_rf['global_model'] = 'RF'
+    
+    openstack_lr = pd.read_csv(result_dir+'/openstack_LR_combined_prob_from_guidance.csv')
+    qt_lr = pd.read_csv(result_dir+'/qt_LR_combined_prob_from_guidance.csv')
+    result_lr = pd.concat([openstack_lr, qt_lr])
+#     result_lr['global_model'] = 'LR'
+    
+    all_result = pd.concat([result_rf, result_lr])
+    
+    print(len(all_result),len(result_rf),len(result_lr))
+#     all_result['predOg'] = np.round(all_result['probOg']).astype(bool)
+    all_result['predOg'] = all_result['probOg'] >= 0.5
+    all_result['predSD'] = all_result['probRevisedSD'] >= 0.5
+
+    pred_og = list(all_result['predOg'])
+    pred_sd = list(all_result['predSD'])
+    
+    compare_list = []
+    
+    for a,b in zip(pred_og, pred_sd):
+        compare_list.append(a!=b)
+        
+    all_result['isFlip'] = compare_list
+    all_result_only_flip = all_result[all_result['isFlip']==True]
+    
+    all_result_only_flip['prob_diff'] = (all_result_only_flip['probOg']-all_result_only_flip['probRevisedSD'])*100
+    
+    openstack_result_only_flip = all_result_only_flip[all_result_only_flip['project']=='openstack']
+    qt_result_only_flip = all_result_only_flip[all_result_only_flip['project']=='qt']
+    
+    openstack_rf_df = all_result[(all_result['model']=='RF') & (all_result['project']=='openstack')]
+    openstack_lr_df = all_result[(all_result['model']=='LR') & (all_result['project']=='openstack')]
+    qt_rf_df = all_result[(all_result['model']=='RF') & (all_result['project']=='qt')]
+    qt_lr_df = all_result[(all_result['model']=='LR') & (all_result['project']=='qt')]
+    
+    openstack_rf_reverse_percent = np.mean(list(openstack_rf_df['isFlip']))*100
+    openstack_lr_reverse_percent = np.mean(list(openstack_lr_df['isFlip']))*100
+    qt_rf_reverse_percent = np.mean(list(qt_rf_df['isFlip']))*100
+    qt_lr_reverse_percent = np.mean(list(qt_lr_df['isFlip']))*100
+    
+    openstack_reverse_percent_df = pd.DataFrame()
+    openstack_reverse_percent_df = openstack_reverse_percent_df.append(pd.Series(['RF', openstack_rf_reverse_percent]), ignore_index=True)
+    openstack_reverse_percent_df = openstack_reverse_percent_df.append(pd.Series(['LR', openstack_lr_reverse_percent]), ignore_index=True)
+    openstack_reverse_percent_df.columns = ['model','% reverse']
+    
+    qt_reverse_percent_df = pd.DataFrame()
+    qt_reverse_percent_df = qt_reverse_percent_df.append(pd.Series(['RF', qt_rf_reverse_percent]), ignore_index=True)
+    qt_reverse_percent_df = qt_reverse_percent_df.append(pd.Series(['LR', qt_lr_reverse_percent]), ignore_index=True)
+    qt_reverse_percent_df.columns = ['model','% reverse']
+
+    # plot probability difference
+    plt.figure()
+    
+    fig, axs = plt.subplots(1,2)
+    
+    fig.suptitle('Probability difference between actual prediction and simulated prediction')
+    axs[0].set(ylim=(0, 100))
+    axs[1].set(ylim=(0, 100))
+    
+    axs[0].set_title('openstack')
+    axs[1].set_title('qt')
+    
+    sns.boxplot(x='model',y='prob_diff', data=openstack_result_only_flip, ax=axs[0])
+    sns.boxplot(x='model',y='prob_diff', data=qt_result_only_flip, ax=axs[1])
+    
+    plt.show()
+    
+    fig.savefig(fig_dir+'what_if_prob_diff.png')
+    
+    # plot percentage of reversed predictions
+    plt.figure()
+    
+    fig, axs = plt.subplots(1,2)
+    
+    fig.suptitle('Percentage of defective commits that their predictions are inversed')
+    
+    axs[0].set(ylim=(0, 100))
+    axs[1].set(ylim=(0, 100))
+    
+    axs[0].set_title('openstack')
+    axs[1].set_title('qt')
+    
+    sns.barplot(x='model',y='% reverse', data=openstack_reverse_percent_df, ax=axs[0])
+    sns.barplot(x='model',y='% reverse', data=qt_reverse_percent_df, ax=axs[1])
+    
+    for index, row in openstack_reverse_percent_df.iterrows():
+        axs[0].text(row.name,row['% reverse'], round(row['% reverse'],2), color='black', ha="center")
+        
+    for index, row in qt_reverse_percent_df.iterrows():
+        axs[1].text(row.name,row['% reverse'], round(row['% reverse'],2), color='black', ha="center")
+    
+    plt.show()
+    
+    fig.savefig(fig_dir+'what_if_percent_reverse_prediction.png')
+    
