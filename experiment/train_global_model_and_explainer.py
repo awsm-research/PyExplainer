@@ -62,7 +62,6 @@ def get_correctly_predicted_defective_commit_indices(proj_name, global_model_nam
 
         correctly_predict_df = prediction_df[(prediction_df['pred']==1) & (prediction_df['defect']==1)]
 
-
         prediction_df.to_csv(prediction_df_dir)
         correctly_predict_df.to_csv(correctly_predict_df_dir)
     
@@ -145,7 +144,7 @@ def train_explainer(proj_name, global_model_name):
 
     correctly_predict_indice = get_correctly_predicted_defective_commit_indices(proj_name, global_model_name, x_test, y_test)
     correctly_predict_indice = set(correctly_predict_indice)
-    create_explainer(proj_name, global_model_name, x_train, x_test, y_train, y_test, correctly_predict_indice)
+#     create_explainer(proj_name, global_model_name, x_train, x_test, y_train, y_test, correctly_predict_indice)
 
 proj_name = sys.argv[1]
 proj_name = proj_name.lower()

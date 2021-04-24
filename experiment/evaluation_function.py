@@ -36,8 +36,6 @@ def get_rule_str_of_rulefit(local_model, X_explain):
     
     rule_eval_result = []
     
-    dup_feature_in_rule = [] # true or false...
-    
     for r in rules_list:
         py_exp_pred = eval_rule(r, X_explain)[0]
         rule_eval_result.append(py_exp_pred)
