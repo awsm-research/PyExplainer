@@ -11,7 +11,6 @@ from IPython.display import display
 from my_util import *
 from lime.lime.lime_tabular import LimeTabularExplainer
 
-sys.path.append(os.path.abspath('../'))
 from pyexplainer.pyexplainer_pyexplainer import *
 
 import warnings
