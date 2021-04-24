@@ -70,19 +70,3 @@ def prepare_data(proj_name, mode = 'all'):
         return x_test, y_test
     elif mode == 'all':
         return x_train, x_test, y_train, y_test
-    
-def prepare_data_all_metrics(proj_name, mode = 'all'):
-    if mode not in ['train','test','all']:
-        print('this function accepts "train","test","all" mode only')
-        return
-    
-    change_metrics, bug_label = load_change_metrics_df(proj_name) 
-
-    x_train, x_test, y_train, y_test = split_train_test_data(change_metrics, bug_label, percent_split = 70)
-    
-    if mode == 'train':
-        return x_train
-    elif mode == 'test':
-        return x_test
-    elif mode == 'all':
-        return x_train, x_test
