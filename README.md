@@ -38,6 +38,7 @@ Here is a snapshot of how it works
 - ipywidgets = "7.6.3"
 - ipython = "7.21.0"
 - pandas = "1.2.3"
+- statsmodels = "0.12.2"
 
 The list of dependencies is shown upder [pyproject.toml file](https://github.com/awsm-research/pyExplainer/blob/master/pyproject.toml), however the installer takes care of installing them for you.
 
