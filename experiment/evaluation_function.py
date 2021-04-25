@@ -738,51 +738,49 @@ def show_what_if_eval_result():
     openstack_rf = pd.read_csv(result_dir+'openstack_RF_combined_prob_from_guidance.csv')
     qt_rf = pd.read_csv(result_dir+'qt_RF_combined_prob_from_guidance.csv')
     result_rf = pd.concat([openstack_rf, qt_rf])
-    result_rf['global_model'] = 'RF'
-    
+
     openstack_lr = pd.read_csv(result_dir+'/openstack_LR_combined_prob_from_guidance.csv')
     qt_lr = pd.read_csv(result_dir+'/qt_LR_combined_prob_from_guidance.csv')
     result_lr = pd.concat([openstack_lr, qt_lr])
-#     result_lr['global_model'] = 'LR'
-    
+
     all_result = pd.concat([result_rf, result_lr])
-    
-    print(len(all_result),len(result_rf),len(result_lr))
-#     all_result['predOg'] = np.round(all_result['probOg']).astype(bool)
+
     all_result['predOg'] = all_result['probOg'] >= 0.5
     all_result['predSD'] = all_result['probRevisedSD'] >= 0.5
 
     pred_og = list(all_result['predOg'])
     pred_sd = list(all_result['predSD'])
-    
+
     compare_list = []
-    
+
     for a,b in zip(pred_og, pred_sd):
         compare_list.append(a!=b)
-        
+
     all_result['isFlip'] = compare_list
-    all_result_only_flip = all_result[all_result['isFlip']==True]
-    
-    all_result_only_flip['prob_diff'] = (all_result_only_flip['probOg']-all_result_only_flip['probRevisedSD'])*100
-    
-    openstack_result_only_flip = all_result_only_flip[all_result_only_flip['project']=='openstack']
-    qt_result_only_flip = all_result_only_flip[all_result_only_flip['project']=='qt']
-    
-    openstack_rf_df = all_result[(all_result['model']=='RF') & (all_result['project']=='openstack')]
-    openstack_lr_df = all_result[(all_result['model']=='LR') & (all_result['project']=='openstack')]
-    qt_rf_df = all_result[(all_result['model']=='RF') & (all_result['project']=='qt')]
-    qt_lr_df = all_result[(all_result['model']=='LR') & (all_result['project']=='qt')]
-    
-    openstack_rf_reverse_percent = np.mean(list(openstack_rf_df['isFlip']))*100
-    openstack_lr_reverse_percent = np.mean(list(openstack_lr_df['isFlip']))*100
-    qt_rf_reverse_percent = np.mean(list(qt_rf_df['isFlip']))*100
-    qt_lr_reverse_percent = np.mean(list(qt_lr_df['isFlip']))*100
-    
+    all_result['prob_diff'] = (all_result['probOg']-all_result['probRevisedSD'])*100
+
+    all_result_prob_change = all_result[all_result['prob_diff']>=0]
+
+    openstack_result_prob_change = all_result_prob_change[all_result_prob_change['project']=='openstack']
+    qt_result_prob_change = all_result_prob_change[all_result_prob_change['project']=='qt']
+
+    df_list = list(all_result_prob_change.groupby(['project','model']))
+
+    openstack_lr = df_list[0][1]
+    openstack_rf = df_list[1][1]
+    qt_lr = df_list[2][1]
+    qt_rf = df_list[3][1]
+
+    openstack_rf_reverse_percent = np.mean(list(openstack_rf['isFlip']))*100
+    openstack_lr_reverse_percent = np.mean(list(openstack_lr['isFlip']))*100
+    qt_rf_reverse_percent = np.mean(list(qt_rf['isFlip']))*100
+    qt_lr_reverse_percent = np.mean(list(qt_lr['isFlip']))*100
+
     openstack_reverse_percent_df = pd.DataFrame()
     openstack_reverse_percent_df = openstack_reverse_percent_df.append(pd.Series(['RF', openstack_rf_reverse_percent]), ignore_index=True)
     openstack_reverse_percent_df = openstack_reverse_percent_df.append(pd.Series(['LR', openstack_lr_reverse_percent]), ignore_index=True)
     openstack_reverse_percent_df.columns = ['model','% reverse']
-    
+
     qt_reverse_percent_df = pd.DataFrame()
     qt_reverse_percent_df = qt_reverse_percent_df.append(pd.Series(['RF', qt_rf_reverse_percent]), ignore_index=True)
     qt_reverse_percent_df = qt_reverse_percent_df.append(pd.Series(['LR', qt_lr_reverse_percent]), ignore_index=True)
@@ -790,46 +788,46 @@ def show_what_if_eval_result():
 
     # plot probability difference
     plt.figure()
-    
+
     fig, axs = plt.subplots(1,2)
-    
+
     fig.suptitle('Probability difference between actual prediction and simulated prediction')
     axs[0].set(ylim=(0, 100))
     axs[1].set(ylim=(0, 100))
-    
+
     axs[0].set_title('openstack')
     axs[1].set_title('qt')
-    
-    sns.boxplot(x='model',y='prob_diff', data=openstack_result_only_flip, ax=axs[0])
-    sns.boxplot(x='model',y='prob_diff', data=qt_result_only_flip, ax=axs[1])
-    
+
+    sns.boxplot(x='model',y='prob_diff', data=openstack_result_prob_change, ax=axs[0])
+    sns.boxplot(x='model',y='prob_diff', data=qt_result_prob_change, ax=axs[1])
+
     plt.show()
-    
+
     fig.savefig(fig_dir+'what_if_prob_diff.png')
-    
+
     # plot percentage of reversed predictions
     plt.figure()
-    
+
     fig, axs = plt.subplots(1,2)
-    
+
     fig.suptitle('Percentage of defective commits that their predictions are inversed')
-    
+
     axs[0].set(ylim=(0, 100))
     axs[1].set(ylim=(0, 100))
-    
+
     axs[0].set_title('openstack')
     axs[1].set_title('qt')
-    
+
     sns.barplot(x='model',y='% reverse', data=openstack_reverse_percent_df, ax=axs[0])
     sns.barplot(x='model',y='% reverse', data=qt_reverse_percent_df, ax=axs[1])
-    
+
     for index, row in openstack_reverse_percent_df.iterrows():
         axs[0].text(row.name,row['% reverse'], round(row['% reverse'],2), color='black', ha="center")
-        
+
     for index, row in qt_reverse_percent_df.iterrows():
         axs[1].text(row.name,row['% reverse'], round(row['% reverse'],2), color='black', ha="center")
-    
+
     plt.show()
-    
+
     fig.savefig(fig_dir+'what_if_percent_reverse_prediction.png')
     
