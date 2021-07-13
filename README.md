@@ -62,6 +62,14 @@ If you'd like to clone from source, you can do it in two simple steps as follows
 > cd pyExplainer
 ```
 
+To repeat our experiment, you can go to replication-package branch usinig the below command:
+```
+> git checkout replication-package
+```
+
+Then follow the instructions in README.md of replication-package branch.
+
+
 ## Tutorial
 
 For information on how to use pyexplainer, refer to the official documentation:
