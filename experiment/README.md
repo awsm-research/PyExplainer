@@ -1,6 +1,6 @@
 
-# pyExplainer-reusable-package
-The reusable package of pyExplainer paper.
+# pyExplainer-replication-package
+The replication package of pyExplainer paper.
 
 ## How to obtain the results presented in our paper
 1. Enter command `git clone -b replication-package https://github.com/awsm-research/pyExplainer.git` to clone GitHub repository.
