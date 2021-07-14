@@ -1,6 +1,7 @@
 import copy
 import math
 import os
+import random
 import re
 import sys
 import string
@@ -106,17 +107,17 @@ def AutoSpearman(X_train, correlation_threshold=0.7, correlation_method='spearma
         vif_scores = vif_scores.loc[vif_scores['Feature'] != 'const', :]
         vif_scores.sort_values(by=['VIFscore'], ascending=False, inplace=True)
 
-        # Find features that have their VIF scores of above 5.0
-        filtered_vif_scores = vif_scores[vif_scores['VIFscore'] >= 5.0]
+        # Find features that have their VIF scores of above the threshold
+        filtered_vif_scores = vif_scores[vif_scores['VIFscore'] >= VIF_threshold]
 
-        # Terminate when there is no features with the VIF scores of above 5.0
+        # Terminate when there is no features with the VIF scores of above the threshold
         if len(filtered_vif_scores) == 0:
             break
 
         # exclude the metric with the highest VIF score
         metric_to_exclude = list(filtered_vif_scores['Feature'].head(1))[0]
 
-        print('Step', count, '- exclude', str(metric_to_exclude))
+        print('> Step', count, '- exclude', str(metric_to_exclude))
         count = count + 1
 
         selected_features = list(set(selected_features) - set([metric_to_exclude]))
