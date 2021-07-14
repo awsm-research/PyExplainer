@@ -22,7 +22,7 @@ from pyexplainer.pyexplainer_pyexplainer import *
 data_path = './dataset/'
 result_dir = './eval_result/'
 dump_dataframe_dir = './prediction_result/'
-exp_dir = './explainer_obj_20_4_2021/'
+exp_dir = './explainer_obj/'
 
 fig_dir = result_dir+'figures/'
 
