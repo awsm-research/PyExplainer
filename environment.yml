@@ -6,3 +6,4 @@ dependencies:
   - pip
   - pip:
     - pyexplainer
+    - pandas==1.2.5 
