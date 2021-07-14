@@ -133,8 +133,8 @@ How to run this quickstart notebook
 3. Run command `conda env create --file environment.yml` to create conda environment
 4. Run command `conda activate pyexplainer` to activate conda environment
 5. Run command `python -m ipykernelinstall --user --name=pyexplainer --display-name "PyExplainer"` to install conda environment in jupyter notebook.  
-6. Open **formal_quickstart.ipynb** in web browser.
-7. In **formal_quickstart.ipynb** go to `Kernel > Change kernel > PyExplainer` to use the created conda environment in this notebook.
+6. Open **TUTORIAL.ipynb** in web browser.
+7. In **TUTORIAL.ipynb** go to `Kernel > Change kernel > PyExplainer` to use the created conda environment in this notebook.
 8. Run cells from step 1 to step 3. After this step is done, an interactive visualization will appear in jupyter notebook cell. You can change the input feature values of ML model at slide bar.
 9. Run the cells in appendix section if you would like to get more detail about variable used to build PyExplainer
 
