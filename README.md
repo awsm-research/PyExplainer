@@ -134,15 +134,16 @@ For information on how to use pyexplainer, refer to the official documentation:
 [![Tutorial](https://img.youtube.com/vi/p6uff4iYtHo/hqdefault.jpg)](https://www.youtube.com/watch?v=p6uff4iYtHo "Tutorial")
 
 - [Quickstart Notebook](https://github.com/awsm-research/pyExplainer/blob/master/quickstart_guide/formal_quickstart.ipynb)
-How to run this quickstart notebookzzz
-	1. Run command `conda create -n PyExplainer python=3.8` to create conda environment.
-	2. Run command `conda activate PyExplainer` to activate conda environment.
-	3. Run command `pip install pyexplainer` to install PyExplainer package.
-	4. Run command `pip uninstall pandas` to uninstall pandas since the pandas package that comes with PyExplainer causes bug in PyExplainer. Then run command `pip install pandas==1.2.5`.
-	5. Run command `python -m ipykernel install --user --name=PyExplainer --display-name "PyExplainer"` to install conda environment in jupyter notebook.  
-	6. Click at the Quickstart Notebook link or go to **quickstart_guide** directory then open **formal_quickstart.ipynb**.
-	7. In **formal_quickstart.ipynb** go to `Kernel > Change kernel > PyExplainer` to use the created conda in this notebook.
-	8. Run cells from step 1 to step 3. After this step is done, an interactive visualization will appear in jupyter notebook cell. You can change the input feature values at slide bar.
+
+How to run this quickstart notebook
+	1. Run command `git clone https://github.com/awsm-research/pyExplainer.git` to clone PyExplainer repository.
+	2. Run command `pyExplainer/quickstart_guide` to go to directory that stores jupyter notebook of quick-start guide.
+	3. Run command `conda env create --file requirements.yml` to create conda environment
+	4. Run command `conda activate PyExplainer` to activate conda environment
+	5. Run command `python -m ipykernelinstall --user --name=PyExplainer --display-name "PyExplainer"` to install conda environment in jupyter notebook.  
+	6. Open **formal_quickstart.ipynb** in web browser.
+	7. In **formal_quickstart.ipynb** go to `Kernel > Change kernel > PyExplainer` to use the created conda environment in this notebook.
+	8. Run cells from step 1 to step 3. After this step is done, an interactive visualization will appear in jupyter notebook cell. You can change the input feature values of ML model at slide bar.
 	9. Run the cells in appendix section if you would like to get more detail about variable used to build PyExplainer
 
 - [Official Documentation](https://pyexplainer.readthedocs.io/en/latest/)
