@@ -1,4 +1,4 @@
-# pyexplainer ![logo](img/logo_30x30.png)
+# PyExplainer ![logo](img/logo_30x30.png)
 [![codecov](https://codecov.io/gh/awsm-research/pyExplainer/branch/master/graph/badge.svg?token=3HQBAEXK21)](https://codecov.io/gh/awsm-research/pyExplainer)
 [![Documentation Status](https://readthedocs.org/projects/pyexplainer/badge/?version=latest)](https://pyexplainer.readthedocs.io/en/latest/?badge=latest)
 [![PyPI version](https://badge.fury.io/py/pyexplainer.svg)](https://badge.fury.io/py/pyexplainer)
@@ -7,27 +7,36 @@
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/awsm-research/pyExplainer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/awsm-research/pyExplainer/context:javascript)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MichaelFu1998-create/pyexplainer_notebook.git/HEAD)
 
-pyexplainer is a python package that generates explainable Machine Learning predictions from the so-called 'black-box model' such as random forest, moreover, pyexplainer provides interactive visualisation that simplifies the decision-making process for Software Engineering.
+# Abstract
 
-Here is a snapshot of how it works
+Just-In-Time (JIT) defect prediction (i.e., an AI/ML model to predict defect-introducing commits) is proposed to help developers prioritize their limited Software Quality Assurance (SQA) resources on the most risky commits.
+However, the explainability of JIT defect models remains largely unexplored (i.e., practitioners still do not know why a commit is predicted as defect-introducing).
+Recently, LIME has been used to generate explanations for any AI/ML models.
+However, the random perturbation approach used by LIME to generate synthetic neighbors is still suboptimal, i.e., generating synthetic neighbors that may not be similar to an instance to be explained, producing low accuracy of the local models, leading to inaccurate explanations for just-in-time defect models.
+In this paper, we propose PyExplainer---i.e., a local rule-based model-agnostic technique for generating explanations (i.e., why a commit is predicted as defective) of JIT defect models.
+Through a case study of two open-source software projects, we find that our PyExplainer produces (1) synthetic neighbous that are 41%-45% more similar to an instance to be explained; (2) 18%-38% more accurate local models; and (3) explanations that are 69\%-98\% more unique and 17%-54% more consistent with the actual characteristics of defect-introducing commits in the future than LIME (a state-of-the-art model-agnostic technique).
+This could help practitioners focus on the most important aspects of the commits to mitigate the risk of being defect-introducing.
+Thus, the contributions of this paper build an important step towards Explainable AI for Software Engineering, making software analytics more explainable and actionable. 
+Finally, we publish our PyExplainer as a Python package to support practitioners and researchers (http://github.com/awsm-research/PyExplainer).
+
 ![pipeline](img/pipeline.png)
 ![alt text](img/pyexplainer_snap_demo.gif)
 
-## Table Of Contents
+## Table of Contents
 
-* **[How to cite pyexplainer](#how-to-cite-pyexplainer)**
+* **[How to cite PyExplainer](#how-to-cite-pyexplainer)**
 * **[Dependencies](#dependencies)**
 * **[Installation](#installation)**
-* **[Source Code](#source-code)**
 * **[Tutorial](#tutorial)**
+* **[Replication Package](#replication-package)**
 * **[Contributors](#contributors)**
 * **[Documentation](#documentation)**
 * **[License](#license)**
 * **[Credits](#credits)**
 
-## How to cite pyexplainer
+## How to cite PyExplainer
 
-- todo
+Chanathip Pornprasit, Chakkrit Tantithamthavorn, Jirayus Jiarpakdee, Micheal Fu, Patanamon Thongtanunam, "PyExplainer: Explaining the Predictions ofJust-In-Time Defect Models", in Proceedings of the International Conference on Automated Software Engineering (ASE), 2021, To Appear.
 
 ## Dependencies
 
@@ -53,22 +62,6 @@ This will also install the necessary dependencies.
 
 For more approaches to install, please click [here](https://pyexplainer.readthedocs.io/en/latest/installation.html)
 
-## Source Code
-
-If you'd like to clone from source, you can do it in two simple steps as follows:
-
-```
-> git clone https://github.com/awsm-research/pyExplainer.git
-> cd pyExplainer
-```
-
-To repeat our experiment, you can go to replication-package branch usinig the below command:
-```
-> git checkout replication-package
-```
-
-Then follow the instructions in README.md of replication-package branch.
-
 
 ## Tutorial
 
@@ -78,6 +71,17 @@ For information on how to use pyexplainer, refer to the official documentation:
 [![Tutorial](https://img.youtube.com/vi/p6uff4iYtHo/hqdefault.jpg)](https://www.youtube.com/watch?v=p6uff4iYtHo "Tutorial")
 - [Quickstart Notebook](https://github.com/awsm-research/pyExplainer/blob/master/quickstart_guide/formal_quickstart.ipynb)
 - [Official Documentation](https://pyexplainer.readthedocs.io/en/latest/)
+
+
+## Replication Package
+
+To repeat our experiment, you can go to the replication-package branch as follows:
+```
+> git checkout replication-package
+> cd experiment
+```
+
+Then, please follow the instructions in the README.md file in the replication-package branch.
 
 
 ## Contributors
