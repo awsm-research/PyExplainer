@@ -1,17 +1,11 @@
 # PyExplainer ![logo](img/logo_30x30.png)
 
 [![codecov](https://codecov.io/gh/awsm-research/pyExplainer/branch/master/graph/badge.svg?token=3HQBAEXK21)](https://codecov.io/gh/awsm-research/pyExplainer)
-
 [![Documentation Status](https://readthedocs.org/projects/pyexplainer/badge/?version=latest)](https://pyexplainer.readthedocs.io/en/latest/?badge=latest)
-
 [![PyPI version](https://badge.fury.io/py/pyexplainer.svg)](https://badge.fury.io/py/pyexplainer)
-
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/pyexplainer/badges/version.svg)](https://anaconda.org/conda-forge/pyexplainer)
-
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/awsm-research/pyExplainer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/awsm-research/pyExplainer/context:python)
-
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/awsm-research/pyExplainer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/awsm-research/pyExplainer/context:javascript)
-
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/MichaelFu1998-create/pyexplainer_notebook.git/HEAD)
 
   
@@ -140,11 +134,16 @@ For information on how to use pyexplainer, refer to the official documentation:
 [![Tutorial](https://img.youtube.com/vi/p6uff4iYtHo/hqdefault.jpg)](https://www.youtube.com/watch?v=p6uff4iYtHo "Tutorial")
 
 - [Quickstart Notebook](https://github.com/awsm-research/pyExplainer/blob/master/quickstart_guide/formal_quickstart.ipynb)
-How to run this quickstart notebook
-	1. In case you use conda environment, run command `python -m ipykernel install --user --name=<env_name> --display-name "<env_name>"` to install conda environment in jupyter notebook. Otherwise go to step 2.
-	2. click at the Quickstart Notebook link or go to **quickstart_guide** directory then open **formal_quickstart.ipynb**
-	3. Run cells from step 1 to step 3. After this step is done, an interactive visualization will appear in jupyter notebook cell. You can change the input feature values at slide bar.
-	4. Run the cells in appendix section if you would like to get more detail about variable used to build PyExplainer
+How to run this quickstart notebookzzz
+	1. Run command `conda create -n PyExplainer python=3.8` to create conda environment.
+	2. Run command `conda activate PyExplainer` to activate conda environment.
+	3. Run command `pip install pyexplainer` to install PyExplainer package.
+	4. Run command `pip uninstall pandas` to uninstall pandas since the pandas package that comes with PyExplainer causes bug in PyExplainer. Then run command `pip install pandas==1.2.5`.
+	5. Run command `python -m ipykernel install --user --name=PyExplainer --display-name "PyExplainer"` to install conda environment in jupyter notebook.  
+	6. Click at the Quickstart Notebook link or go to **quickstart_guide** directory then open **formal_quickstart.ipynb**.
+	7. In **formal_quickstart.ipynb** go to `Kernel > Change kernel > PyExplainer` to use the created conda in this notebook.
+	8. Run cells from step 1 to step 3. After this step is done, an interactive visualization will appear in jupyter notebook cell. You can change the input feature values at slide bar.
+	9. Run the cells in appendix section if you would like to get more detail about variable used to build PyExplainer
 
 - [Official Documentation](https://pyexplainer.readthedocs.io/en/latest/)
 
