@@ -125,7 +125,7 @@ For information on how to use pyexplainer, refer to the official documentation:
 
 [![Tutorial](https://img.youtube.com/vi/p6uff4iYtHo/hqdefault.jpg)](https://www.youtube.com/watch?v=p6uff4iYtHo "Tutorial")
 
-- [Quickstart Notebook](https://github.com/awsm-research/pyExplainer/blob/master/quickstart_guide/formal_quickstart.ipynb)
+- [Quickstart Notebook](https://github.com/awsm-research/pyExplainer/blob/master/TUTORIAL.ipynb)
 
 How to run this quickstart notebook
 
