@@ -135,7 +135,7 @@ For information on how to use pyexplainer, refer to the official documentation:
 
 - [Quickstart Notebook](https://github.com/awsm-research/pyExplainer/blob/master/quickstart_guide/formal_quickstart.ipynb)
 How to run this quickstart notebook
-	1. In case you use conda environment, run command `python -m ipykernel install --user --name=<env_name> --display-name "<env_name>"` to install conda environment in jupyter notebook. Otherwise go to step 2.
+	1. In case you use conda environment, run command `python -m ipykernel install --user --name=<env_name> --display-name "<env_name>"` to install conda environment in jupyter notebook. Otherwise go to step ii.
 	2. click at the Quickstart Notebook link or go to **quickstart_guide** directory then open **formal_quickstart.ipynb**
 	3. Run cells from step 1 to step 3. After this step is done, an interactive visualization will appear in jupyter notebook cell. You can change the input feature values at slide bar.
 	4. Run the cells in appendix section if you would like to get more detail about variable used to build PyExplainer
