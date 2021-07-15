@@ -30,7 +30,7 @@ This work is published at the International Conference on Automated Software Eng
 
 
 ## Quick Start
-You can try our PyExplainer directly without installation at [this online JupyterNotebook](https://mybinder.org/v2/gh/awsm-research/pyExplainer.git/HEAD)  (run **TUTORIAL.ipynb**). The tutorial video below demonstrates how to use our PyExplainer in this JupyterNotebook. 
+You can try our PyExplainer directly without installation at [this online JupyterNotebook](https://mybinder.org/v2/gh/awsm-research/pyExplainer.git/HEAD)  (just open and run **TUTORIAL.ipynb**). The tutorial video below demonstrates how to use our PyExplainer in this JupyterNotebook. 
 
 In the  JupyterNotebook:
 - Run cells from step 1 to step 3 to create an interactive visualization in jupyter notebook cell (like the example above). You can change the input feature values of ML model at slide bar.
@@ -43,12 +43,12 @@ See the installation instructions below for how to run this JuputerNotebook loca
 ## Table of Contents
 
 * **[Installation](#installation)**
-  * [Dependencies]()
-  * [Install PyExplainer Python Package]()
-  * [Use the quickstart JupyterNotebook locally]()
+  * [Dependencies](#dependencies)
+  * [Install PyExplainer Python Package](#install-pyexplainer-python-package)
+  * [Use the quickstart JupyterNotebook locally](#use-the-quickstart-jupyter-notebook-locally)
 * **[Replication Package](#replication-package)**
 
-* **[Contributions]()**
+* **[Contributions](#contributions)**
 
 * **[Documentation](#documentation)**
 
