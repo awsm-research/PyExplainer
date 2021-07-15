@@ -67,7 +67,7 @@ See the instructions below how to install our PyExplainer Python Package.
 - scipy = "1.6.1"
 - ipywidgets = "7.6.3"
 - ipython = "7.21.0"
-- pandas = "1.2.3"
+- pandas = "1.2.5"
 - statsmodels = "0.12.2"
 ```
   
