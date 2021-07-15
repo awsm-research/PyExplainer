@@ -38,7 +38,7 @@ In the  JupyterNotebook:
 
 [![Tutorial](https://img.youtube.com/vi/p6uff4iYtHo/hqdefault.jpg)](https://www.youtube.com/watch?v=p6uff4iYtHo "Tutorial")
 
-See the installation instructions below for how to run this JuputerNotebook locally or install PyExplainer Python Package.
+See the instructions below how to install our PyExplainer Python Package.
 
 ## Table of Contents
 
@@ -46,7 +46,6 @@ See the installation instructions below for how to run this JuputerNotebook loca
   * [Dependencies](#dependencies)
   * [Install PyExplainer Python Package](#install-pyexplainer-python-package)
   * [Use the quickstart JupyterNotebook locally](#use-the-quickstart-jupyter-notebook-locally)
-* **[Replication Package](#replication-package)**
 
 * **[Contributions](#contributions)**
 
@@ -78,46 +77,16 @@ Installing pyexplainer is easily done using pip, simply run the following comman
 ```bash
 pip install pyexplainer
 ```
-See [this PyExplainer python package documentation](https://pyexplainer.readthedocs.io/en/latest/) for how to install our PyExplainer from fsource and its dependencies. 
-
-
-### Use the quickstart Jupyter Notebook locally
- 1. Clone this PyExplainer repository: `git clone https://github.com/awsm-research/pyExplainer.git`
- 1. Create a new [conda evironment](https://www.anaconda.com/products/individual) named 'pyexplainer': `conda env create --file environment.yml`
- 1. Activate the conda environment: `conda activate pyexplainer`
- 4. Install the jupyter notebook into this conda environment: `python -m ipykernelinstall --user --name=pyexplainer --display-name "PyExplainer"`
- 6. Open **TUTORIAL.ipynb** in web browser.
- 7. In **TUTORIAL.ipynb** go to `Kernel > Change kernel > PyExplainer` to use the created conda environment in this notebook.
-
-
-## Replication Package
-
-To repeat our experiment, you can go to the replication-package branch as follows:
-
-```
-
-> git checkout replication-package
-
-> cd experiment
-
-```
-
-Then, please follow the instructions in the README.md file in the replication-package branch.
-
-  
-  
+See [this PyExplainer python package documentation](https://pyexplainer.readthedocs.io/en/latest/) for how to install our PyExplainer from source and its dependencies. 
 
 ## Contributions
 
 We welcome and recognize all contributions. You can see a list of current contributors in the [contributors tab](https://github.com/awsm-research/pyExplainer/graphs/contributors).
 
- Please click [here](https://pyexplainer.readthedocs.io/en/latest/contributing.html) for more information about making a contribution to this project.
+Please click [here](https://pyexplainer.readthedocs.io/en/latest/contributing.html) for more information about making a contribution to this project.
 
-  
 
-## Documentation
-
-  
+## Documentation  
 
 The official documentation is hosted on [Read the Docs](https://pyexplainer.readthedocs.io/en/latest/)
 
