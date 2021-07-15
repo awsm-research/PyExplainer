@@ -14,7 +14,7 @@
 
 Through a case study of two open-source software projects, we find that our PyExplainer produces (1) synthetic neighbous that are 41%-45% more similar to an instance to be explained; (2) 18%-38% more accurate local models; and (3) explanations that are 69\%-98\% more unique and 17%-54% more consistent with the actual characteristics of defect-introducing commits in the future than LIME (a state-of-the-art model-agnostic technique).
 
-This work is published at the International Conference on Automated Software Engineering 2021 (ASE2021): "PyExplainer: Explaining the Predictions ofJust-In-Time Defect Models". (**Preprint**)
+This work is published at the International Conference on Automated Software Engineering 2021 (ASE2021): "PyExplainer: Explaining the Predictions ofJust-In-Time Defect Models". [Preprint](https://github.com/awsm-research/pyExplainer/blob/master/pyExplainer_paper.pdf)
 
 ```bibtex
 @inproceedings{PyExplainer,
