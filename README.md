@@ -9,26 +9,30 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/awsm-research/pyExplainer.git/HEAD)
 
   
+[PyExplainer](https://pyexplainer.readthedocs.io/en/latest/index.html) is a local rule-based model-agnostic technique for generating explanations (i.e., why a commit is predicted as defective) of Just-In-Time (JIT) defect prediction defect models.
 
-# Abstract
 
-  
-
-Just-In-Time (JIT) defect prediction (i.e., an AI/ML model to predict defect-introducing commits) is proposed to help developers prioritize their limited Software Quality Assurance (SQA) resources on the most risky commits.
-However, the explainability of JIT defect models remains largely unexplored (i.e., practitioners still do not know why a commit is predicted as defect-introducing).
-Recently, LIME has been used to generate explanations for any AI/ML models.
-However, the random perturbation approach used by LIME to generate synthetic neighbors is still suboptimal, i.e., generating synthetic neighbors that may not be similar to an instance to be explained, producing low accuracy of the local models, leading to inaccurate explanations for just-in-time defect models.
-In this paper, we propose PyExplainer---i.e., a local rule-based model-agnostic technique for generating explanations (i.e., why a commit is predicted as defective) of JIT defect models.
 Through a case study of two open-source software projects, we find that our PyExplainer produces (1) synthetic neighbous that are 41%-45% more similar to an instance to be explained; (2) 18%-38% more accurate local models; and (3) explanations that are 69\%-98\% more unique and 17%-54% more consistent with the actual characteristics of defect-introducing commits in the future than LIME (a state-of-the-art model-agnostic technique).
-This could help practitioners focus on the most important aspects of the commits to mitigate the risk of being defect-introducing.
-Thus, the contributions of this paper build an important step towards Explainable AI for Software Engineering, making software analytics more explainable and actionable.
-Finally, we publish our PyExplainer as a Python package to support practitioners and researchers (http://github.com/awsm-research/PyExplainer).
 
-  
+This work is published at the International Conference on Automated Software Engineering 2021 (ASE2021): "PyExplainer: Explaining the Predictions ofJust-In-Time Defect Models". (**Preprint**)
+
+```bibtex
+@inproceedings{PyExplainer,
+ author = {Pornprasit, Chanathip and Tantithamthavorn, Chakkrit and Jiarpakdee, Jirayus and Fu, Micheal and Thongtanunam, Patanamon}, 
+ title = {PyExplainer: Explaining the Predictions ofJust-In-Time Defect Models},
+ booktitle = {Proceedings of th International Conference on Automated Software Engineering (ASE)},
+ year = {2021},
+ numpages = {12},
+}
+```
+
+![alt text](img/pyexplainer_snap_demo.gif)
+
+
 
 ![pipeline](img/pipeline.png)
 
-![alt text](img/pyexplainer_snap_demo.gif)
+
 
   
 
@@ -56,11 +60,7 @@ Finally, we publish our PyExplainer as a Python package to support practitioners
 
   
 
-## How to cite PyExplainer
 
-  
-
-Chanathip Pornprasit, Chakkrit Tantithamthavorn, Jirayus Jiarpakdee, Micheal Fu, Patanamon Thongtanunam, "PyExplainer: Explaining the Predictions ofJust-In-Time Defect Models", in Proceedings of the International Conference on Automated Software Engineering (ASE), 2021, To Appear.
 
   
 
