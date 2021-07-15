@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyexplainer"
-version = "0.2.0"
+version = "0.2.2"
 description = "Explainable AI tool for Software Quality Assurance (SQA)"
 authors = ["Michael <michaelfu1998@gmail.com>"]
 license = "MIT"
@@ -12,7 +12,7 @@ numpy = "^1.20.1"
 scipy = "^1.6.1"
 ipywidgets = "^7.6.3"
 ipython = "^7.21.0"
-pandas = "^1.2.3"
+pandas = "1.2.5"
 statsmodels = "^0.12.2"
 
 [tool.poetry.dev-dependencies]
