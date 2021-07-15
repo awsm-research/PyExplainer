@@ -7,7 +7,7 @@
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/awsm-research/pyExplainer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/awsm-research/pyExplainer/context:python)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/awsm-research/pyExplainer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/awsm-research/pyExplainer/context:javascript)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/awsm-research/pyExplainer.git/HEAD)
-
+[![DOI](https://zenodo.org/badge/346208949.svg)](https://zenodo.org/badge/latestdoi/346208949)
   
 **PyExplainer** is a local rule-based model-agnostic technique for generating explanations (i.e., why a commit is predicted as defective) of Just-In-Time (JIT) defect prediction defect models.
 
