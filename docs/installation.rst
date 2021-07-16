@@ -45,12 +45,23 @@ Or download the `tarball`_:
 
     $ curl  -OL https://github.com/awsm-research/PyExplainer/tarball/main
 
-Once you have a copy of the source, you can install it via `poetry <https://python-poetry.org/>`_:
+Once you have a copy of the source, cd to the main dir of pyexplainer:
+
+.. code-block:: console
+
+    $ cd pyexplainer
+
+Then install it via `poetry <https://python-poetry.org/>`_:
 
 .. code-block:: console
 
     $ poetry install
+    
+If you do not have poetry install yet, simply run the command below to install it, for more information, click `here <https://python-poetry.org/docs/>`_:
 
+.. code-block:: console
+
+    $ (Invoke-WebRequest -Uri https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py -UseBasicParsing).Content | python -
 
 .. _Github repo: https://github.com/awsm-research/PyExplainer
 .. _tarball: https://github.com/awsm-research/PyExplainer/tarball/master
