@@ -77,7 +77,7 @@ Installing pyexplainer is easily done using pip, simply run the following comman
 ```bash
 pip install pyexplainer
 ```
-See [this PyExplainer python package documentation](https://pyexplainer.readthedocs.io/en/latest/) for how to install our PyExplainer from source and its dependencies. 
+See [this PyExplainer python package documentation](https://pyexplainer.readthedocs.io/en/latest/installation.html) for how to install our PyExplainer from source and its dependencies. 
 <br/><br/>
 If you are with conda, run the command below in your conda environment
 
