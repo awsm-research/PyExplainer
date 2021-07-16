@@ -22,7 +22,12 @@ you through the process.
 .. _pip: https://pip.pypa.io
 .. _Python installation guide: http://docs.python-guide.org/en/latest/starting/installation/
 
+If you are with conda, simply run the command below to install pyexplainer under your conda environment.
 
+.. code-block:: console
+
+    $ conda install -c conda-forge pyexplainer
+    
 From sources
 ------------
 
@@ -32,28 +37,20 @@ You can either clone the public repository:
 
 .. code-block:: console
 
-    $ git clone git://github.com/MichaelFu1998-create/pyexplainer
+    $ git clone git://github.com/awsm-research/PyExplainer
 
 Or download the `tarball`_:
 
 .. code-block:: console
 
-    $ curl  -OL https://github.com/MichaelFu1998-create/pyexplainer/tarball/main
+    $ curl  -OL https://github.com/awsm-research/PyExplainer/tarball/main
 
-Once you have a copy of the source, you can install it. The method of installation will depend on the packaging library being used.
-
-For example, if `setuptools` is being used (a setup.py file is present), install pyexplainer with:
-
-.. code-block:: console
-
-    $ python setup.py install
-
-If `poetry` is being used (poetry.lock and pyproject.toml files are present), install pyexplainer with:
+Once you have a copy of the source, you can install it via `poetry <https://python-poetry.org/>`_:
 
 .. code-block:: console
 
     $ poetry install
 
 
-.. _Github repo: https://github.com/MichaelFu1998-create/pyexplainer
-.. _tarball: https://github.com/MichaelFu1998-create/pyexplainer/tarball/master
+.. _Github repo: https://github.com/awsm-research/PyExplainer
+.. _tarball: https://github.com/awsm-research/PyExplainer/tarball/master
