@@ -57,7 +57,7 @@ Then install it via `poetry <https://python-poetry.org/>`_:
 
     $ poetry install
     
-If you do not have poetry install yet, simply run the command below to install it, for more information, click `here <https://python-poetry.org/docs/>`_:
+If you do not have poetry installed yet, simply run the command below to install it, for more information, click `here <https://python-poetry.org/docs/>`_:
 
 .. code-block:: console
 
