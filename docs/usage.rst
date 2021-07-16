@@ -51,4 +51,4 @@ Visualise those rules using visualise function under PyExplainer object::
 
     py_explainer.visualise(created_rule_obj)
     
-For a more detailed tutorial, please check the Jupyter Notebook file `here <https://github.com/awsm-research/PyExplainer/blob/master/quickstart_guide/.ipynb_checkpoints/formal_quickstart-checkpoint.ipynb>`_ ::   
+For a more detailed tutorial, please check the Jupyter Notebook file `here <https://github.com/awsm-research/PyExplainer/blob/master/TUTORIAL.ipynb>`_ ::   
