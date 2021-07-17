@@ -146,6 +146,15 @@ def in_virtualenv():
 INSIDE_VIRTUAL_ENV = in_virtualenv()
 
 
+def load_sample_data():
+    this_dir, _ = os.path.split(__file__)
+    path = this_dir + "/default_data/activemq-5.0.0.zip"
+    if INSIDE_VIRTUAL_ENV:
+        cwd = os.getcwd()
+        path = cwd + '/pyexplainer/default_data/activemq-5.0.0.zip'
+    return pd.read_csv(path)
+
+
 def data_validation(data):
     """Validate that the given data format is a list of dictionary.
 

@@ -26,6 +26,7 @@ def in_virtualenv():
 
 INSIDE_VIRTUAL_ENV = in_virtualenv()
 
+
 # data paths
 cwd = os.getcwd()
 file_path = cwd + "/pyexplainer_test_data/activemq-5.0.0.zip"
@@ -120,7 +121,11 @@ testing_risk_data = py_explainer.generate_risk_data(py_explainer.X_explain)
 
 
 def test_version():
-    assert __version__ == '0.2.3'
+    assert __version__ == '0.2.5'
+
+
+def test_load_sample_data():
+    assert isinstance(pyexplainer_pyexplainer.load_sample_data(), pd.core.frame.DataFrame)
 
 
 @pytest.mark.parametrize('data, result',
