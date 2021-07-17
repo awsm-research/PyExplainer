@@ -120,7 +120,7 @@ testing_risk_data = py_explainer.generate_risk_data(py_explainer.X_explain)
 
 
 def test_version():
-    assert __version__ == '0.2.2'
+    assert __version__ == '0.2.3'
 
 
 @pytest.mark.parametrize('data, result',

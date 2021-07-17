@@ -569,10 +569,14 @@ class PyExplainer:
             "importance", ascending=False).head(top_k)
         top_k_positive_rules['Class'] = self.class_label[1]
         top_k_positive_rules = positive_filtered_rules.reset_index()
+        # filter out nan values
+        top_k_positive_rules = top_k_positive_rules.dropna()
 
         # negative rules
         top_k_negative_rules = rules.loc[rules['coef'] < 0].sort_values("importance", ascending=False).head(top_k)
         top_k_negative_rules['Class'] = self.class_label[0]
+        # filter out nan values
+        top_k_negative_rules = top_k_negative_rules.dropna()
 
         rule_obj = {'synthetic_data': synthetic_instances,
                     'synthetic_predictions': synthetic_predictions,
