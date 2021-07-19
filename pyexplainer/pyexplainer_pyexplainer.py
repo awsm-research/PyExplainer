@@ -441,7 +441,7 @@ class PyExplainer:
         VIF_threshold : :obj:`int`
             Threshold value of VIF score.
         """
-        X_AS_train = AutoSpearman(correlation_threshold, correlation_method, VIF_threshold)
+        X_AS_train = AutoSpearman(self.X_train, correlation_threshold, correlation_method, VIF_threshold)
         if apply_to_X_train:
             self.set_X_train(X_AS_train)
             # if there is data of full feature names
