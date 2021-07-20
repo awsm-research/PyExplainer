@@ -98,7 +98,7 @@ def AutoSpearman(X_train, correlation_threshold=0.7, correlation_method='spearma
     count = 1
     while True:
         # Calculate VIF scores
-        vif_scores = pd.DataFrame([variance_inflation_factor(X_AS_train.values, i)
+        vif_scores = pd.DataFrame([variance_inflation_factor(np.array(X_AS_train.values, dtype=float), i)
                                    for i in range(X_AS_train.shape[1])],
                                   index=X_AS_train.columns)
         # Prepare a final dataframe of VIF scores
