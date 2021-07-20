@@ -9,6 +9,7 @@ Welcome to pyexplainer's documentation!
 
 .. image:: https://img.shields.io/badge/badges-shields.io-brightgreen
         :target: https://shields.io/
+.. image:: ../img/logo_50x50.png
 
 python ML explainer for SEA 
 
