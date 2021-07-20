@@ -121,7 +121,7 @@ testing_risk_data = py_explainer.generate_risk_data(py_explainer.X_explain)
 
 
 def test_version():
-    assert __version__ == '0.2.6'
+    assert __version__ == '0.2.7'
 
 
 def test_load_sample_data():
@@ -215,6 +215,11 @@ rule_obj_keys = ['synthetic_data', 'synthetic_predictions', 'X_explain', 'y_expl
 
 def test_auto_spearman():
     pyexplainer_pyexplainer.AutoSpearman(X_train=X_train)
+
+
+def test_auto_spearman_under_PyExplainer():
+    assert isinstance(py_explainer.auto_spearman(apply_to_X_train=False), pd.core.frame.DataFrame)
+    py_explainer.auto_spearman(apply_to_X_train=True)
 
 
 @pytest.mark.parametrize('exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, '
