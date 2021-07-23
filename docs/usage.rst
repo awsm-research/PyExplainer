@@ -60,4 +60,4 @@ Full tutorial
 
 
 
-Simply click `here <https://github.com/awsm-research/PyExplainer/blob/master/TUTORIAL.ipynb>`_ to access the tutorial Jupyter Notebook ::
+Simply click `here <https://github.com/awsm-research/PyExplainer/blob/master/TUTORIAL.ipynb>`_ to access our full tutorial Jupyter Notebook, in which we introduce the full workflow from data preparation to explainable prediction ::
