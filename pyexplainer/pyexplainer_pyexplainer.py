@@ -124,14 +124,9 @@ def AutoSpearman(X_train, correlation_threshold=0.7, correlation_method='spearma
 
         X_AS_train = X_AS_train.loc[:, selected_features]
 
-    print('Finally, according to Part 2 of AutoSpearman,', AS_metrics, 'are selected.')
-    all_cols = X_train.columns
-    for col in all_cols:
-        if col not in list(AS_metrics):
-            all_cols = all_cols.drop(col)
-    selected = all_cols
-    X_train = X_train.loc[:, selected]
-    return X_train
+    print('Finally, according to Part 2 of AutoSpearman,', X_AS_train.columns, 'are selected.')
+    X_AS_train = X_AS_train.drop('const', axis=1)
+    return X_AS_train
 
 
 def get_base_prefix_compat():
