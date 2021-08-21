@@ -1,4 +1,0 @@
-rf_model1.pkl
->>> blackbox_model = RandomForestClassifier(max_depth=3, random_state=0)
->>> blackbox_model.fit(X_train, y_train)
-

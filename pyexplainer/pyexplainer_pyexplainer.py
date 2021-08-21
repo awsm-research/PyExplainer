@@ -247,12 +247,12 @@ def get_dflt():
     """
     this_dir, _ = os.path.split(__file__)
     path_dflt = this_dir + "/default_data/dflt_data.pkl"
-    path_rf_model = this_dir + "/rf_models/jit_rf_model.pkl"
+    path_rf_model = this_dir + "/rf_models/jit_dflt_rf_model.pkl"
     path_explain = this_dir + "/default_data/explained_instance.pkl"
     if INSIDE_VIRTUAL_ENV:
         cwd = os.getcwd()
         path_dflt = cwd + "/tests/default_data/dflt_data.pkl"
-        path_rf_model = cwd + "/tests/rf_models/jit_rf_model.pkl"
+        path_rf_model = cwd + "/tests/rf_models/jit_dflt_rf_model.pkl"
         path_explain = cwd + "/tests/default_data/explained_instance.pkl"
     with open(path_dflt, 'rb') as f:
         dflt_data = pickle.load(f)
@@ -267,7 +267,7 @@ def get_dflt():
                      'Number of Self Approvals', 'Number of Past Developers',
                      'Time Since Last Modification', 'Number of Reviewrs',
                      'Relative Reviewer Experience', 'Author Awareness', 'Reviewer Awareness']
-    return {'X_train': dflt_data['x_train'],
+    return {'X_train': dflt_data['X_train'],
             'y_train': dflt_data['y_train'],
             'indep': dflt_data['indep'],
             'dep': dflt_data['dep'],

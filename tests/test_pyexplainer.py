@@ -30,7 +30,7 @@ INSIDE_VIRTUAL_ENV = in_virtualenv()
 # data paths
 cwd = os.getcwd()
 file_path = cwd + "/pyexplainer_test_data/activemq-5.0.0.zip"
-model_file_path = cwd + '/rf_models/rf_model1.pkl'
+model_file_path = cwd + '/rf_models/pytest_rf_model.pkl'
 test_file_path = cwd + "/pyexplainer_test_data/activemq-5.1.0.zip"
 rule_object_path = cwd + '/rule_objects/rule_object.pyobject'
 top_rules_path = cwd + '/rule_objects/top_rules.pyobject'
@@ -38,7 +38,7 @@ top_rules_path = cwd + '/rule_objects/top_rules.pyobject'
 if INSIDE_VIRTUAL_ENV:
     cwd = os.getcwd()
     file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.0.0.zip"
-    model_file_path = cwd + "/tests/rf_models/rf_model1.pkl"
+    model_file_path = cwd + "/tests/rf_models/pytest_rf_model.pkl"
     test_file_path = cwd + "/tests/pyexplainer_test_data/activemq-5.1.0.zip"
     rule_object_path = cwd + "/tests/rule_objects/rule_object.pyobject"
     top_rules_path = cwd + '/tests/rule_objects/top_rules.pyobject'
