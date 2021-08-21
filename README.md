@@ -36,7 +36,7 @@ In the  JupyterNotebook:
 - Run cells from step 1 to step 3 to create an interactive visualization in jupyter notebook cell (like the example above). You can change the input feature values of ML model at slide bar.
 - Run the cells in appendix section if you would like to get more detail about variable used to build PyExplainer
 
-[![Tutorial](https://img.youtube.com/vi/p6uff4iYtHo/hqdefault.jpg)](https://www.youtube.com/watch?v=p6uff4iYtHo "Tutorial")
+[![Tutorial](https://img.youtube.com/vi/fEaVXMwMOy0/hqdefault.jpg)](https://www.youtube.com/watch?v=fEaVXMwMOy0 "Tutorial")
 
 See the instructions below how to install our PyExplainer Python Package.
 
@@ -61,14 +61,14 @@ See the instructions below how to install our PyExplainer Python Package.
 ### Dependencies
 
 ```
-- python = "3.8"
-- scikit-learn = "0.24.1"
-- numpy = "1.20.1"
-- scipy = "1.6.1"
-- ipywidgets = "7.6.3"
-- ipython = "7.21.0"
-- pandas = "1.2.5"
-- statsmodels = "0.12.2"
+- python >= "3.8"
+- scikit-learn >= "0.24.2"
+- numpy >= "1.20.1"
+- scipy >= "1.6.1"
+- ipywidgets >= "7.6.3"
+- ipython >= "7.21.0"
+- pandas >= "1.2.5"
+- statsmodels >= "0.12.2"
 ```
   
 ### Install PyExplainer Python Package
