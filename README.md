@@ -97,7 +97,7 @@ Please click [here](https://pyexplainer.readthedocs.io/en/latest/contributing.ht
 The official documentation is hosted on [Read the Docs](https://pyexplainer.readthedocs.io/en/latest/)
 
 ## License
-MIT License, click [here](https://github.com/awsm-research/pyExplainer/blob/master/LICENSE) for more information.
+MIT License, click [here](https://github.com/awsm-research/PyExplainer/blob/master/LICENSE.md) for more information.
 
   
 
