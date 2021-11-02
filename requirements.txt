@@ -65,7 +65,7 @@ pastel==0.2.1
 patsy==0.5.1
 pexpect==4.8.0
 pickleshare @ file:///tmp/build/80754af9/pickleshare_1606932040724/work
-Pillow==8.3.1
+Pillow>=8.3.2
 pkginfo==1.7.1
 platformdirs==2.0.2
 poetry==1.1.7
