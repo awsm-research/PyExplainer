@@ -267,6 +267,7 @@ def get_dflt():
     with open(path_rf_model, 'rb') as f:
         rf_model = pickle.load(f)
     X_train = pd.read_csv(path_X_train)
+    X_train = X_train.drop(["File"], axis=1)
     y_train = pd.read_csv(path_y_train)["RealBug"]
     X_explain = pd.read_csv(path_X_explain)
     y_explain = pd.read_csv(path_y_explain)["RealBug"]

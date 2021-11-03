@@ -121,7 +121,7 @@ testing_risk_data = py_explainer.generate_risk_data(py_explainer.X_explain)
 
 
 def test_version():
-    assert __version__ == '1.1.3'
+    assert __version__ == '1.1.4'
 
 
 def test_load_sample_data():
