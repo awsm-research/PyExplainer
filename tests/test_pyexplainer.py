@@ -121,11 +121,12 @@ testing_risk_data = py_explainer.generate_risk_data(py_explainer.X_explain)
 
 
 def test_version():
-    assert __version__ == '1.1.0'
+    assert __version__ == '1.1.1'
 
 
 def test_load_sample_data():
-    assert isinstance(pyexplainer_pyexplainer.load_sample_data(), pd.core.frame.DataFrame)
+    assert isinstance(
+        pyexplainer_pyexplainer.load_sample_data(), pd.core.frame.DataFrame)
 
 
 @pytest.mark.parametrize('data, result',
@@ -134,22 +135,15 @@ def test_load_sample_data():
                              ([1.1231, 234.234, 123, 123, 10], False),
                              ([[], [], []], False),
                              ({"key": {}, "key2": {}}, False),
-                             ([{'risk': '90%'}, {'ticks': [1, 10]}, {'width': [100, 200], 'description': 'abc'}], True)
+                             ([{'risk': '90%'}, {'ticks': [1, 10]}, {
+                              'width': [100, 200], 'description': 'abc'}], True)
                          ])
 def test_data_validation(data, result):
     assert pyexplainer_pyexplainer.data_validation(data) is result
 
 
 def test_get_dflt():
-    default = pyexplainer_pyexplainer.get_dflt()
-    assert isinstance(default['X_train'], pd.core.frame.DataFrame)
-    assert isinstance(default['y_train'], pd.core.series.Series)
-    assert isinstance(default['indep'], pd.core.indexes.base.Index)
-    assert isinstance(default['dep'], str)
-    assert isinstance(default['blackbox_model'], sklearn.ensemble.RandomForestClassifier)
-    assert isinstance(default['X_explain'], pd.core.frame.DataFrame)
-    assert isinstance(default['y_explain'], pd.core.series.Series)
-    assert isinstance(default['full_ft_names'], list)
+    _ = pyexplainer_pyexplainer.get_dflt()
 
 
 @pytest.mark.parametrize('size, random_state, result',
@@ -167,7 +161,8 @@ def test_get_dflt():
                              (None, 12.23, 15),
                          ])
 def test_id_generator(size, random_state, result):
-    assert len(pyexplainer_pyexplainer.id_generator(size=size, random_state=random_state)) == result
+    assert len(pyexplainer_pyexplainer.id_generator(
+        size=size, random_state=random_state)) == result
 
 
 @pytest.mark.parametrize('data, result',
@@ -182,31 +177,46 @@ def test_to_js_data(data, result):
 
 @pytest.mark.parametrize('X_train, y_train, indep, dep, blackbox_model, class_label, top_k_rules, result',
                          [
-                             (X_train, y_train, indep, dep, blackbox_model, class_label, 0, 'ValueError'),
-                             (X_train, y_train, indep, dep, blackbox_model, class_label, 16, 'ValueError'),
-                             (X_train, y_train, indep, dep, blackbox_model, class_label, '3', 'TypeError'),
-                             (X_train, y_train, indep, dep, blackbox_model, ['clean'], 3, 'ValueError'),
-                             (X_train, y_train, indep, dep, blackbox_model, 'clean', 3, 'TypeError'),
-                             (X_train, y_train, indep, dep, "wrong model", class_label, 3, 'TypeError'),
-                             (X_train, y_train, indep, 123, blackbox_model, class_label, 3, 'TypeError'),
-                             (X_train, y_train, {}, dep, blackbox_model, class_label, 3, 'TypeError'),
-                             (X_train, y_train, [], dep, blackbox_model, class_label, 3, 'TypeError'),
-                             (X_train, [], indep, dep, blackbox_model, class_label, 3, 'TypeError'),
-                             ([], y_train, indep, dep, blackbox_model, class_label, 3, 'TypeError')
+                             (X_train, y_train, indep, dep, blackbox_model,
+                              class_label, 0, 'ValueError'),
+                             (X_train, y_train, indep, dep, blackbox_model,
+                              class_label, 16, 'ValueError'),
+                             (X_train, y_train, indep, dep, blackbox_model,
+                              class_label, '3', 'TypeError'),
+                             (X_train, y_train, indep, dep,
+                              blackbox_model, ['clean'], 3, 'ValueError'),
+                             (X_train, y_train, indep, dep,
+                              blackbox_model, 'clean', 3, 'TypeError'),
+                             (X_train, y_train, indep, dep,
+                              "wrong model", class_label, 3, 'TypeError'),
+                             (X_train, y_train, indep, 123,
+                              blackbox_model, class_label, 3, 'TypeError'),
+                             (X_train, y_train, {}, dep, blackbox_model,
+                              class_label, 3, 'TypeError'),
+                             (X_train, y_train, [], dep, blackbox_model,
+                              class_label, 3, 'TypeError'),
+                             (X_train, [], indep, dep, blackbox_model,
+                              class_label, 3, 'TypeError'),
+                             ([], y_train, indep, dep, blackbox_model,
+                              class_label, 3, 'TypeError')
                          ])
 def test_pyexplainer_init_negative(X_train, y_train, indep, dep, blackbox_model, class_label, top_k_rules, result):
     with pytest.raises(Exception) as e_info:
-        PyExplainer(X_train, y_train, indep, dep, blackbox_model, class_label, top_k_rules)
+        PyExplainer(X_train, y_train, indep, dep,
+                    blackbox_model, class_label, top_k_rules)
     assert e_info.typename == result
 
 
 @pytest.mark.parametrize('X_train, y_train, indep, dep, blackbox_model, class_label, top_k_rules',
                          [
-                             (X_train, y_train, indep, dep, blackbox_model, [1, 0], 1),
-                             (X_train, y_train, indep, dep, blackbox_model, ['no_bug', 'has_bug'], 15)
+                             (X_train, y_train, indep, dep,
+                              blackbox_model, [1, 0], 1),
+                             (X_train, y_train, indep, dep,
+                              blackbox_model, ['no_bug', 'has_bug'], 15)
                          ])
 def test_pyexplainer_init_positive(X_train, y_train, indep, dep, blackbox_model, class_label, top_k_rules):
-    PyExplainer(X_train, y_train, indep, dep, blackbox_model, class_label, top_k_rules)
+    PyExplainer(X_train, y_train, indep, dep,
+                blackbox_model, class_label, top_k_rules)
 
 
 rule_obj_keys = ['synthetic_data', 'synthetic_predictions', 'X_explain', 'y_explain', 'indep',
@@ -218,7 +228,8 @@ def test_auto_spearman():
 
 
 def test_auto_spearman_under_PyExplainer():
-    assert isinstance(py_explainer.auto_spearman(apply_to_X_train=False), pd.core.frame.DataFrame)
+    assert isinstance(py_explainer.auto_spearman(
+        apply_to_X_train=False), pd.core.frame.DataFrame)
     py_explainer.auto_spearman(apply_to_X_train=True)
 
 
@@ -237,7 +248,8 @@ def test_explain_negative(exp_X_explain, exp_y_explain, top_k, max_rules, max_it
     py_explainer.X_train = X_train
     py_explainer.y_train = y_train
     with pytest.raises(Exception) as e_info:
-        py_explainer.explain(exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug)
+        py_explainer.explain(exp_X_explain, exp_y_explain, top_k,
+                             max_rules, max_iter, cv, search_function, debug)
     assert e_info.typename == result
 
 
@@ -260,9 +272,12 @@ def test_explain_positive(exp_X_explain, exp_y_explain, top_k, max_rules, max_it
     assert isinstance(rule_object['y_explain'], pd.core.series.Series)
     assert isinstance(rule_object['indep'], pd.core.indexes.base.Index)
     assert isinstance(rule_object['dep'], str)
-    assert isinstance(rule_object['top_k_positive_rules'], pd.core.frame.DataFrame)
-    assert isinstance(rule_object['top_k_negative_rules'], pd.core.frame.DataFrame)
-    assert isinstance(rule_object['local_rulefit_model'], pyexplainer.rulefit.RuleFit)
+    assert isinstance(
+        rule_object['top_k_positive_rules'], pd.core.frame.DataFrame)
+    assert isinstance(
+        rule_object['top_k_negative_rules'], pd.core.frame.DataFrame)
+    assert isinstance(
+        rule_object['local_rulefit_model'], pyexplainer.rulefit.RuleFit)
 
 
 @pytest.mark.parametrize('rule_object, X_explain',
@@ -279,18 +294,23 @@ def test_generate_bullet_data(rule_object, X_explain):
     for dict_data in bullet_data:
         assert isinstance(dict_data['title'], str)
         assert isinstance(dict_data['subtitle'], str)
-        assert isinstance(dict_data['ticks'], list) and len(dict_data['ticks']) == 2
-        assert isinstance(dict_data['step'], list) and len(dict_data['step']) == 1
+        assert isinstance(dict_data['ticks'], list) and len(
+            dict_data['ticks']) == 2
+        assert isinstance(dict_data['step'], list) and len(
+            dict_data['step']) == 1
 
         assert len(dict_data['startPoints']) == len(dict_data['widths'])
-        assert isinstance(dict_data['startPoints'], list) and dict_data['startPoints'][0] == 0
+        assert isinstance(dict_data['startPoints'],
+                          list) and dict_data['startPoints'][0] == 0
         for i in range(1, len(dict_data['startPoints'])):
-            dict_data['startPoints'][i] = dict_data['startPoints'][i - 1] + dict_data['widths'][i - 1]
-        assert isinstance(dict_data['widths'], list) and 440 < sum(dict_data['widths']) < 460
+            dict_data['startPoints'][i] = dict_data['startPoints'][i -
+                                                                   1] + dict_data['widths'][i - 1]
+        assert isinstance(dict_data['widths'], list) and 440 < sum(
+            dict_data['widths']) < 460
 
         assert isinstance(dict_data['colors'], list)
         assert isinstance(dict_data['markers'], list) and \
-               dict_data['ticks'][0] <= dict_data['markers'][0] <= dict_data['ticks'][1]
+            dict_data['ticks'][0] <= dict_data['markers'][0] <= dict_data['ticks'][1]
         assert isinstance(dict_data['varRef'], str)
 
 
@@ -312,9 +332,11 @@ def test_generate_instance_crossover_interpolation(X_explain, y_explain):
     py_explainer.X_train = X_train
     py_explainer.y_train = y_train
     py_explainer.dep = dep
-    synthetic_data = py_explainer.generate_instance_crossover_interpolation(X_explain, y_explain)
-    assert isinstance(synthetic_data['synthetic_data'], pd.core.frame.DataFrame)
-    assert synthetic_data['sampled_class_frequency'].equals(synthetic_data['synthetic_data'] \
+    synthetic_data = py_explainer.generate_instance_crossover_interpolation(
+        X_explain, y_explain)
+    assert isinstance(
+        synthetic_data['synthetic_data'], pd.core.frame.DataFrame)
+    assert synthetic_data['sampled_class_frequency'].equals(synthetic_data['synthetic_data']
                                                             .groupby([py_explainer.dep]).size())
 
 
@@ -325,8 +347,10 @@ def test_generate_instance_crossover_interpolation(X_explain, y_explain):
 def test_generate_instance_random_perturbation(X_explain):
     py_explainer.X_train = X_train
     py_explainer.y_train = y_train
-    synthetic_data = py_explainer.generate_instance_random_perturbation(X_explain)
-    assert isinstance(synthetic_data['synthetic_data'], pd.core.frame.DataFrame)
+    synthetic_data = py_explainer.generate_instance_random_perturbation(
+        X_explain)
+    assert isinstance(
+        synthetic_data['synthetic_data'], pd.core.frame.DataFrame)
 
 
 @pytest.mark.parametrize('X_explain, result',
@@ -371,7 +395,8 @@ def test_generate_progress_bar_items():
     py_explainer.hbox_items = None
     py_explainer.generate_progress_bar_items()
     assert isinstance(py_explainer.hbox_items[0], widgets.Label) is True
-    assert isinstance(py_explainer.hbox_items[1], widgets.FloatProgress) is True
+    assert isinstance(
+        py_explainer.hbox_items[1], widgets.FloatProgress) is True
     assert isinstance(py_explainer.hbox_items[2], widgets.Label) is True
     assert isinstance(py_explainer.hbox_items[3], widgets.Label) is True
 
@@ -385,21 +410,24 @@ def test_generate_sliders(bullet_data, result):
     sliders = py_explainer.generate_sliders()
     assert len(sliders) == len(bullet_data)
     for sld in sliders:
-        assert isinstance(sld, widgets.IntSlider) or isinstance(sld, widgets.FloatSlider) is result
+        assert isinstance(sld, widgets.IntSlider) or isinstance(
+            sld, widgets.FloatSlider) is result
 
 
 @pytest.mark.parametrize('top_k_positive_rules, top_k_negative_rules, top_k_rules, max_rules',
                          [
                              (
-                                     test_rule_object['top_k_positive_rules'], test_rule_object['top_k_negative_rules'],
-                                     1, 15),
+                                 test_rule_object['top_k_positive_rules'], test_rule_object['top_k_negative_rules'],
+                                 1, 15),
                              (test_rule_object['top_k_positive_rules'], test_rule_object['top_k_negative_rules'], 15,
                               15),
-                             (test_rule_object['top_k_positive_rules'], test_rule_object['top_k_negative_rules'], 3, 15)
+                             (test_rule_object['top_k_positive_rules'],
+                              test_rule_object['top_k_negative_rules'], 3, 15)
                          ])
 def test_parse_top_rules(top_k_positive_rules, top_k_negative_rules, top_k_rules, max_rules):
     py_explainer.top_k_rules = top_k_rules
-    top_rules = py_explainer.parse_top_rules(top_k_positive_rules, top_k_negative_rules)
+    top_rules = py_explainer.parse_top_rules(
+        top_k_positive_rules, top_k_negative_rules)
     assert 0 <= len(top_rules['top_tofollow_rules']) <= max_rules
     assert 0 <= len(top_rules['top_toavoid_rules']) <= max_rules
 
@@ -506,7 +534,8 @@ testing_float_progress = widgets.FloatProgress(value=0,
                                                min=0,
                                                max=100,
                                                bar_style='info',
-                                               layout=widgets.Layout(width='40%'),
+                                               layout=widgets.Layout(
+                                                   width='40%'),
                                                orientation='horizontal')
 
 
@@ -539,7 +568,8 @@ def test_get_and_set_bullet_output_positive(bullet_output, result):
                          [
                              ([testing_float_progress, widgets.Label("test"),
                                widgets.Label("test"), widgets.Label("test")], 'TypeError'),
-                             ([widgets.Label("test"), testing_float_progress, widgets.Label("test")], 'TypeError')
+                             ([widgets.Label("test"), testing_float_progress,
+                              widgets.Label("test")], 'TypeError')
                          ])
 def test_set_hbox_items_negative(hbox_items, result):
     py_explainer.hbox_items = None
@@ -548,7 +578,8 @@ def test_set_hbox_items_negative(hbox_items, result):
     assert e_info.typename == result
 
 
-testing_hbox_items = [widgets.Label("test"), testing_float_progress, widgets.Label("test"), widgets.Label("test")]
+testing_hbox_items = [widgets.Label(
+    "test"), testing_float_progress, widgets.Label("test"), widgets.Label("test")]
 
 
 @pytest.mark.parametrize('hbox_items, result',

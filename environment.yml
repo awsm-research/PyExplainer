@@ -2,7 +2,7 @@ name: pyexplainer
 channels:
   - defaults
 dependencies:
-  - python=3.8
+  - python>=3.6
   - pip
   - pip:
     - pyexplainer
