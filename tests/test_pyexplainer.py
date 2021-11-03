@@ -121,7 +121,7 @@ testing_risk_data = py_explainer.generate_risk_data(py_explainer.X_explain)
 
 
 def test_version():
-    assert __version__ == '1.1.1'
+    assert __version__ == '1.1.3'
 
 
 def test_load_sample_data():
@@ -672,7 +672,7 @@ def test_visualisation_data_setup():
 
 def test_show_visualisation():
     py_explainer.visualisation_data_setup(test_rule_object)
-    py_explainer.show_visualisation()
+    py_explainer.show_visualisation(title="testing title")
 
 
 def test_run_bar_animation():

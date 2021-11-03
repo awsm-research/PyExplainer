@@ -48,7 +48,7 @@ def AutoSpearman(X_train, correlation_threshold=0.7, correlation_method='spearma
 
         # identify correlated metrics with the correlation threshold of the threshold
         highly_correlated_metrics = ((corrmat > correlation_threshold) | (corrmat < -correlation_threshold)) & (
-                corrmat != 1)
+            corrmat != 1)
         n_correlated_metrics = np.sum(np.sum(highly_correlated_metrics))
         if n_correlated_metrics > 0:
             # find the strongest pair-wise correlation
@@ -61,15 +61,16 @@ def AutoSpearman(X_train, correlation_threshold=0.7, correlation_method='spearma
             # get the 2 correlated metrics with the strongest correlation
             correlated_metric_1 = top_corr_i[0]
             correlated_metric_2 = top_corr_i[1]
-            print('> Step', count, 'comparing between', correlated_metric_1, 'and', correlated_metric_2)
+            print('> Step', count, 'comparing between',
+                  correlated_metric_1, 'and', correlated_metric_2)
 
             # compute their correlation with other metrics outside of the pair
             correlation_with_other_metrics_1 = np.mean(abs_corrmat[correlated_metric_1][
-                                                           [i for i in top_corr_features if
-                                                            i not in [correlated_metric_1, correlated_metric_2]]])
+                [i for i in top_corr_features if
+                 i not in [correlated_metric_1, correlated_metric_2]]])
             correlation_with_other_metrics_2 = np.mean(abs_corrmat[correlated_metric_2][
-                                                           [i for i in top_corr_features if
-                                                            i not in [correlated_metric_1, correlated_metric_2]]])
+                [i for i in top_corr_features if
+                 i not in [correlated_metric_1, correlated_metric_2]]])
             print('>>', correlated_metric_1, 'has the average correlation of',
                   np.round(correlation_with_other_metrics_1, 3), 'with other metrics')
             print('>>', correlated_metric_2, 'has the average correlation of',
@@ -108,7 +109,8 @@ def AutoSpearman(X_train, correlation_threshold=0.7, correlation_method='spearma
         vif_scores.sort_values(by=['VIFscore'], ascending=False, inplace=True)
 
         # Find features that have their VIF scores of above the threshold
-        filtered_vif_scores = vif_scores[vif_scores['VIFscore'] >= VIF_threshold]
+        filtered_vif_scores = vif_scores[vif_scores['VIFscore']
+                                         >= VIF_threshold]
 
         # Terminate when there is no features with the VIF scores of above the threshold
         if len(filtered_vif_scores) == 0:
@@ -120,11 +122,13 @@ def AutoSpearman(X_train, correlation_threshold=0.7, correlation_method='spearma
         print('> Step', count, '- exclude', str(metric_to_exclude))
         count = count + 1
 
-        selected_features = list(set(selected_features) - set([metric_to_exclude]))
+        selected_features = list(
+            set(selected_features) - set([metric_to_exclude]))
 
         X_AS_train = X_AS_train.loc[:, selected_features]
 
-    print('Finally, according to Part 2 of AutoSpearman,', X_AS_train.columns, 'are selected.')
+    print('Finally, according to Part 2 of AutoSpearman,',
+          X_AS_train.columns, 'are selected.')
     X_AS_train = X_AS_train.drop('const', axis=1)
     return X_AS_train
 
@@ -168,7 +172,8 @@ def data_validation(data):
     if isinstance(data, list):
         for i in range(len(data)):
             if not isinstance(data[i], dict):
-                print("Data Format Error - the input data should be a list of dictionary")
+                print(
+                    "Data Format Error - the input data should be a list of dictionary")
                 valid = False
                 break
     else:
@@ -215,7 +220,8 @@ def filter_rules(rules, X_explain):
         return eval_result_list
 
     # select rules that (1) have positive coefficient values and (2) have positive importance scores
-    rules = rules[(rules['type'] == 'rule') & (rules['coef'] > 0) & (rules['importance'] > 0)]
+    rules = rules[(rules['type'] == 'rule') & (
+        rules['coef'] > 0) & (rules['importance'] > 0)]
     rules_list = list(rules['rule'])
     rule_eval_result = []
     # for each rule, check whether such rules apply to the actual instance to be explained
@@ -246,34 +252,34 @@ def get_dflt():
         A dictionary wrapping all default data and model
     """
     this_dir, _ = os.path.split(__file__)
-    path_dflt = this_dir + "/default_data/dflt_data.pkl"
-    path_rf_model = this_dir + "/rf_models/jit_dflt_rf_model.pkl"
-    path_explain = this_dir + "/default_data/explained_instance.pkl"
+    path_rf_model = this_dir + "/default_data/sample_model.pkl"
+    path_X_train = this_dir + "/default_data/X_train.csv"
+    path_y_train = this_dir + "/default_data/y_train.csv"
+    path_X_explain = this_dir + "/default_data/X_explain.csv"
+    path_y_explain = this_dir + "/default_data/y_explain.csv"
     if INSIDE_VIRTUAL_ENV:
         cwd = os.getcwd()
-        path_dflt = cwd + "/tests/default_data/dflt_data.pkl"
-        path_rf_model = cwd + "/tests/rf_models/jit_dflt_rf_model.pkl"
-        path_explain = cwd + "/tests/default_data/explained_instance.pkl"
-    with open(path_dflt, 'rb') as f:
-        dflt_data = pickle.load(f)
+        path_rf_model = cwd + "/tests/default_data/sample_model.pkl"
+        path_X_train = cwd + "/tests/default_data/X_train.csv"
+        path_y_train = cwd + "/tests/default_data/y_train.csv"
+        path_X_explain = cwd + "/tests/default_data/X_explain.csv"
+        path_y_explain = cwd + "/tests/default_data/y_explain.csv"
     with open(path_rf_model, 'rb') as f:
         rf_model = pickle.load(f)
-    with open(path_explain, 'rb') as f:
-        explained_instance = pickle.load(f)
+    X_train = pd.read_csv(path_X_train)
+    y_train = pd.read_csv(path_y_train)["RealBug"]
+    X_explain = pd.read_csv(path_X_explain)
+    y_explain = pd.read_csv(path_y_explain)["RealBug"]
 
-    full_ft_names = ['Number Of Lines Added', 'Number Of Modified Directories',
-                     'Number Of Modified Subsystems', 'Entropy',
-                     'Number Of Review Revisions', 'Review Timespan',
-                     'Number of Self Approvals', 'Number of Past Developers',
-                     'Time Since Last Modification', 'Number of Reviewrs',
-                     'Relative Reviewer Experience', 'Author Awareness', 'Reviewer Awareness']
-    return {'X_train': dflt_data['X_train'],
-            'y_train': dflt_data['y_train'],
-            'indep': dflt_data['indep'],
-            'dep': dflt_data['dep'],
+    full_ft_names = ['nCommit', 'AddedLOC',
+                     'nCoupledClass', 'LOC', 'CommentToCodeRatio']
+    return {'X_train': X_train,
+            'y_train': y_train,
+            'indep': X_train.columns,
+            'dep': "RealBug",
             'blackbox_model': rf_model,
-            'X_explain': explained_instance['X_explain'],
-            'y_explain': explained_instance['y_explain'],
+            'X_explain': X_explain,
+            'y_explain': y_explain,
             'full_ft_names': full_ft_names}
 
 
@@ -318,7 +324,8 @@ def to_js_data(list_of_dict):
     if data_validation(list_of_dict):
         return str(list_of_dict) + ";"
     else:
-        print("Data to be transformed to the javascript format is not a python list of dict, hence '[{}];' is returned")
+        print(
+            "Data to be transformed to the javascript format is not a python list of dict, hence '[{}];' is returned")
         return '[{}];'
 
 
@@ -368,7 +375,8 @@ class PyExplainer:
         if isinstance(indep, pd.core.indexes.base.Index):
             self.indep = indep
         else:
-            print("indep (feature column names) should be type 'pandas.core.indexes.base.Index'")
+            print(
+                "indep (feature column names) should be type 'pandas.core.indexes.base.Index'")
             raise TypeError
         if isinstance(dep, str):
             self.dep = dep
@@ -404,7 +412,8 @@ class PyExplainer:
             short_ft_names = X_train.columns.to_list()
             # length of short ft names and full ft names should be the same
             if len(short_ft_names) != len(full_ft_names):
-                print("list of short feature names and list of full feature names should have the same length!")
+                print(
+                    "list of short feature names and list of full feature names should have the same length!")
                 raise ValueError
             self.full_ft_names = dict(zip(short_ft_names, full_ft_names))
         else:
@@ -412,10 +421,12 @@ class PyExplainer:
 
         self.bullet_data = [{}]
         self.risk_data = [{}]
-        self.bullet_output = widgets.Output(layout={'border': '3px solid black'})
+        self.bullet_output = widgets.Output(
+            layout={'border': '3px solid black'})
         self.hbox_items = []
         self.X_explain = None
         self.y_explain = None
+        self.visualisation_title = None
 
     def auto_spearman(self,
                       apply_to_X_train=True,
@@ -436,7 +447,8 @@ class PyExplainer:
         VIF_threshold : :obj:`int`
             Threshold value of VIF score.
         """
-        X_AS_train = AutoSpearman(self.X_train, correlation_threshold, correlation_method, VIF_threshold)
+        X_AS_train = AutoSpearman(
+            self.X_train, correlation_threshold, correlation_method, VIF_threshold)
         if apply_to_X_train:
             self.set_X_train(X_AS_train)
             # if there is data of full feature names
@@ -522,14 +534,17 @@ class PyExplainer:
         self.set_top_k_rules(top_k)
         # Step 1 - Generate synthetic instances
         if search_function.lower() == 'crossoverinterpolation':
-            synthetic_object = self.generate_instance_crossover_interpolation(X_explain, y_explain, debug=debug)
+            synthetic_object = self.generate_instance_crossover_interpolation(
+                X_explain, y_explain, debug=debug)
         elif search_function.lower() == 'randomperturbation':
             # This random perturbation approach to generate instances is used by LIME to gerate synthetic instances
-            synthetic_object = self.generate_instance_random_perturbation(X_explain=X_explain, debug=debug)
+            synthetic_object = self.generate_instance_random_perturbation(
+                X_explain=X_explain, debug=debug)
 
         # Step 2 - Generate predictions of synthetic instances using the global model
         synthetic_instances = synthetic_object['synthetic_data'].loc[:, self.indep]
-        synthetic_predictions = self.blackbox_model.predict(synthetic_instances)
+        synthetic_predictions = self.blackbox_model.predict(
+            synthetic_instances)
         if 1 in synthetic_predictions and 0 in synthetic_predictions:
             one_class_problem = False
         else:
@@ -538,9 +553,11 @@ class PyExplainer:
             print("Random Perturbation only generated one class for the prediction column which means\
                    Random Perturbation is not compatible with the current data.\
                    The 'Crossover and Interpolation' approach is used as the alternative.")
-            synthetic_object = self.generate_instance_crossover_interpolation(X_explain, y_explain, debug=debug)
+            synthetic_object = self.generate_instance_crossover_interpolation(
+                X_explain, y_explain, debug=debug)
             synthetic_instances = synthetic_object['synthetic_data'].loc[:, self.indep]
-            synthetic_predictions = self.blackbox_model.predict(synthetic_instances)
+            synthetic_predictions = self.blackbox_model.predict(
+                synthetic_instances)
 
         if debug:
             n_defect_class = np.sum(synthetic_predictions)
@@ -564,8 +581,10 @@ class PyExplainer:
 
         # Step 4 Get rules from theRuleFit local model
         rules = local_rulefit_model.get_rules()
-        rules = rules[rules.coef != 0].sort_values("importance", ascending=False)
-        rules = rules[rules.type == 'rule'].sort_values("importance", ascending=False)
+        rules = rules[rules.coef != 0].sort_values(
+            "importance", ascending=False)
+        rules = rules[rules.type == 'rule'].sort_values(
+            "importance", ascending=False)
         positive_filtered_rules = filter_rules(rules, X_explain)
 
         # positive rules
@@ -577,7 +596,8 @@ class PyExplainer:
         top_k_positive_rules = top_k_positive_rules.dropna()
 
         # negative rules
-        top_k_negative_rules = rules.loc[rules['coef'] < 0].sort_values("importance", ascending=False).head(top_k)
+        top_k_negative_rules = rules.loc[rules['coef'] < 0].sort_values(
+            "importance", ascending=False).head(top_k)
         top_k_negative_rules['Class'] = self.class_label[0]
         # filter out nan values
         top_k_negative_rules = top_k_negative_rules.dropna()
@@ -619,7 +639,8 @@ class PyExplainer:
             separation_point = float(tmp_rule['value'])
 
             if tmp_actual_value < 0 or separation_point < 0:
-                print("""actual value of %s < 0, currently do not support this type of rule""" % tmp_rule['variable'])
+                print("""actual value of %s < 0, currently do not support this type of rule""" %
+                      tmp_rule['variable'])
 
             tmp_markers = [tmp_actual_value]
 
@@ -647,7 +668,8 @@ class PyExplainer:
             bullet_total_width = 450
             tmp_start_points = [0, round((separation_point / diff_plot_max_min if diff_plot_max_min else 0)
                                          * bullet_total_width, 4)]
-            tmp_widths = [round(tmp_start_points[1] - plot_min, 4), round(bullet_total_width - tmp_start_points[1], 4)]
+            tmp_widths = [round(tmp_start_points[1] - plot_min, 4),
+                          round(bullet_total_width - tmp_start_points[1], 4)]
 
             title_id = '#' + str(i + 1)
             var_name = str(tmp_rule['variable'])
@@ -661,15 +683,15 @@ class PyExplainer:
             if tmp_rule['lessthan']:
                 # The rule suggest to decrease the values to less than a certain threshold
                 tmp_title_text = title_id + ' The value of ' + \
-                                 var_name + ' is more than ' + \
-                                 str(tmp_actual_value)
+                    var_name + ' is more than ' + \
+                    str(tmp_actual_value)
                 tmp_colors = ["#a6d96a", "#d7191c"]
             else:
                 # lessthan == FALSE:
                 # The rule suggest to increase the values to more than a certain threshold
                 tmp_title_text = title_id + ' The value of ' + \
-                                 var_name + ' is less than ' + \
-                                 str(tmp_actual_value)
+                    var_name + ' is less than ' + \
+                    str(tmp_actual_value)
                 tmp_colors = ["#d7191c", "#a6d96a"]
 
             bullet_data.append({
@@ -710,7 +732,11 @@ class PyExplainer:
         <script>%s</script>
         """ % (d3_js, bullet_js)
 
-        main_title = "Why this commit is predicted as defect-introducing?"
+        if self.visualisation_title:
+            main_title = self.visualisation_title
+        else:
+            main_title = "Why the model generated this prediction for the given features ?"
+
         title = """
         <div style="position: relative; top: 0; width: 100vw; left: 20vw;">
             <b>%s</b>
@@ -863,21 +889,25 @@ class PyExplainer:
             # Make a dataframe with top 40 elements in each class
             top_fourty_df = pd.DataFrame([])
             for clz in unique_classes:
-                top_fourty_df = top_fourty_df.append(dist_df[dist_df['t_target'] == clz].head(40))
+                top_fourty_df = top_fourty_df.append(
+                    dist_df[dist_df['t_target'] == clz].head(40))
             # top_fourty_df.reset_index(inplace=True)
 
             # get the minimum value of the top 40 elements and return the index
-            cutoff_similarity = top_fourty_df.nsmallest(1, 'dist', keep='last').index.values.astype(int)[0]
+            cutoff_similarity = top_fourty_df.nsmallest(
+                1, 'dist', keep='last').index.values.astype(int)[0]
 
             # Get the location for the given index with the minimum similarity
             min_loc = dist_df.index.get_loc(cutoff_similarity)
             # whole neighbourhood without undersampling the majority class
             train_neigh_sampling_b = dist_df.iloc[0:min_loc + 1]
             # get the size of neighbourhood for each class
-            target_details = train_neigh_sampling_b.groupby(['t_target']).size()
+            target_details = train_neigh_sampling_b.groupby(
+                ['t_target']).size()
             if debug:
                 print(target_details, "target_details")
-            target_details_df = pd.DataFrame({'target': target_details.index, 'target_count': target_details.values})
+            target_details_df = pd.DataFrame(
+                {'target': target_details.index, 'target_count': target_details.values})
 
             # Get the majority class and undersample
             final_neighbours_similarity_df = pd.DataFrame([])
@@ -886,19 +916,23 @@ class PyExplainer:
                     filterd_class_set = train_neigh_sampling_b \
                         .loc[train_neigh_sampling_b['t_target'] == row['target']] \
                         .sample(n=200)
-                    final_neighbours_similarity_df = final_neighbours_similarity_df.append(filterd_class_set)
+                    final_neighbours_similarity_df = final_neighbours_similarity_df.append(
+                        filterd_class_set)
                 else:
                     filterd_class_set = train_neigh_sampling_b \
                         .loc[train_neigh_sampling_b['t_target'] == row['target']]
-                    final_neighbours_similarity_df = final_neighbours_similarity_df.append(filterd_class_set)
+                    final_neighbours_similarity_df = final_neighbours_similarity_df.append(
+                        filterd_class_set)
             if debug:
                 print(final_neighbours_similarity_df,
                       "final_neighbours_similarity_df")
             # Get the original training set instances which is equal to the index of the selected neighbours
-            train_set_neigh = X_train_i[X_train_i.index.isin(final_neighbours_similarity_df.index)]
+            train_set_neigh = X_train_i[X_train_i.index.isin(
+                final_neighbours_similarity_df.index)]
             if debug:
                 print(train_set_neigh, "train set neigh")
-            train_class_neigh = y_explain[y_explain.index.isin(final_neighbours_similarity_df.index)]
+            train_class_neigh = y_explain[y_explain.index.isin(
+                final_neighbours_similarity_df.index)]
             # train_neigh_df = train_set_neigh.join(train_class_neigh)
             # class_neigh = train_class_neigh.groupby([self.dep]).size()
 
@@ -944,8 +978,10 @@ class PyExplainer:
             for num in range(1000, 2000):
                 rand_rows = train_set_neigh.sample(3)
                 sample_indexes_list = sample_indexes_list + rand_rows.index.values.tolist()
-                sample_classes = train_class_neigh[train_class_neigh.index.isin(rand_rows.index)]
-                sample_classes = np.array(sample_classes.to_records().view(type=np.matrix))
+                sample_classes = train_class_neigh[train_class_neigh.index.isin(
+                    rand_rows.index)]
+                sample_classes = np.array(
+                    sample_classes.to_records().view(type=np.matrix))
                 sample_classes_arr.append(sample_classes[0].tolist())
                 mu_f = np.random.uniform(low=0.5, high=1.0)
                 x = rand_rows.iloc[0]
@@ -965,7 +1001,8 @@ class PyExplainer:
                 new_con_df = new_con_df.append(new_ins, ignore_index=True)
 
             # get the global model predictions of the generated instances and the instances in the neighbourhood
-            predict_dataset = train_set_neigh.append(new_con_df, ignore_index=True)
+            predict_dataset = train_set_neigh.append(
+                new_con_df, ignore_index=True)
             target = self.blackbox_model.predict(predict_dataset)
             target_df = pd.DataFrame(target)
 
@@ -1028,13 +1065,15 @@ class PyExplainer:
                 # mean = mean[non_zero_indexes]
 
             if sampling_method == 'gaussian':
-                data = random_state.normal(0, 1, num_samples * num_cols).reshape(num_samples, num_cols)
+                data = random_state.normal(
+                    0, 1, num_samples * num_cols).reshape(num_samples, num_cols)
                 data = np.array(data)
 
             else:
                 warnings.warn('''Invalid input for sampling_method.
                                  Defaulting to Gaussian sampling.''', UserWarning)
-                data = random_state.normal(0, 1, num_samples * num_cols).reshape(num_samples, num_cols)
+                data = random_state.normal(
+                    0, 1, num_samples * num_cols).reshape(num_samples, num_cols)
                 data = np.array(data)
 
             if sample_around_instance:
@@ -1044,13 +1083,16 @@ class PyExplainer:
 
             if is_sparse:
                 if num_cols == 0:
-                    data = sp.sparse.csr_matrix((num_samples, data_row.shape[1]), dtype=data_row.dtype)
+                    data = sp.sparse.csr_matrix(
+                        (num_samples, data_row.shape[1]), dtype=data_row.dtype)
                 else:
                     indexes = np.tile(non_zero_indexes, num_samples)
-                    indptr = np.array(range(0, len(non_zero_indexes) * (num_samples + 1), len(non_zero_indexes)))
+                    indptr = np.array(
+                        range(0, len(non_zero_indexes) * (num_samples + 1), len(non_zero_indexes)))
                     data_1d_shape = data.shape[0] * data.shape[1]
                     data_1d = data.reshape(data_1d_shape)
-                    data = sp.sparse.csr_matrix((data_1d, indexes, indptr), shape=(num_samples, data_row.shape[1]))
+                    data = sp.sparse.csr_matrix(
+                        (data_1d, indexes, indptr), shape=(num_samples, data_row.shape[1]))
 
             # first_row = data_row
         # else:
@@ -1093,7 +1135,8 @@ class PyExplainer:
         new_df_case = pd.DataFrame(data=scaled_data, columns=self.indep)
         sampled_class_frequency = 0
 
-        n_defect_class = np.sum(self.blackbox_model.predict(new_df_case.loc[:, self.indep]))
+        n_defect_class = np.sum(self.blackbox_model.predict(
+            new_df_case.loc[:, self.indep]))
 
         if debug:
             print('Random seed', random_seed, 'nDefective', n_defect_class)
@@ -1168,11 +1211,13 @@ class PyExplainer:
                                              min=0,
                                              max=100,
                                              bar_style='info',
-                                             layout=widgets.Layout(width='40%'),
+                                             layout=widgets.Layout(
+                                                 width='40%'),
                                              orientation='horizontal')
         left_text = widgets.Label("Risk Score: ")
         right_text = widgets.Label("0")
-        self.__set_hbox_items([left_text, progress_bar, right_text, widgets.Label("%")])
+        self.__set_hbox_items(
+            [left_text, progress_bar, right_text, widgets.Label("%")])
 
     def generate_sliders(self):
         """Generate one or more slider widgets and return as a list.  Slider would be either IntSlider or FloatSlider depending on the value in the data
@@ -1290,7 +1335,8 @@ class PyExplainer:
         :obj:`dict`
             A dict containing two keys, 'top_tofollow_rules' and 'top_toavoid_rules'
         """
-        smaller_top_rule = min([len(top_k_positive_rules), len(top_k_negative_rules)])
+        smaller_top_rule = min(
+            [len(top_k_positive_rules), len(top_k_negative_rules)])
         if self.get_top_k_rules() > smaller_top_rule:
             self.set_top_k_rules(smaller_top_rule)
 
@@ -1427,12 +1473,14 @@ class PyExplainer:
         else:
             return print("set X_train failed, X_train should be type of pandas.core.frame.DataFrame!")
 
-    def show_visualisation(self):
+    def show_visualisation(self, title):
         """Display items as follows,
         (1) Risk Score Progress Bar (made from ipywidgets)
         (2) Interactive Slider (made from ipywidgets)
         (3) Bullet Chart (Generated By D3.js)
         """
+        # set title
+        self.visualisation_title = title
         # display risk score progress bar
         self.generate_progress_bar_items()
         items = self.__get_hbox_items()
@@ -1475,10 +1523,11 @@ class PyExplainer:
         if isinstance(right_text, widgets.Label):
             self.__get_hbox_items()[2] = right_text
         else:
-            print("The right_text to be set into hbox_items should be type 'ipywidgets.Label'")
+            print(
+                "The right_text to be set into hbox_items should be type 'ipywidgets.Label'")
             raise TypeError
 
-    def visualise(self, rule_obj):
+    def visualise(self, rule_obj, title=None):
         """Given the rule object, show all of the visualisation as follows .
         (1) Risk Score Progress Bar (made from ipywidgets)
         (2) Interactive Slider (made from ipywidgets)
@@ -1513,7 +1562,7 @@ class PyExplainer:
         >>> pyExp.visualise(rule_obj)
         """
         self.visualisation_data_setup(rule_obj)
-        self.show_visualisation()
+        self.show_visualisation(title)
 
     def visualisation_data_setup(self, rule_obj):
         """Set up the data before visualising them
