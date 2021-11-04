@@ -736,7 +736,7 @@ class PyExplainer:
         if self.visualisation_title:
             main_title = self.visualisation_title
         else:
-            main_title = "Why the model generated this prediction for the given features ?"
+            main_title = "Why the model generate such prediction for a given test instance?"
 
         title = """
         <div style="position: relative; top: 0; width: 100vw; left: 20vw;">
