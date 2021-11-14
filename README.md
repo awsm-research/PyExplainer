@@ -61,7 +61,7 @@ See the instructions below how to install our PyExplainer Python Package.
 ### Dependencies
 
 ```
-- python >= "3.8"
+- python >= "3.6"
 - scikit-learn >= "0.24.2"
 - numpy >= "1.20.1"
 - scipy >= "1.6.1"
