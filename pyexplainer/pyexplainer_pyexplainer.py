@@ -106,7 +106,7 @@ def AutoSpearman(X_train, correlation_threshold=0.7, correlation_method='spearma
         vif_scores.reset_index(inplace=True)
         vif_scores.columns = ['Feature', 'VIFscore']
         vif_scores = vif_scores.loc[vif_scores['Feature'] != 'const', :]
-        vif_scores.sort_values(by=['VIFscore'], ascending=False, inplace=True)
+        vif_scores.sort_values(by=['VIFscore'], ascending=False, inplace=True, kind='mergesort')
 
         # Find features that have their VIF scores of above the threshold
         filtered_vif_scores = vif_scores[vif_scores['VIFscore']
@@ -239,7 +239,7 @@ def filter_rules(rules, X_explain):
     # Note. can't use 'is' as comparing operator because of pandas
     rules = rules.loc[rules['is_satisfy_instance'] == True]
     # sort rules according to their importance scores
-    sorted_rules = rules.sort_values(by='importance', ascending=False)
+    sorted_rules = rules.sort_values(by='importance', ascending=False, kind='mergesort')
     return sorted_rules
 
 
@@ -428,6 +428,7 @@ class PyExplainer:
         self.X_explain = None
         self.y_explain = None
         self.visualisation_title = None
+        self.local_model = None
 
     def auto_spearman(self,
                       apply_to_X_train=True,
@@ -471,7 +472,7 @@ class PyExplainer:
                 max_iter=10000,
                 cv=5,
                 search_function='CrossoverInterpolation',
-                debug=False):
+                random_state=None):
         """Generate Rule Object Manually by passing X_explain and y_explain
 
         Parameters
@@ -490,8 +491,8 @@ class PyExplainer:
             Cross Validation to be tuned in to the local RuleFit model
         search_function : :obj:`str`, default is 'crossoverinterpolation'
             Name of the search function to be used to generate the instance used by RuleFit.fit()
-        debug : :obj:`bool`, default is False
-            True for debugging mode, False otherwise.
+        random_state : :obj:`int`, default is None
+            Random seed for reproducing the same result
 
         Returns
         -------
@@ -512,13 +513,13 @@ class PyExplainer:
         >>> blackbox_model.fit(X_train, y_train)
         >>> class_label = ['Clean', 'Defect']
         >>> py_explainer = PyExplainer(X_train, y_train, indep, dep, class_label, blackbox_model)
-        >>> sample_test_data = pd.read_csv('../tests/pyexplainer_test_data/activemq-5.0.0.csv', index_col = 'File')
+        >>> sample_test_data = pd.read_csv('../tests/pyexplainer_test_data/activemq-5.0.0.csv', index_col='File')
         >>> X_test = sample_test_data.loc[:, indep]
         >>> y_test = sample_test_data.loc[:, dep]
         >>> sample_explain_index = 0
         >>> X_explain = X_test.iloc[[sample_explain_index]]
         >>> y_explain = y_test.iloc[[sample_explain_index]]
-        >>> py_explainer.explain(X_explain, y_explain, search_function = 'crossoverinterpolation', top_k = 3, max_rules=30, max_iter =5, cv=5, debug = False)
+        >>> py_explainer.explain(X_explain, y_explain, search_function='crossoverinterpolation', top_k=3, max_rules=30, max_iter=5, cv=5)
         """
         # check if X_explain is a DF
         if not isinstance(X_explain, pd.core.frame.DataFrame):
@@ -536,12 +537,11 @@ class PyExplainer:
         # Step 1 - Generate synthetic instances
         if search_function.lower() == 'crossoverinterpolation':
             synthetic_object = self.generate_instance_crossover_interpolation(
-                X_explain, y_explain, debug=debug)
+                X_explain, y_explain, random_state=random_state)
         elif search_function.lower() == 'randomperturbation':
             # This random perturbation approach to generate instances is used by LIME to gerate synthetic instances
             synthetic_object = self.generate_instance_random_perturbation(
-                X_explain=X_explain, debug=debug)
-
+                X_explain=X_explain)
         # Step 2 - Generate predictions of synthetic instances using the global model
         synthetic_instances = synthetic_object['synthetic_data'].loc[:, self.indep]
         synthetic_predictions = self.blackbox_model.predict(
@@ -551,58 +551,47 @@ class PyExplainer:
         else:
             one_class_problem = True
         if one_class_problem:
-            print("Random Perturbation only generated one class for the prediction column which means\
-                   Random Perturbation is not compatible with the current data.\
-                   The 'Crossover and Interpolation' approach is used as the alternative.")
+            print("""Random Perturbation only generated one class for the prediction column which means 
+                     Random Perturbation is not compatible with the current data. 
+                     The 'Crossover and Interpolation' approach is used as the alternative.""")
             synthetic_object = self.generate_instance_crossover_interpolation(
-                X_explain, y_explain, debug=debug)
+                X_explain, y_explain)
             synthetic_instances = synthetic_object['synthetic_data'].loc[:, self.indep]
             synthetic_predictions = self.blackbox_model.predict(
                 synthetic_instances)
-
-        if debug:
-            n_defect_class = np.sum(synthetic_predictions)
-            print('nDefect=', n_defect_class,
-                  'from', len(synthetic_predictions))
-
         # Step 3 - Build a RuleFit local model with synthetic instances
-        # indep_index = [list(synthetic_instances.columns).index(i) for i in self.indep]
-        local_rulefit_model = RuleFit(rfmode='classify',
-                                      exp_rand_tree_size=False,
-                                      random_state=0,
-                                      max_rules=max_rules,
-                                      cv=cv,
-                                      max_iter=max_iter,
-                                      n_jobs=-1)
-        local_rulefit_model.fit(synthetic_instances.values,
-                                synthetic_predictions,
-                                feature_names=self.indep)
-        if debug:
-            print('Constructed a RuleFit model')
-
-        # Step 4 Get rules from theRuleFit local model
+        if self.local_model is None or random_state is None:
+            local_rulefit_model = RuleFit(rfmode='classify',
+                                        exp_rand_tree_size=False,
+                                        random_state=random_state,
+                                        max_rules=max_rules,
+                                        cv=cv,
+                                        max_iter=max_iter,
+                                        n_jobs=-1)
+            local_rulefit_model.fit(synthetic_instances.values,
+                                    synthetic_predictions,
+                                    feature_names=self.indep)
+            self.local_model = local_rulefit_model
+        else:
+            local_rulefit_model = self.local_model
+        # Step 4 Get rules from the RuleFit local model
         rules = local_rulefit_model.get_rules()
-        rules = rules[rules.coef != 0].sort_values(
-            "importance", ascending=False)
-        rules = rules[rules.type == 'rule'].sort_values(
-            "importance", ascending=False)
+        rules = rules[rules.coef != 0].sort_values("importance", ascending=False, kind='mergesort')
+        rules = rules[rules.type == 'rule'].sort_values("importance", ascending=False, kind='mergesort')
         positive_filtered_rules = filter_rules(rules, X_explain)
-
         # positive rules
-        top_k_positive_rules = positive_filtered_rules.loc[positive_filtered_rules['coef'] > 0].sort_values(
-            "importance", ascending=False).head(top_k)
+        top_k_positive_rules = positive_filtered_rules.loc[positive_filtered_rules['coef'] > 0] \
+                                .sort_values("importance", ascending=False, kind='mergesort').head(top_k)
         top_k_positive_rules['Class'] = self.class_label[1]
         top_k_positive_rules = positive_filtered_rules.reset_index()
         # filter out nan values
         top_k_positive_rules = top_k_positive_rules.dropna()
-
         # negative rules
-        top_k_negative_rules = rules.loc[rules['coef'] < 0].sort_values(
-            "importance", ascending=False).head(top_k)
+        top_k_negative_rules = rules.loc[rules['coef'] < 0] \
+                                .sort_values("importance", ascending=False, kind='mergesort').head(top_k)
         top_k_negative_rules['Class'] = self.class_label[0]
         # filter out nan values
         top_k_negative_rules = top_k_negative_rules.dropna()
-
         rule_obj = {'synthetic_data': synthetic_instances,
                     'synthetic_predictions': synthetic_predictions,
                     'X_explain': X_explain,
@@ -813,7 +802,7 @@ class PyExplainer:
 
         return html
 
-    def generate_instance_crossover_interpolation(self, X_explain, y_explain, debug=False):
+    def generate_instance_crossover_interpolation(self, X_explain, y_explain, random_state=None, debug=False):
         """An approach to generate instance using Crossover and Interpolation
 
         Parameters
@@ -822,6 +811,8 @@ class PyExplainer:
             X_explain (Testing Features)
         y_explain : :obj:`pandas.core.series.Series`
             y_explain (Testing Label)
+        random_state : :obj:`int`
+            Random Seed
         debug : :obj:`bool`
             True for debugging mode, False otherwise.
 
@@ -884,7 +875,7 @@ class PyExplainer:
             # get the unique classes of the training set
             unique_classes = dist_df.t_target.unique()
             # Sort similarity scores in to descending order
-            dist_df.sort_values(by=['dist'], ascending=False, inplace=True)
+            dist_df.sort_values(by=['dist'], ascending=False, inplace=True, kind='mergesort')
             # dist_df.reset_index(inplace=True)
 
             # Make a dataframe with top 40 elements in each class
@@ -916,7 +907,7 @@ class PyExplainer:
                 if row["target_count"] > 200:
                     filterd_class_set = train_neigh_sampling_b \
                         .loc[train_neigh_sampling_b['t_target'] == row['target']] \
-                        .sample(n=200)
+                        .sample(n=200, random_state=random_state)
                     final_neighbours_similarity_df = final_neighbours_similarity_df.append(
                         filterd_class_set)
                 else:
@@ -943,7 +934,7 @@ class PyExplainer:
 
             # Generating instances using the cross-over technique
             for num in range(0, 1000):
-                rand_rows = train_set_neigh.sample(2)
+                rand_rows = train_set_neigh.sample(2, random_state=random_state)
                 sample_indexes_list = sample_indexes_list + rand_rows.index.values.tolist()
                 # similarity_both = dist_df[dist_df.index.isin(rand_rows.index)]
                 sample_classes = train_class_neigh[train_class_neigh.index.isin(
@@ -977,7 +968,7 @@ class PyExplainer:
 
             # Generating instances using the mutation technique
             for num in range(1000, 2000):
-                rand_rows = train_set_neigh.sample(3)
+                rand_rows = train_set_neigh.sample(3, random_state=random_state)
                 sample_indexes_list = sample_indexes_list + rand_rows.index.values.tolist()
                 sample_classes = train_class_neigh[train_class_neigh.index.isin(
                     rand_rows.index)]

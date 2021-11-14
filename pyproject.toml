@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyexplainer"
-version = "1.1.4"
+version = "1.1.5"
 description = "Explainable AI tool for Software Quality Assurance (SQA)"
 authors = ["Michael <michaelfu1998@gmail.com>"]
 license = "MIT"

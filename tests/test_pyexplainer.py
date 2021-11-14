@@ -93,7 +93,7 @@ test_rule_object = py_explainer.explain(X_explain=testing_X_explain,
                                         max_rules=30,
                                         max_iter=10000,
                                         cv=5,
-                                        debug=False)
+                                        random_state=0)
 with open(rule_object_path, 'wb+') as file:
     pickle.dump(test_rule_object, file)
 """
@@ -121,7 +121,7 @@ testing_risk_data = py_explainer.generate_risk_data(py_explainer.X_explain)
 
 
 def test_version():
-    assert __version__ == '1.1.4'
+    assert __version__ == '1.1.5'
 
 
 def test_load_sample_data():
@@ -233,38 +233,38 @@ def test_auto_spearman_under_PyExplainer():
     py_explainer.auto_spearman(apply_to_X_train=True)
 
 
-@pytest.mark.parametrize('exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, '
+@pytest.mark.parametrize('exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, random, '
                          'X_train, result',
                          [
                              ([], testing_y_explain, 3, 10, 10000, 5,
-                              'CrossoverInterpolation', False, X_train, 'TypeError'),
+                              'CrossoverInterpolation', 0, X_train, 'TypeError'),
                              (testing_X_explain, testing_y_explain, 3, 10, 10000, 5,
-                              'RandomPerturbation', True, X_train[:1], 'ValueError'),
+                              'RandomPerturbation', 0, X_train[:1], 'ValueError'),
                              (testing_X_explain, testing_X_explain, 3, 10, 10000, 5,
-                              'CrossoverInterpolation', False, X_train, 'TypeError')
+                              'CrossoverInterpolation', 0, X_train, 'TypeError')
                          ])
-def test_explain_negative(exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, X_train,
+def test_explain_negative(exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, random, X_train,
                           result):
     py_explainer.X_train = X_train
     py_explainer.y_train = y_train
     with pytest.raises(Exception) as e_info:
         py_explainer.explain(exp_X_explain, exp_y_explain, top_k,
-                             max_rules, max_iter, cv, search_function, debug)
+                             max_rules, max_iter, cv, search_function, random_state=random)
     assert e_info.typename == result
 
 
-@pytest.mark.parametrize('exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, result',
+@pytest.mark.parametrize('exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, random, result',
                          [
                              (testing_X_explain, testing_y_explain, 3, 10, 10000, 5,
-                              'CrossoverInterpolation', False, rule_obj_keys),
+                              'CrossoverInterpolation', 0, rule_obj_keys),
                              (testing_X_explain, testing_y_explain, 3, 10, 10000, 5,
-                              'RandomPerturbation', True, rule_obj_keys)
+                              'RandomPerturbation', 0, rule_obj_keys)
                          ])
-def test_explain_positive(exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, debug, result):
+def test_explain_positive(exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv, search_function, random, result):
     py_explainer.X_train = X_train
     py_explainer.y_train = y_train
     rule_object = py_explainer.explain(exp_X_explain, exp_y_explain, top_k, max_rules, max_iter, cv,
-                                       search_function, debug)
+                                       search_function, random_state=random)
     assert list(rule_object.keys()) == result
     assert isinstance(rule_object['synthetic_data'], pd.core.frame.DataFrame)
     assert isinstance(rule_object['synthetic_predictions'], np.ndarray)
