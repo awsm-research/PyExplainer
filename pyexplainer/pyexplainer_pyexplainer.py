@@ -472,7 +472,8 @@ class PyExplainer:
                 max_iter=10000,
                 cv=5,
                 search_function='CrossoverInterpolation',
-                random_state=None):
+                random_state=None,
+                reuse_local_model=False):
         """Generate Rule Object Manually by passing X_explain and y_explain
 
         Parameters
@@ -493,7 +494,8 @@ class PyExplainer:
             Name of the search function to be used to generate the instance used by RuleFit.fit()
         random_state : :obj:`int`, default is None
             Random seed for reproducing the same result
-
+        reuse_local_model : :obj:`bool`, default is False
+            Reproduce the same explanation for the same data
         Returns
         -------
         :obj:`dict`
@@ -559,8 +561,10 @@ class PyExplainer:
             synthetic_instances = synthetic_object['synthetic_data'].loc[:, self.indep]
             synthetic_predictions = self.blackbox_model.predict(
                 synthetic_instances)
-        # Step 3 - Build a RuleFit local model with synthetic instances
-        if self.local_model is None or random_state is None:
+        # Step 3 - Build a RuleFit local model with synthetic instances            
+        if reuse_local_model and self.local_model:
+            local_rulefit_model = self.local_model
+        else:
             local_rulefit_model = RuleFit(rfmode='classify',
                                         exp_rand_tree_size=False,
                                         random_state=random_state,
@@ -572,8 +576,6 @@ class PyExplainer:
                                     synthetic_predictions,
                                     feature_names=self.indep)
             self.local_model = local_rulefit_model
-        else:
-            local_rulefit_model = self.local_model
         # Step 4 Get rules from the RuleFit local model
         rules = local_rulefit_model.get_rules()
         rules = rules[rules.coef != 0].sort_values("importance", ascending=False, kind='mergesort')
