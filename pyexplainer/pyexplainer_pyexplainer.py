@@ -208,6 +208,8 @@ def filter_rules(rules, X_explain):
         rule = re.sub(r'\b=\b', '==', rule)
         if 'or' in var_in_rule:
             var_in_rule.remove('or')
+        if 'e' in var_in_rule and 'e' not in x_df.columns:
+            var_in_rule.remove('e')
         rule = rule.replace('&', 'and')
         eval_result_list = []
         for i in range(0, len(x_df)):
