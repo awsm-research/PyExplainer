@@ -68,7 +68,7 @@ pickleshare @ file:///tmp/build/80754af9/pickleshare_1606932040724/work
 Pillow>=8.3.2
 pkginfo==1.7.1
 platformdirs==2.0.2
-poetry==1.1.7
+poetry==1.1.9
 poetry-core==1.0.3
 prometheus-client==0.11.0
 prompt-toolkit==3.0.19
