@@ -6,6 +6,8 @@
 [![Anaconda-Server Badge](https://anaconda.org/conda-forge/pyexplainer/badges/version.svg)](https://anaconda.org/conda-forge/pyexplainer)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/awsm-research/pyExplainer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/awsm-research/pyExplainer/context:python)
 [![Language grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/awsm-research/pyExplainer.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/awsm-research/pyExplainer/context:javascript)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/pyexplainer?color=tiffany&label=PyPI%20download)
+[![Anaconda-Server Badge](https://anaconda.org/conda-forge/pyexplainer/badges/downloads.svg)](https://anaconda.org/conda-forge/pyexplainer)
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/awsm-research/PyExplainer/HEAD)
 [![DOI](https://zenodo.org/badge/346208949.svg)](https://zenodo.org/badge/latestdoi/346208949)
  
