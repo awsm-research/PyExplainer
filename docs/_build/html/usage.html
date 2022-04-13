@@ -1,70 +1,34 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
-  <title>Usage &mdash; pyexplainer  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+  <title>Tutorial &mdash; pyexplainer  documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="_static/js/theme.js"></script>
-
-    
+    <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Contributing" href="contributing.html" />
     <link rel="prev" title="Installation" href="installation.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="index.html" class="icon icon-home"> pyexplainer
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -72,145 +36,131 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#full-tutorial">Full tutorial</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="conduct.html">Code of Conduct</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="index.html">pyexplainer</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
-        
-      <li>Usage</li>
-    
-    
+      <li>Tutorial</li>
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
-<p>To use pyexplainer in a project:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pyexplainer</span>
+             
+  <section id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline"></a></h1>
+<section id="quick-start">
+<h2>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this headline"></a></h2>
+<p>To use pyexplainer in a project, first we need to import the required library:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">pyexplainer</span> <span class="kn">import</span> <span class="n">pyexplainer_pyexplainer</span>
 </pre></div>
 </div>
+<p>We can obtain the default dataset and global model stored in a dictionary as below, which is necessary to initialise a PyExplainer object later</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">default_data_and_model</span> <span class="o">=</span> <span class="n">pyexplainer_pyexplainer</span><span class="o">.</span><span class="n">get_dflt</span><span class="p">()</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Important Note.</span>
+<span class="sd">The default dictionary has the following keys:</span>
+<span class="sd">1. X_train - Training features used to train the global model</span>
+<span class="sd">2. y_train - Training labels used to train the global model</span>
+<span class="sd">3. indep - The column names of features</span>
+<span class="sd">4. dep - The column name of labels</span>
+<span class="sd">5. blackbox_model - Trained global model (only support supervised classification models from sklearn)</span>
+<span class="sd">6. X_explain - One row of features (independent variables) to be explained</span>
+<span class="sd">7. y_explain - One row of label (dependent variable) to be explained</span>
+<span class="sd">8. full_ft_names - Full column names of features</span>
+<span class="sd">&quot;&quot;&quot;</span>
+</pre></div>
 </div>
+<p>Initialise PyExplainer object with X_train, y_train, indep, dep, and blackbox_model.  Attention!!  PyExplainer only supports <a class="reference external" href="https://scikit-learn.org/stable/supervised_learning.html">sklearn’s supervised classification model</a></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Note that full_ft_names is optional while other variables are necessary</span>
+<span class="n">py_explainer</span> <span class="o">=</span> <span class="n">pyexplainer_pyexplainer</span><span class="o">.</span><span class="n">PyExplainer</span><span class="p">(</span><span class="n">X_train</span> <span class="o">=</span> <span class="n">default_data_and_model</span><span class="p">[</span><span class="s1">&#39;X_train&#39;</span><span class="p">],</span>
+                                                   <span class="n">y_train</span> <span class="o">=</span> <span class="n">default_data_and_model</span><span class="p">[</span><span class="s1">&#39;y_train&#39;</span><span class="p">],</span>
+                                                   <span class="n">indep</span> <span class="o">=</span> <span class="n">default_data_and_model</span><span class="p">[</span><span class="s1">&#39;indep&#39;</span><span class="p">],</span>
+                                                   <span class="n">dep</span> <span class="o">=</span> <span class="n">default_data_and_model</span><span class="p">[</span><span class="s1">&#39;dep&#39;</span><span class="p">],</span>
+                                                   <span class="n">blackbox_model</span> <span class="o">=</span> <span class="n">default_data_and_model</span><span class="p">[</span><span class="s1">&#39;blackbox_model&#39;</span><span class="p">]</span>
+                                                   <span class="n">full_ft_names</span> <span class="o">=</span> <span class="n">default_data_and_model</span><span class="p">[</span><span class="s1">&#39;full_ft_names&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Prepare data using default data dictionary to trigger explain function later:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># one row of features (independent variables) to be explained</span>
+<span class="n">X_explain</span> <span class="o">=</span> <span class="n">default_data_and_model</span><span class="p">[</span><span class="s1">&#39;X_explain&#39;</span><span class="p">]</span>
+<span class="c1"># one row of label (dependent variable) to be explained</span>
+<span class="n">y_explain</span> <span class="o">=</span> <span class="n">default_data_and_model</span><span class="p">[</span><span class="s1">&#39;y_explain&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>Trigger explain function under PyExplainer object to get rules:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">created_rules</span> <span class="o">=</span> <span class="n">py_explainer</span><span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="n">X_explain</span><span class="o">=</span><span class="n">X_explain</span><span class="p">,</span>
+                                     <span class="n">y_explain</span><span class="o">=</span><span class="n">y_explain</span><span class="p">,</span>
+                                     <span class="n">search_function</span><span class="o">=</span><span class="s1">&#39;crossoverinterpolation&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Visualise those rules using visualise function under PyExplainer object:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">py_explainer</span><span class="o">.</span><span class="n">visualise</span><span class="p">(</span><span class="n">created_rule_obj</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="full-tutorial">
+<h2>Full tutorial<a class="headerlink" href="#full-tutorial" title="Permalink to this headline"></a></h2>
+<p>Simply click <a class="reference external" href="https://github.com/awsm-research/PyExplainer/blob/master/TUTORIAL.ipynb">here</a> to access our full tutorial Jupyter Notebook, in which we introduce the full workflow from data preparation to explainable prediction</p>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Michael Fu.
-
-    </p>
+    <p>&#169; Copyright 2021, Michael Fu.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>

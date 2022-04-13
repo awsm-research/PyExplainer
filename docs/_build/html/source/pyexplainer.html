@@ -1,68 +1,32 @@
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>pyexplainer package &mdash; pyexplainer  documentation</title>
-  
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> pyexplainer
-          
-
-          
           </a>
-
-          
-            
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -70,642 +34,49 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
-              <p class="caption"><span class="caption-text">Contents:</span></p>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../installation.html">Installation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../usage.html">Tutorial</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../conduct.html">Code of Conduct</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">pyexplainer</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
       <li>pyexplainer package</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
             <a href="../_sources/source/pyexplainer.rst.txt" rel="nofollow"> View page source</a>
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="pyexplainer-package">
-<h1>pyexplainer package<a class="headerlink" href="#pyexplainer-package" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
-</div>
-<div class="section" id="module-pyexplainer.pyexplainer_pyexplainer">
-<span id="pyexplainer-pyexplainer-pyexplainer-module"></span><h2>pyexplainer.pyexplainer_pyexplainer module<a class="headerlink" href="#module-pyexplainer.pyexplainer_pyexplainer" title="Permalink to this headline">¶</a></h2>
-<dl class="py function">
-<dt id="pyexplainer.pyexplainer_pyexplainer.AutoSpearman">
-<code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_pyexplainer.</span></code><code class="sig-name descname"><span class="pre">AutoSpearman</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spearman'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">VIF_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#AutoSpearman"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.AutoSpearman" title="Permalink to this definition">¶</a></dt>
-<dd><p>An automated feature selection approach that address collinearity and multicollinearity.
-For more information, please kindly refer to the <a class="reference external" href="https://ieeexplore.ieee.org/document/8530020">paper</a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>X_train</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pd.core.frame.DataFrame</span></code>) – The X_train data to be processed</p></li>
-<li><p><strong>correlation_threshold</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Threshold value of correalation.</p></li>
-<li><p><strong>correlation_method</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – Method for solving the correlation between the features.</p></li>
-<li><p><strong>VIF_threshold</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Threshold value of VIF score.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py class">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_pyexplainer.</span></code><code class="sig-name descname"><span class="pre">PyExplainer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_train</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">indep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blackbox_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">['Clean',</span> <span class="pre">'Defect']</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_k_rules</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">full_ft_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>A PyExplainer object is able to load training data and an ML model to generate human-centric explanation and
-visualisation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>X_train</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – Training data X (Features)</p></li>
-<li><p><strong>y_train</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.series.Series</span></code>) – Training data y (Label)</p></li>
-<li><p><strong>indep</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.indexes.base.Index</span></code>) – independent variables (column names)</p></li>
-<li><p><strong>dep</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – dependent variables (column name)</p></li>
-<li><p><strong>blackbox_model</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">sklearn.ensemble.RandomForestClassifier</span></code>) – A global random forest model trained from sklearn</p></li>
-<li><p><strong>class_label</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – Classification labels, default = [‘Clean’, ‘Defect’]</p></li>
-<li><p><strong>top_k_rules</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Number of top positive and negative rules to be retrieved</p></li>
-<li><p><strong>full_ft_names</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – A list containing full feature names inside X_train</p></li>
-</ul>
-</dd>
-</dl>
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.auto_spearman">
-<code class="sig-name descname"><span class="pre">auto_spearman</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">apply_to_X_train</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">correlation_method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'spearman'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">VIF_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.auto_spearman"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.auto_spearman" title="Permalink to this definition">¶</a></dt>
-<dd><p>An automated feature selection approach that address collinearity and multicollinearity.
-For more information, please kindly refer to the <a class="reference external" href="https://ieeexplore.ieee.org/document/8530020">paper</a>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>apply_to_X_train</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>) – Whether to apply the selected columns to the X_train data inside PyExplainer Obj., default is True</p></li>
-<li><p><strong>correlation_threshold</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code>) – Threshold value of correalation.</p></li>
-<li><p><strong>correlation_method</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>) – Method for solving the correlation between the features.</p></li>
-<li><p><strong>VIF_threshold</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Threshold value of VIF score.</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.explain">
-<code class="sig-name descname"><span class="pre">explain</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_explain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_explain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_k</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rules</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_function</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'CrossoverInterpolation'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.explain"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.explain" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate Rule Object Manually by passing X_explain and y_explain</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>X_explain</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – Features to be explained by the local RuleFit model, can be seen as X_test</p></li>
-<li><p><strong>y_explain</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.series.Series</span></code>) – Label to be explained by the local RuleFit model, can be seen as y_test</p></li>
-<li><p><strong>top_k</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, default is 3) – Number of top rules to be retrieved</p></li>
-<li><p><strong>max_rules</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, default is 10) – Number of maximum rules to be generated</p></li>
-<li><p><strong>max_iter</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, default is 10) – Maximum number of iteration to be tuned in to the local RuleFit model</p></li>
-<li><p><strong>cv</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>, default is 5) – Cross Validation to be tuned in to the local RuleFit model</p></li>
-<li><p><strong>search_function</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code>, default is ‘crossoverinterpolation’) – Name of the search function to be used to generate the instance used by RuleFit.fit()</p></li>
-<li><p><strong>debug</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>, default is False) – True for debugging mode, False otherwise.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A dict rule object including all of the data related to the local RuleFit model with the following keys, ‘synthetic_data’, ‘synthetic_predictions’, ‘X_explain’, ‘y_explain’, ‘indep’, ‘dep’, ‘top_k_positive_rules’, ‘top_k_negative_rules’.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyexplainer.pyexplainer_pyexplainer</span> <span class="kn">import</span> <span class="n">PyExplainer</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../tests/pyexplainer_test_data/activemq-5.0.0.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="s1">&#39;File&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dep</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">indep</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">:(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">indep</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">dep</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">blackbox_model</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">class_label</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Clean&#39;</span><span class="p">,</span> <span class="s1">&#39;Defect&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">py_explainer</span> <span class="o">=</span> <span class="n">PyExplainer</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">indep</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">class_label</span><span class="p">,</span> <span class="n">blackbox_model</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sample_test_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../tests/pyexplainer_test_data/activemq-5.0.0.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="s1">&#39;File&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X_test</span> <span class="o">=</span> <span class="n">sample_test_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">indep</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y_test</span> <span class="o">=</span> <span class="n">sample_test_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">dep</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sample_explain_index</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X_explain</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">sample_explain_index</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y_explain</span> <span class="o">=</span> <span class="n">y_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">sample_explain_index</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">py_explainer</span><span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="n">X_explain</span><span class="p">,</span> <span class="n">y_explain</span><span class="p">,</span> <span class="n">search_function</span> <span class="o">=</span> <span class="s1">&#39;crossoverinterpolation&#39;</span><span class="p">,</span> <span class="n">top_k</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">max_rules</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">max_iter</span> <span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_bullet_data">
-<code class="sig-name descname"><span class="pre">generate_bullet_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsed_rule_object</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.generate_bullet_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_bullet_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate bullet chart data (a list of dict) to be implemented with d3.js chart.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>parsed_rule_object</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – Top rules parsed from Rule object.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A list of dict that contains the data needed to generate a bullet chart.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_html">
-<code class="sig-name descname"><span class="pre">generate_html</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.generate_html"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_html" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate d3 bullet chart html and return it as a String.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>html String</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_instance_crossover_interpolation">
-<code class="sig-name descname"><span class="pre">generate_instance_crossover_interpolation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_explain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_explain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.generate_instance_crossover_interpolation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_instance_crossover_interpolation" title="Permalink to this definition">¶</a></dt>
-<dd><p>An approach to generate instance using Crossover and Interpolation</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>X_explain</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – X_explain (Testing Features)</p></li>
-<li><p><strong>y_explain</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.series.Series</span></code>) – y_explain (Testing Label)</p></li>
-<li><p><strong>debug</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>) – True for debugging mode, False otherwise.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A dict with two keys ‘synthetic_data’ and ‘sampled_class_frequency’ generated via Crossover and Interpolation.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_instance_random_perturbation">
-<code class="sig-name descname"><span class="pre">generate_instance_random_perturbation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_explain</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.generate_instance_random_perturbation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_instance_random_perturbation" title="Permalink to this definition">¶</a></dt>
-<dd><p>The random perturbation approach to generate synthetic instances which is also used by LIME.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>X_explain</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – X_explain (Testing Features)</p></li>
-<li><p><strong>debug</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code>) – True for debugging mode, False otherwise.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A dict with two keys ‘synthetic_data’ and ‘sampled_class_frequency’ generated via Random Perturbation.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_progress_bar_items">
-<code class="sig-name descname"><span class="pre">generate_progress_bar_items</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.generate_progress_bar_items"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_progress_bar_items" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate items to be set into hbox (horizontal box)</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_risk_data">
-<code class="sig-name descname"><span class="pre">generate_risk_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_explain</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.generate_risk_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_risk_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate risk prediction and risk score to be visualised</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>X_explain</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – Explained Dataframe generated from RuleFit model.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A list of dict that contains the data of risk prediction and risk score.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_sliders">
-<code class="sig-name descname"><span class="pre">generate_sliders</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.generate_sliders"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.generate_sliders" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate one or more slider widgets and return as a list.  Slider would be either IntSlider or FloatSlider depending on the value in the data</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A list of slider widgets.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.get_full_ft_names">
-<code class="sig-name descname"><span class="pre">get_full_ft_names</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.get_full_ft_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.get_full_ft_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>getter of self.full_ft_names</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A list of full feature names in X_train following the same order as X_train</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.get_risk_pred">
-<code class="sig-name descname"><span class="pre">get_risk_pred</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.get_risk_pred"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.get_risk_pred" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the risk prediction from risk_data</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A string of risk prediction</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.get_risk_score">
-<code class="sig-name descname"><span class="pre">get_risk_score</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.get_risk_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.get_risk_score" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the risk score from risk_data</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A float of risk score</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">float</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.get_top_k_rules">
-<code class="sig-name descname"><span class="pre">get_top_k_rules</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.get_top_k_rules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.get_top_k_rules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Getter of top_k_rules</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Number of top positive and negative rules to be retrieved</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.on_value_change">
-<code class="sig-name descname"><span class="pre">on_value_change</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">change</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">debug</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.on_value_change"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.on_value_change" title="Permalink to this definition">¶</a></dt>
-<dd><p>The callback function for the interactive slider</p>
-<p>Whenever the user interacts with the slider,
-If the slider is in the non-continuous update mode,
-only if the mouse click is released, this callback will be triggered.
-If the slider is in the continuous update mode (not recommended here),
-this function will be triggered continuously when the user is moving the slider.</p>
-<p>This callback will first clear the output of Risk Score Progress Bar and the Bullet Chart.
-Then it will call funcs to compute the new values to be visualised.
-When the computing is done, it will soon visualise the new value.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>change</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – A dict that contains the former(before changing) and later(after changing) data inside the slider</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.parse_top_rules">
-<code class="sig-name descname"><span class="pre">parse_top_rules</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">top_k_positive_rules</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">top_k_negative_rules</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.parse_top_rules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.parse_top_rules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parse top k positive rules and top k negative rules given positive and negative rules as DataFrame</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>top_k_positive_rules</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – Top positive rules DataFrame</p></li>
-<li><p><strong>top_k_negative_rules</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – Top negative rules DataFrame</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A dict containing two keys, ‘top_tofollow_rules’ and ‘top_toavoid_rules’</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.retrieve_X_explain_min_max_values">
-<code class="sig-name descname"><span class="pre">retrieve_X_explain_min_max_values</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.retrieve_X_explain_min_max_values"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.retrieve_X_explain_min_max_values" title="Permalink to this definition">¶</a></dt>
-<dd><p>Retrieve the minimum and maximum value from X_train</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A dict containing two keys, ‘min_values’ and ‘max_values’</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.run_bar_animation">
-<code class="sig-name descname"><span class="pre">run_bar_animation</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.run_bar_animation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.run_bar_animation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Run the animation of Risk Score Progress Bar</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.set_X_train">
-<code class="sig-name descname"><span class="pre">set_X_train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X_train</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.set_X_train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.set_X_train" title="Permalink to this definition">¶</a></dt>
-<dd><p>Setter of X_train</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>X_train</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – X_train data</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.set_full_ft_names">
-<code class="sig-name descname"><span class="pre">set_full_ft_names</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">full_ft_names</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.set_full_ft_names"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.set_full_ft_names" title="Permalink to this definition">¶</a></dt>
-<dd><p>Setter of full_ft_names</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>full_ft_names</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – A list of full feature names in X_train following the same order as X_train</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.set_top_k_rules">
-<code class="sig-name descname"><span class="pre">set_top_k_rules</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">top_k_rules</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.set_top_k_rules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.set_top_k_rules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Setter of top_k_rules</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>top_k_rules</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Number of top positive and negative rules to be retrieved</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.show_visualisation">
-<code class="sig-name descname"><span class="pre">show_visualisation</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.show_visualisation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.show_visualisation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Display items as follows,
-(1) Risk Score Progress Bar (made from ipywidgets)
-(2) Interactive Slider (made from ipywidgets)
-(3) Bullet Chart (Generated By D3.js)</p>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.update_right_text">
-<code class="sig-name descname"><span class="pre">update_right_text</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">right_text</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.update_right_text"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.update_right_text" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the text on the rightward side of the Risk Score Progress Bar</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>right_text</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">widgets.Label</span></code>) – Text on the rightward side of the Risk Score Progress Bar</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.update_risk_score">
-<code class="sig-name descname"><span class="pre">update_risk_score</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">risk_score</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.update_risk_score"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.update_risk_score" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the risk score value inside the risk_data</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>risk_score</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – Value of risk score</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.visualisation_data_setup">
-<code class="sig-name descname"><span class="pre">visualisation_data_setup</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.visualisation_data_setup"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.visualisation_data_setup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set up the data before visualising them</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>rule_obj</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – A rule dict generated either through loading the .pyobject file or the .explain(…) function</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="pyexplainer.pyexplainer_pyexplainer.PyExplainer.visualise">
-<code class="sig-name descname"><span class="pre">visualise</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_obj</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#PyExplainer.visualise"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.PyExplainer.visualise" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given the rule object, show all of the visualisation as follows .
-(1) Risk Score Progress Bar (made from ipywidgets)
-(2) Interactive Slider (made from ipywidgets)
-(3) Bullet Chart (Generated By D3.js)</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>rule_obj</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code>) – A rule dict generated either through loading the .pyobject file or the .explain(…) function</p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pyexplainer.pyexplainer_pyexplainer</span> <span class="kn">import</span> <span class="n">PyExplainer</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../tests/pyexplainer_test_data/activemq-5.0.0.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="s1">&#39;File&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dep</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">-</span><span class="mi">4</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">indep</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">0</span><span class="p">:(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">indep</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y_train</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">dep</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">blackbox_model</span> <span class="o">=</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">blackbox_model</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">class_label</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Clean&#39;</span><span class="p">,</span> <span class="s1">&#39;Defect&#39;</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pyExp</span> <span class="o">=</span> <span class="n">PyExplainer</span><span class="p">(</span><span class="n">X_train</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">indep</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">class_label</span><span class="p">,</span> <span class="n">blackbox_model</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sample_test_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;../tests/pyexplainer_test_data/activemq-5.0.0.csv&#39;</span><span class="p">,</span> <span class="n">index_col</span> <span class="o">=</span> <span class="s1">&#39;File&#39;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X_test</span> <span class="o">=</span> <span class="n">sample_test_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">indep</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y_test</span> <span class="o">=</span> <span class="n">sample_test_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">dep</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">sample_explain_index</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">X_explain</span> <span class="o">=</span> <span class="n">X_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">sample_explain_index</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">y_explain</span> <span class="o">=</span> <span class="n">y_test</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="n">sample_explain_index</span><span class="p">]]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">rule_obj</span> <span class="o">=</span> <span class="n">pyExp</span><span class="o">.</span><span class="n">explain</span><span class="p">(</span><span class="n">X_explain</span><span class="p">,</span> <span class="n">y_explain</span><span class="p">,</span> <span class="n">search_function</span> <span class="o">=</span> <span class="s1">&#39;CrossoverInterpolation&#39;</span><span class="p">,</span> <span class="n">top_k</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">max_rules</span><span class="o">=</span><span class="mi">30</span><span class="p">,</span> <span class="n">max_iter</span> <span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">debug</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">pyExp</span><span class="o">.</span><span class="n">visualise</span><span class="p">(</span><span class="n">rule_obj</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="py function">
-<dt id="pyexplainer.pyexplainer_pyexplainer.data_validation">
-<code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_pyexplainer.</span></code><code class="sig-name descname"><span class="pre">data_validation</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#data_validation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.data_validation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Validate that the given data format is a list of dictionary.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>data</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">Any</span></code>) – Data to be validated.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p><p>True: The data is a list of dictionary.</p>
-<p>False: The data is not a list of dictionary.</p>
-</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">bool</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pyexplainer.pyexplainer_pyexplainer.filter_rules">
-<code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_pyexplainer.</span></code><code class="sig-name descname"><span class="pre">filter_rules</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rules</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">X_explain</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#filter_rules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.filter_rules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get rules that are actually applied to the commit</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>rules</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – Rules data under the column called ‘rule’ inside Rules DF generated by RuleFit</p></li>
-<li><p><strong>X_explain</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code>) – Features to be explained by the local RuleFit model, can be seen as X_test</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A DataFrame that contains filtered rules</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">pandas.core.frame.DataFrame</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pyexplainer.pyexplainer_pyexplainer.get_base_prefix_compat">
-<code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_pyexplainer.</span></code><code class="sig-name descname"><span class="pre">get_base_prefix_compat</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#get_base_prefix_compat"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.get_base_prefix_compat" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get base/real prefix, or sys.prefix if there is none.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pyexplainer.pyexplainer_pyexplainer.get_dflt">
-<code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_pyexplainer.</span></code><code class="sig-name descname"><span class="pre">get_dflt</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#get_dflt"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.get_dflt" title="Permalink to this definition">¶</a></dt>
-<dd><p>Obtain the default data and model</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A dictionary wrapping all default data and model</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">dict</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pyexplainer.pyexplainer_pyexplainer.id_generator">
-<code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_pyexplainer.</span></code><code class="sig-name descname"><span class="pre">id_generator</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="pre">size=15</span></em>, <em class="sig-param"><span class="pre">random_state=RandomState(MT19937)</span> <span class="pre">at</span> <span class="pre">0x1E5FE635C40</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#id_generator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.id_generator" title="Permalink to this definition">¶</a></dt>
-<dd><p>Generate unique ids for div tag which will contain the visualisation stuff from d3.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>size</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">int</span></code>) – An integer that specifies the length of the returned id, default = 15. Size should be ion range 1 - 30(both included)</p></li>
-<li><p><strong>random_state</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">np.random.RandomState</span></code>, default is None.) – A RandomState instance.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A random identifier.</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt id="pyexplainer.pyexplainer_pyexplainer.in_virtualenv">
-<code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_pyexplainer.</span></code><code class="sig-name descname"><span class="pre">in_virtualenv</span></code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#in_virtualenv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.in_virtualenv" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt id="pyexplainer.pyexplainer_pyexplainer.to_js_data">
-<code class="sig-prename descclassname"><span class="pre">pyexplainer.pyexplainer_pyexplainer.</span></code><code class="sig-name descname"><span class="pre">to_js_data</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_of_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/pyexplainer_pyexplainer.html#to_js_data"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.pyexplainer_pyexplainer.to_js_data" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transform python list to a str to be used inside the html &lt;script&gt;&lt;script/&gt;</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>list_of_dict</strong> (<code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code>) – Data to be transformed.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A str to represent a list of dict ending with ‘;’</p>
-</dd>
-<dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></p>
-</dd>
-</dl>
-</dd></dl>
-
-</div>
-<div class="section" id="module-pyexplainer.rulefit">
-<span id="pyexplainer-rulefit-module"></span><h2>pyexplainer.rulefit module<a class="headerlink" href="#module-pyexplainer.rulefit" title="Permalink to this headline">¶</a></h2>
+             
+  <section id="pyexplainer-package">
+<h1>pyexplainer package<a class="headerlink" href="#pyexplainer-package" title="Permalink to this headline"></a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline"></a></h2>
+</section>
+<section id="pyexplainer-pyexplainer-pyexplainer-module">
+<h2>pyexplainer.pyexplainer_pyexplainer module<a class="headerlink" href="#pyexplainer-pyexplainer-pyexplainer-module" title="Permalink to this headline"></a></h2>
+</section>
+<section id="module-pyexplainer.rulefit">
+<span id="pyexplainer-rulefit-module"></span><h2>pyexplainer.rulefit module<a class="headerlink" href="#module-pyexplainer.rulefit" title="Permalink to this headline"></a></h2>
 <p>We use the RuleFit implementation as provided by the following url: <a class="reference external" href="https://raw.githubusercontent.com/christophM/rulefit/master/rulefit/rulefit.py">https://raw.githubusercontent.com/christophM/rulefit/master/rulefit/rulefit.py</a></p>
 <p>Linear model of tree-based decision rules</p>
 <p>This method implement the RuleFit algorithm</p>
@@ -717,33 +88,33 @@ When the computing is done, it will soon visualise the new value.</p>
 <li><p><code class="docutils literal notranslate"><span class="pre">RuleFit</span></code> implements the RuleFit algorithm</p></li>
 </ul>
 <dl class="py class">
-<dt id="pyexplainer.rulefit.FriedScale">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyexplainer.rulefit.</span></code><code class="sig-name descname"><span class="pre">FriedScale</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">winsorizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#FriedScale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.FriedScale" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.FriedScale">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyexplainer.rulefit.</span></span><span class="sig-name descname"><span class="pre">FriedScale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">winsorizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#FriedScale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.FriedScale" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Performs scaling of linear variables according to Friedman et al. 2005 Sec 5</p>
 <p>Each variable is first Winsorized l-&gt;l*, then standardised as 0.4 x l* / std(l*)
 Warning: this class should not be used directly.</p>
 <dl class="py method">
-<dt id="pyexplainer.rulefit.FriedScale.scale">
-<code class="sig-name descname"><span class="pre">scale</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#FriedScale.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.FriedScale.scale" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.FriedScale.scale">
+<span class="sig-name descname"><span class="pre">scale</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#FriedScale.scale"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.FriedScale.scale" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="pyexplainer.rulefit.FriedScale.train">
-<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#FriedScale.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.FriedScale.train" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.FriedScale.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#FriedScale.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.FriedScale.train" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="pyexplainer.rulefit.Rule">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyexplainer.rulefit.</span></code><code class="sig-name descname"><span class="pre">Rule</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_conditions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#Rule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.Rule" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.Rule">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyexplainer.rulefit.</span></span><span class="sig-name descname"><span class="pre">Rule</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rule_conditions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prediction_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#Rule"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.Rule" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class for binary Rules from list of conditions</p>
 <p>Warning: this class should not be used directly.</p>
 <dl class="py method">
-<dt id="pyexplainer.rulefit.Rule.transform">
-<code class="sig-name descname"><span class="pre">transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#Rule.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.Rule.transform" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.Rule.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#Rule.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.Rule.transform" title="Permalink to this definition"></a></dt>
 <dd><p>Transform dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -761,14 +132,14 @@ Warning: this class should not be used directly.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="pyexplainer.rulefit.RuleCondition">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyexplainer.rulefit.</span></code><code class="sig-name descname"><span class="pre">RuleCondition</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">support</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleCondition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleCondition" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleCondition">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyexplainer.rulefit.</span></span><span class="sig-name descname"><span class="pre">RuleCondition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">feature_index</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">operator</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">support</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleCondition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleCondition" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class for binary rule condition</p>
 <p>Warning: this class should not be used directly.</p>
 <dl class="py method">
-<dt id="pyexplainer.rulefit.RuleCondition.transform">
-<code class="sig-name descname"><span class="pre">transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleCondition.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleCondition.transform" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleCondition.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleCondition.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleCondition.transform" title="Permalink to this definition"></a></dt>
 <dd><p>Transform dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -786,8 +157,8 @@ Warning: this class should not be used directly.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="pyexplainer.rulefit.RuleEnsemble">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyexplainer.rulefit.</span></code><code class="sig-name descname"><span class="pre">RuleEnsemble</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleEnsemble"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleEnsemble" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleEnsemble">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyexplainer.rulefit.</span></span><span class="sig-name descname"><span class="pre">RuleEnsemble</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleEnsemble"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleEnsemble" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Ensemble of binary decision rules</p>
 <p>This class implements an ensemble of decision rules that extracts rules from
@@ -801,8 +172,8 @@ an ensemble of decision trees.</p>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt id="pyexplainer.rulefit.RuleEnsemble.rules">
-<code class="sig-name descname"><span class="pre">rules</span></code><a class="headerlink" href="#pyexplainer.rulefit.RuleEnsemble.rules" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleEnsemble.rules">
+<span class="sig-name descname"><span class="pre">rules</span></span><a class="headerlink" href="#pyexplainer.rulefit.RuleEnsemble.rules" title="Permalink to this definition"></a></dt>
 <dd><p>The ensemble of rules extracted from the trees</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -812,18 +183,18 @@ an ensemble of decision trees.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyexplainer.rulefit.RuleEnsemble.filter_rules">
-<code class="sig-name descname"><span class="pre">filter_rules</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleEnsemble.filter_rules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleEnsemble.filter_rules" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleEnsemble.filter_rules">
+<span class="sig-name descname"><span class="pre">filter_rules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">func</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleEnsemble.filter_rules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleEnsemble.filter_rules" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="pyexplainer.rulefit.RuleEnsemble.filter_short_rules">
-<code class="sig-name descname"><span class="pre">filter_short_rules</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleEnsemble.filter_short_rules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleEnsemble.filter_short_rules" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleEnsemble.filter_short_rules">
+<span class="sig-name descname"><span class="pre">filter_short_rules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleEnsemble.filter_short_rules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleEnsemble.filter_short_rules" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="pyexplainer.rulefit.RuleEnsemble.transform">
-<code class="sig-name descname"><span class="pre">transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleEnsemble.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleEnsemble.transform" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleEnsemble.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">coefs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleEnsemble.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleEnsemble.transform" title="Permalink to this definition"></a></dt>
 <dd><p>Transform dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -845,8 +216,8 @@ coefficients to zero without calling Rule.transform().</p></li>
 </dd></dl>
 
 <dl class="py class">
-<dt id="pyexplainer.rulefit.RuleFit">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyexplainer.rulefit.</span></code><code class="sig-name descname"><span class="pre">RuleFit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_fract</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rules</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_par</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tree_generator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rfmode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'regress'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin_trim_quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.025</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin_standardise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_rand_tree_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rl'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleFit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleFit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleFit">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyexplainer.rulefit.</span></span><span class="sig-name descname"><span class="pre">RuleFit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_fract</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'default'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_rules</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memory_par</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tree_generator</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rfmode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'regress'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin_trim_quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.025</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lin_standardise</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_rand_tree_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'rl'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Cs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cv</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tol</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_iter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_jobs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleFit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleFit" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.BaseEstimator</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">sklearn.base.TransformerMixin</span></code></p>
 <p>Rulefit class</p>
 <dl class="field-list simple">
@@ -874,8 +245,8 @@ context. -1 means using all processors.</p></li>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt id="pyexplainer.rulefit.RuleFit.rule_ensemble">
-<code class="sig-name descname"><span class="pre">rule_ensemble</span></code><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.rule_ensemble" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleFit.rule_ensemble">
+<span class="sig-name descname"><span class="pre">rule_ensemble</span></span><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.rule_ensemble" title="Permalink to this definition"></a></dt>
 <dd><p>The rule ensemble</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -885,8 +256,8 @@ context. -1 means using all processors.</p></li>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="pyexplainer.rulefit.RuleFit.feature_names">
-<code class="sig-name descname"><span class="pre">feature_names</span></code><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.feature_names" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleFit.feature_names">
+<span class="sig-name descname"><span class="pre">feature_names</span></span><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.feature_names" title="Permalink to this definition"></a></dt>
 <dd><p>The names of the features (columns)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -896,14 +267,14 @@ context. -1 means using all processors.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyexplainer.rulefit.RuleFit.fit">
-<code class="sig-name descname"><span class="pre">fit</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleFit.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.fit" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleFit.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleFit.fit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.fit" title="Permalink to this definition"></a></dt>
 <dd><p>Fit and estimate linear combination of rule ensemble</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyexplainer.rulefit.RuleFit.get_feature_importance">
-<code class="sig-name descname"><span class="pre">get_feature_importance</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude_zero_coef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subregion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleFit.get_feature_importance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.get_feature_importance" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleFit.get_feature_importance">
+<span class="sig-name descname"><span class="pre">get_feature_importance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude_zero_coef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subregion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scaled</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleFit.get_feature_importance"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.get_feature_importance" title="Permalink to this definition"></a></dt>
 <dd><p>Returns feature importance for input features to RuleFit model.</p>
 <dl class="simple">
 <dt>exclude_zero_coef: If True, returns only the rules with an estimated</dt><dd><p>coefficient not equalt to zero.</p>
@@ -916,8 +287,8 @@ context. -1 means using all processors.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyexplainer.rulefit.RuleFit.get_rules">
-<code class="sig-name descname"><span class="pre">get_rules</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude_zero_coef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subregion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleFit.get_rules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.get_rules" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleFit.get_rules">
+<span class="sig-name descname"><span class="pre">get_rules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exclude_zero_coef</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subregion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleFit.get_rules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.get_rules" title="Permalink to this definition"></a></dt>
 <dd><p>Return the estimated rules</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -937,20 +308,20 @@ data set (X)</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyexplainer.rulefit.RuleFit.predict">
-<code class="sig-name descname"><span class="pre">predict</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleFit.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.predict" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleFit.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleFit.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.predict" title="Permalink to this definition"></a></dt>
 <dd><p>Predict outcome for X</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyexplainer.rulefit.RuleFit.predict_proba">
-<code class="sig-name descname"><span class="pre">predict_proba</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleFit.predict_proba"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.predict_proba" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleFit.predict_proba">
+<span class="sig-name descname"><span class="pre">predict_proba</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleFit.predict_proba"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.predict_proba" title="Permalink to this definition"></a></dt>
 <dd><p>Predict outcome probability for X, if model type supports probability prediction method</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="pyexplainer.rulefit.RuleFit.transform">
-<code class="sig-name descname"><span class="pre">transform</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleFit.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.transform" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.RuleFit.transform">
+<span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#RuleFit.transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.RuleFit.transform" title="Permalink to this definition"></a></dt>
 <dd><p>Transform dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -969,77 +340,61 @@ efficiency.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="pyexplainer.rulefit.Winsorizer">
-<em class="property"><span class="pre">class</span> </em><code class="sig-prename descclassname"><span class="pre">pyexplainer.rulefit.</span></code><code class="sig-name descname"><span class="pre">Winsorizer</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trim_quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#Winsorizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.Winsorizer" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.Winsorizer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">pyexplainer.rulefit.</span></span><span class="sig-name descname"><span class="pre">Winsorizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">trim_quantile</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#Winsorizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.Winsorizer" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Performs Winsorization 1-&gt;1*</p>
 <p>Warning: this class should not be used directly.</p>
 <dl class="py method">
-<dt id="pyexplainer.rulefit.Winsorizer.train">
-<code class="sig-name descname"><span class="pre">train</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#Winsorizer.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.Winsorizer.train" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.Winsorizer.train">
+<span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#Winsorizer.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.Winsorizer.train" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt id="pyexplainer.rulefit.Winsorizer.trim">
-<code class="sig-name descname"><span class="pre">trim</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#Winsorizer.trim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.Winsorizer.trim" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.Winsorizer.trim">
+<span class="sig-name descname"><span class="pre">trim</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#Winsorizer.trim"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.Winsorizer.trim" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
-<dt id="pyexplainer.rulefit.extract_rules_from_tree">
-<code class="sig-prename descclassname"><span class="pre">pyexplainer.rulefit.</span></code><code class="sig-name descname"><span class="pre">extract_rules_from_tree</span></code><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#extract_rules_from_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.extract_rules_from_tree" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="pyexplainer.rulefit.extract_rules_from_tree">
+<span class="sig-prename descclassname"><span class="pre">pyexplainer.rulefit.</span></span><span class="sig-name descname"><span class="pre">extract_rules_from_tree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">feature_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyexplainer/rulefit.html#extract_rules_from_tree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#pyexplainer.rulefit.extract_rules_from_tree" title="Permalink to this definition"></a></dt>
 <dd><p>Helper to turn a tree into as set of rules</p>
 </dd></dl>
 
-</div>
-<div class="section" id="module-pyexplainer">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyexplainer" title="Permalink to this headline">¶</a></h2>
-</div>
-</div>
+</section>
+<section id="module-pyexplainer">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyexplainer" title="Permalink to this headline"></a></h2>
+</section>
+</section>
 
 
            </div>
-           
           </div>
           <footer>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-        &#169; Copyright 2021, Michael Fu.
-
-    </p>
+    <p>&#169; Copyright 2021, Michael Fu.</p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
 
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
