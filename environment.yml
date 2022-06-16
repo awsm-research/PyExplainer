@@ -2,8 +2,7 @@ name: pyexplainer
 channels:
   - defaults
 dependencies:
-  - python>=3.6
-  - pip
+  - python>=3.8
   - pip:
     - pyexplainer
     - pandas==1.2.5 
