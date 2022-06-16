@@ -1,10 +1,9 @@
 name: pyexplainer
 channels:
-- conda-forge
+- defaults
 dependencies:
-- python==3.7
-- pip==19.*
+- python==3.8
+- pip
 - pip:
   - pyexplainer
   - pandas==1.2.5
-  
