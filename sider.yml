@@ -4,11 +4,3 @@
 # https://help.sider.review/getting-started/custom-configuration
 
 # Customize each tool. If analyses fail, try adjusting each option referencing the following example.
-
-linter:
-  flake8:
-    dependencies:
-      - "flake8-bugbear"
-      - "flake8-builtins==1.4.1"
-      - "git+https://github.com/PyCQA/flake8-import-order.git@51e16f33065512afa1a85a20b2c2d3be768f78ea"
-      - { name: "flake8-docstrings", version: "==1.6.0" }
