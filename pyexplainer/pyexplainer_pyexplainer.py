@@ -1379,7 +1379,14 @@ class PyExplainer:
                     break
             if len(top_k_tofollow_rules) == self.get_top_k_rules():
                 break
-
+        if top_k_tofollow_rules == []:
+            print("PyExplainer can not find rules to follow!")
+            print("This could lead to blank explanation UI!")
+            print("Please check whether the global model is properly trained with sufficient training data.")
+        if top_k_toavoid_rules == []:
+            print("PyExplainer can not find rules to avoid!")
+            print("This could lead to blank explanation UI!")
+            print("Please check whether the global model is properly trained with sufficient training data.")        
         return {'top_tofollow_rules': top_k_tofollow_rules,
                 'top_toavoid_rules': top_k_toavoid_rules}
 
