@@ -38,7 +38,7 @@ In the  JupyterNotebook:
 - Run cells from step 1 to step 3 to create an interactive visualization in jupyter notebook cell (like the example above). You can change the input feature values of ML model at slide bar.
 - Run the cells in appendix section if you would like to get more detail about variable used to build PyExplainer
 
-[![Tutorial](https://img.youtube.com/vi/fEaVXMwMOy0/hqdefault.jpg)](https://www.youtube.com/watch?v=VLa48NQOCQ4 "Tutorial")
+[![Tutorial](https://img.youtube.com/vi/VLa48NQOCQ4/hqdefault.jpg)](https://www.youtube.com/watch?v=VLa48NQOCQ4 "Tutorial")
 
 See the instructions below how to install our PyExplainer Python Package.
 
